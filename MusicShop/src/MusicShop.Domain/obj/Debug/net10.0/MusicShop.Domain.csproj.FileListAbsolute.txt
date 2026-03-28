@@ -1,0 +1,11 @@
+D:\Pine tree\MusicShop\src\MusicShop.Domain\bin\Debug\net10.0\MusicShop.Domain.deps.json
+D:\Pine tree\MusicShop\src\MusicShop.Domain\bin\Debug\net10.0\MusicShop.Domain.dll
+D:\Pine tree\MusicShop\src\MusicShop.Domain\bin\Debug\net10.0\MusicShop.Domain.pdb
+D:\Pine tree\MusicShop\src\MusicShop.Domain\obj\Debug\net10.0\MusicShop.Domain.GeneratedMSBuildEditorConfig.editorconfig
+D:\Pine tree\MusicShop\src\MusicShop.Domain\obj\Debug\net10.0\MusicShop.Domain.AssemblyInfoInputs.cache
+D:\Pine tree\MusicShop\src\MusicShop.Domain\obj\Debug\net10.0\MusicShop.Domain.AssemblyInfo.cs
+D:\Pine tree\MusicShop\src\MusicShop.Domain\obj\Debug\net10.0\MusicShop.Domain.csproj.CoreCompileInputs.cache
+D:\Pine tree\MusicShop\src\MusicShop.Domain\obj\Debug\net10.0\MusicShop.Domain.dll
+D:\Pine tree\MusicShop\src\MusicShop.Domain\obj\Debug\net10.0\refint\MusicShop.Domain.dll
+D:\Pine tree\MusicShop\src\MusicShop.Domain\obj\Debug\net10.0\MusicShop.Domain.pdb
+D:\Pine tree\MusicShop\src\MusicShop.Domain\obj\Debug\net10.0\ref\MusicShop.Domain.dll
