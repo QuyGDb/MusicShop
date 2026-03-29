@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: ankane/pgvector:latest # Dùng bản có sẵn pgvector để sau này làm AI
+    container_name: musicshop-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123456
+      POSTGRES_DB: MusicShopDb
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
