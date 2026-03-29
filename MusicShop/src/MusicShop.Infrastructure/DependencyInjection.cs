@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using MusicShop.Domain.Interfaces;
 using MusicShop.Infrastructure.Persistence;
 using MusicShop.Infrastructure.Persistence.Repositories;
+using MusicShop.Infrastructure.Security;
 using MusicShop.Infrastructure.Services;
 
 namespace MusicShop.Infrastructure;
@@ -23,6 +25,10 @@ public static class DependencyInjection
 
         // 3. Register Security Services
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
+
+        // 4. Register JWT Services
+        services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+        services.AddSingleton<ITokenService, JwtTokenService>();
 
         return services;
     }
