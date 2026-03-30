@@ -52,7 +52,7 @@ builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
 // 4. Configure JWT Authentication
-var jwtSettings = new JwtSettings();
+JwtSettings jwtSettings = new JwtSettings();
 builder.Configuration.GetSection(JwtSettings.SectionName).Bind(jwtSettings);
 
 builder.Services.AddAuthentication(options =>

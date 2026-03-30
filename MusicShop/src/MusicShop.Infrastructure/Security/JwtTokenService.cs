@@ -19,7 +19,7 @@ public class JwtTokenService : ITokenService
 
     public string GenerateToken(User user)
     {
-        var claims = new List<Claim>
+        List<Claim> claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new Claim(JwtRegisteredClaimNames.Email, user.Email),

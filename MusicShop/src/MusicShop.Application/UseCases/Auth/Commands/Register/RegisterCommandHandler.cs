@@ -29,7 +29,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
     public async Task<AuthResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         // Check if the email is already registered
-        var existingUser = await _userRepository.FirstOrDefaultAsync(u => u.Email == request.Email);
+        User? existingUser = await _userRepository.FirstOrDefaultAsync(u => u.Email == request.Email);
         
         if (existingUser != null)
         {
@@ -37,10 +37,10 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
         }
 
         // Hash the password for security
-        var hashedPassword = _passwordHasher.Hash(request.Password);
+        string hashedPassword = _passwordHasher.Hash(request.Password);
 
         // Create new User entity
-        var newUser = new User
+        User newUser = new User
         {
             Email = request.Email,
             FullName = request.FullName,

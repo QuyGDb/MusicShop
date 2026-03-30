@@ -26,7 +26,7 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, AuthResponse>
     public async Task<AuthResponse> Handle(LoginQuery request, CancellationToken cancellationToken)
     {
         // Check if the user exists
-        var existingUser = await _userRepository.FirstOrDefaultAsync(u => u.Email == request.Email);
+        User? existingUser = await _userRepository.FirstOrDefaultAsync(u => u.Email == request.Email);
         
         if (existingUser == null)
         {
@@ -42,7 +42,7 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, AuthResponse>
         }
 
         // Generate JWT token
-        var token = _tokenService.GenerateToken(existingUser);
+        string token = _tokenService.GenerateToken(existingUser);
 
         // Return authentication response
         return new AuthResponse
