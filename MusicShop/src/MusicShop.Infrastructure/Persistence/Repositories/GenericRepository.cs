@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MusicShop.Domain.Interfaces;
+using System.Linq.Expressions;
 
 namespace MusicShop.Infrastructure.Persistence.Repositories;
 
@@ -22,6 +23,11 @@ public class GenericRepository<T> : IRepository<T> where T : class
     public async Task<IReadOnlyList<T>> GetAllAsync()
     {
         return await _dbSet.ToListAsync();
+    }
+
+    public async Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
+    {
+        return await _dbSet.FirstOrDefaultAsync(predicate);
     }
 
     public void Add(T entity)
