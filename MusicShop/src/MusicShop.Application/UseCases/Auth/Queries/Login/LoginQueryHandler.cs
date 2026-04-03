@@ -1,11 +1,13 @@
 using MediatR;
 using MusicShop.Application.DTOs.Auth;
 using MusicShop.Domain.Entities.System;
+using MusicShop.Domain.Common;
+using MusicShop.Domain.Errors;
 using MusicShop.Domain.Interfaces;
 
 namespace MusicShop.Application.UseCases.Auth.Queries.Login;
 
-public class LoginQueryHandler : IRequestHandler<LoginQuery, AuthResponse>
+public class LoginQueryHandler : IRequestHandler<LoginQuery, Result<AuthResponse>>
 {
     private readonly IRepository<User> _userRepository;
     private readonly IRepository<RefreshToken> _refreshTokenRepository;
@@ -32,14 +34,14 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, AuthResponse>
     }
 
     // Handle the login logic
-    public async Task<AuthResponse> Handle(LoginQuery request, CancellationToken cancellationToken)
+    public async Task<Result<AuthResponse>> Handle(LoginQuery request, CancellationToken cancellationToken)
     {
         // Check if the user exists
         User? existingUser = await _userRepository.FirstOrDefaultAsync(u => u.Email == request.Email);
 
         if (existingUser == null)
         {
-            throw new Exception("Error: Invalid email or password!");
+            return Result<AuthResponse>.Failure(AuthErrors.InvalidCredentials);
         }
 
         // Verify the provided password
@@ -47,7 +49,7 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, AuthResponse>
 
         if (!isPasswordValid)
         {
-            throw new Exception("Error: Invalid email or password!");
+            return Result<AuthResponse>.Failure(AuthErrors.InvalidCredentials);
         }
 
         // Generate access token and refresh token for this user
@@ -64,7 +66,7 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, AuthResponse>
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         // Return authentication response
-        return new AuthResponse
+        return Result<AuthResponse>.Success(new AuthResponse
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken,
@@ -73,6 +75,6 @@ public class LoginQueryHandler : IRequestHandler<LoginQuery, AuthResponse>
             Email = existingUser.Email,
             FullName = existingUser.FullName,
             Role = existingUser.Role.ToString()
-        };
+        });
     }
 }

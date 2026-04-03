@@ -5,6 +5,7 @@ using MusicShop.Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using MusicShop.API.Middleware;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +51,8 @@ builder.Services.AddSwaggerGen(c =>
 // 3. Register Clean Architecture Layers
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 // 4. Configure JWT Authentication
 JwtSettings jwtSettings = new JwtSettings();
@@ -83,6 +86,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseExceptionHandler();
 app.UseHttpsRedirection();
 
 // Use Authentication & Authorization

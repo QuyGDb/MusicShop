@@ -1,11 +1,13 @@
 using MediatR;
 using MusicShop.Application.DTOs.Auth;
 using MusicShop.Domain.Entities.System;
+using MusicShop.Domain.Common;
+using MusicShop.Domain.Errors;
 using MusicShop.Domain.Interfaces;
 
-namespace MusicShop.Application.UseCases.Auth.Commands.Refresh;
+namespace MusicShop.Application.UseCases.Auth.Commands.TokenRefresh;
 
-public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, AuthResponse>
+public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, Result<AuthResponse>>
 {
     private readonly IRepository<User> _userRepository;
     private readonly IRepository<RefreshToken> _refreshTokenRepository;
@@ -27,11 +29,11 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, A
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<AuthResponse> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+    public async Task<Result<AuthResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.RefreshToken))
         {
-            throw new Exception("Error: Refresh token is required!");
+            return Result<AuthResponse>.Failure(AuthErrors.InvalidRefreshToken);
         }
 
         string currentRefreshTokenHash = _refreshTokenHasher.Hash(request.RefreshToken);
@@ -41,23 +43,23 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, A
 
         if (existingRefreshToken == null)
         {
-            throw new Exception("Error: Invalid refresh token!");
+            return Result<AuthResponse>.Failure(AuthErrors.InvalidRefreshToken);
         }
 
         if (existingRefreshToken.RevokedAt != null)
         {
-            throw new Exception("Error: Refresh token has been revoked!");
+            return Result<AuthResponse>.Failure(AuthErrors.InvalidRefreshToken);
         }
 
         if (existingRefreshToken.ExpiresAt <= DateTime.UtcNow)
         {
-            throw new Exception("Error: Refresh token has expired!");
+            return Result<AuthResponse>.Failure(AuthErrors.InvalidRefreshToken);
         }
 
         User? user = await _userRepository.GetByIdAsync(existingRefreshToken.UserId);
         if (user == null)
         {
-            throw new Exception("Error: User not found!");
+            return Result<AuthResponse>.Failure(AuthErrors.UserNotFound);
         }
 
         (string accessToken, DateTime accessTokenExpiresAtUtc) = _tokenService.GenerateAccessToken(user);
@@ -78,7 +80,7 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, A
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new AuthResponse
+        return Result<AuthResponse>.Success(new AuthResponse
         {
             AccessToken = accessToken,
             RefreshToken = newRefreshToken,
@@ -87,6 +89,6 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, A
             Email = user.Email,
             FullName = user.FullName,
             Role = user.Role.ToString()
-        };
+        });
     }
 }

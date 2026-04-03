@@ -1,11 +1,13 @@
 using MediatR;
 using MusicShop.Application.DTOs.Auth;
 using MusicShop.Domain.Entities.System;
+using MusicShop.Domain.Common;
+using MusicShop.Domain.Errors;
 using MusicShop.Domain.Interfaces;
 
 namespace MusicShop.Application.UseCases.Auth.Commands.Register;
 
-public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthResponse>
+public class RegisterCommandHandler : IRequestHandler<RegisterCommand, Result<AuthResponse>>
 {
     private readonly IRepository<User> _userRepository;
     private readonly IRepository<RefreshToken> _refreshTokenRepository;
@@ -32,14 +34,14 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
     }
 
     // Handle the registration logic
-    public async Task<AuthResponse> Handle(RegisterCommand request, CancellationToken cancellationToken)
+    public async Task<Result<AuthResponse>> Handle(RegisterCommand request, CancellationToken cancellationToken)
     {
         // Check if the email is already registered
         User? existingUser = await _userRepository.FirstOrDefaultAsync(u => u.Email == request.Email);
 
         if (existingUser != null)
         {
-            throw new Exception("Error: This email is already registered!");
+            return Result<AuthResponse>.Failure(AuthErrors.EmailAlreadyExists);
         }
 
         // Hash the password for security
@@ -72,7 +74,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         // Return the AuthResponse containing user info and token
-        return new AuthResponse
+        return Result<AuthResponse>.Success(new AuthResponse
         {
             AccessToken = accessToken,
             RefreshToken = refreshToken,
@@ -81,6 +83,6 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, AuthRespo
             Email = newUser.Email,
             FullName = newUser.FullName,
             Role = newUser.Role.ToString()
-        };
+        });
     }
 }
