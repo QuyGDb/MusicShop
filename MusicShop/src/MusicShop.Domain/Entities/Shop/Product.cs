@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using MusicShop.Domain.Common;
-
 using MusicShop.Domain.Entities.Catalog;
 using MusicShop.Domain.Enums;
 
@@ -11,22 +10,22 @@ public class Product : BaseEntity
     public string Name { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string? CoverUrl { get; set; }
-    public ProductType Type { get; set; }
+    public ReleaseFormat Format { get; set; } // Renamed from Type, matching ReleaseFormat enum
     public bool IsActive { get; set; } = true;
 
     // Limited Edition
-    public bool IsLimitedEdition { get; set; }
-    public int? LimitedQuantity { get; set; }
+    public bool IsLimited { get; set; }
+    public int? LimitedQty { get; set; }
 
     // Pre-order
-    public bool IsPreOrder { get; set; }
-    public DateTime? ReleaseDate { get; set; }
+    public bool IsPreorder { get; set; }
+    public DateTime? PreorderReleaseDate { get; set; }
 
-    // FK (nullable - merch like shirts, books don't have a Release)
-    public Guid? ReleaseId { get; set; }
-    public Release? Release { get; set; }
+    // FK (Products link to specific Pressings/Versions in ERD)
+    public Guid? ReleaseVersionId { get; set; }
+    public ReleaseVersion? ReleaseVersion { get; set; }
 
     // Navigation
     public ICollection<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
-    public ICollection<ProductCollectionItem> CollectionItems { get; set; } = new List<ProductCollectionItem>();
+    public ICollection<CuratedCollectionItem> CollectionItems { get; set; } = new List<CuratedCollectionItem>();
 }

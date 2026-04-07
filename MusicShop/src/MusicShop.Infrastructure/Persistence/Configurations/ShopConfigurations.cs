@@ -14,16 +14,22 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired()
             .HasMaxLength(300);
 
-        builder.Property(x => x.Type)
-            .HasConversion<string>(); // Map ProductType Enum to string
+        builder.Property(x => x.Format)
+            .HasConversion<string>(); // Map ReleaseFormat Enum to string
 
-        builder.HasIndex(x => x.Name); // Index for faster product searching
+        builder.HasIndex(x => x.Name);
 
         // 1 Product -> Many Variants
         builder.HasMany(x => x.Variants)
             .WithOne(x => x.Product)
             .HasForeignKey(x => x.ProductId)
             .OnDelete(DeleteBehavior.Cascade);
+            
+        // Linked to ReleaseVersion (Pressing)
+        builder.HasOne(x => x.ReleaseVersion)
+            .WithMany()
+            .HasForeignKey(x => x.ReleaseVersionId)
+            .OnDelete(DeleteBehavior.SetNull);
     }
 }
 
@@ -33,28 +39,68 @@ public class ProductVariantConfiguration : IEntityTypeConfiguration<ProductVaria
     {
         builder.HasKey(x => x.Id);
         
-        builder.Property(x => x.Sku)
-            .IsRequired()
-            .HasMaxLength(100);
-
-        builder.Property(x => x.Price)
-            .HasPrecision(18, 2); // Currency data type
-
-        builder.HasIndex(x => x.Sku).IsUnique(); // SKU must be unique
-    }
-}
-
-public class ProductCollectionConfiguration : IEntityTypeConfiguration<ProductCollection>
-{
-    public void Configure(EntityTypeBuilder<ProductCollection> builder)
-    {
-        builder.HasKey(x => x.Id);
-        
-        builder.Property(x => x.Name)
+        builder.Property(x => x.VariantName)
             .IsRequired()
             .HasMaxLength(200);
 
-        // Many-to-Many via ProductCollectionItem junction table
+        builder.Property(x => x.Price)
+            .HasPrecision(18, 2);
+
+        // Extensions 1-1
+        builder.HasOne(x => x.VinylAttributes)
+            .WithOne(x => x.ProductVariant)
+            .HasForeignKey<VinylAttributes>(x => x.ProductVariantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(x => x.CdAttributes)
+            .WithOne(x => x.ProductVariant)
+            .HasForeignKey<CdAttributes>(x => x.ProductVariantId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(x => x.CassetteAttributes)
+            .WithOne(x => x.ProductVariant)
+            .HasForeignKey<CassetteAttributes>(x => x.ProductVariantId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class VinylAttributesConfiguration : IEntityTypeConfiguration<VinylAttributes>
+{
+    public void Configure(EntityTypeBuilder<VinylAttributes> builder)
+    {
+        builder.HasKey(x => x.Id);
+        builder.ToTable("vinyl_attributes");
+    }
+}
+
+public class CdAttributesConfiguration : IEntityTypeConfiguration<CdAttributes>
+{
+    public void Configure(EntityTypeBuilder<CdAttributes> builder)
+    {
+        builder.HasKey(x => x.Id);
+        builder.ToTable("cd_attributes");
+    }
+}
+
+public class CassetteAttributesConfiguration : IEntityTypeConfiguration<CassetteAttributes>
+{
+    public void Configure(EntityTypeBuilder<CassetteAttributes> builder)
+    {
+        builder.HasKey(x => x.Id);
+        builder.ToTable("cassette_attributes");
+    }
+}
+
+public class CuratedCollectionConfiguration : IEntityTypeConfiguration<CuratedCollection>
+{
+    public void Configure(EntityTypeBuilder<CuratedCollection> builder)
+    {
+        builder.HasKey(x => x.Id);
+        
+        builder.Property(x => x.Title)
+            .IsRequired()
+            .HasMaxLength(200);
+
         builder.HasMany(x => x.Items)
             .WithOne(x => x.Collection)
             .HasForeignKey(x => x.CollectionId)
@@ -62,12 +108,11 @@ public class ProductCollectionConfiguration : IEntityTypeConfiguration<ProductCo
     }
 }
 
-public class ProductCollectionItemConfiguration : IEntityTypeConfiguration<ProductCollectionItem>
+public class CuratedCollectionItemConfiguration : IEntityTypeConfiguration<CuratedCollectionItem>
 {
-    public void Configure(EntityTypeBuilder<ProductCollectionItem> builder)
+    public void Configure(EntityTypeBuilder<CuratedCollectionItem> builder)
     {
-        // Declare Composite Key for junction table
-        builder.HasKey(x => new { x.CollectionId, x.ProductId });
+        builder.HasKey(x => x.Id);
 
         builder.HasOne(x => x.Product)
             .WithMany(x => x.CollectionItems)
@@ -75,4 +120,16 @@ public class ProductCollectionItemConfiguration : IEntityTypeConfiguration<Produ
     }
 }
 
-
+public class RecommendationConfiguration : IEntityTypeConfiguration<Recommendation>
+{
+    public void Configure(EntityTypeBuilder<Recommendation> builder)
+    {
+        builder.HasKey(x => x.Id);
+        
+        builder.HasOne(x => x.ProductVariant)
+            .WithMany()
+            .HasForeignKey(x => x.ProductVariantId);
+            
+        builder.HasIndex(x => x.UserId);
+    }
+}

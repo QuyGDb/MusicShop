@@ -6,6 +6,6 @@ namespace MusicShop.Domain.Entities.Orders;
 
 public class Cart : BaseEntity
 {
-    public Guid CustomerId { get; set; }
+    public Guid UserId { get; set; }
     public ICollection<CartItem> Items { get; set; } = new List<CartItem>();
 }

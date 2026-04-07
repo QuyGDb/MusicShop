@@ -35,7 +35,7 @@ public sealed class UpdateArtistCommandHandler(
         // 3. Cập nhật thông tin
         artist.Name = request.Name;
         artist.Bio = request.Bio;
-        artist.Genre = request.Genre;
+        // artist.Genre = request.Genre; // Genre is now Many-to-Many
         artist.Country = request.Country;
         artist.ImageUrl = request.ImageUrl;
 
@@ -47,7 +47,7 @@ public sealed class UpdateArtistCommandHandler(
             Id = artist.Id,
             Name = artist.Name,
             Bio = artist.Bio,
-            Genre = artist.Genre,
+            Genre = null, // TODO: Map from ArtistGenres
             Country = artist.Country,
             ImageUrl = artist.ImageUrl
         });

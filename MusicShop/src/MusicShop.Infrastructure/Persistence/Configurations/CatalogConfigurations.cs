@@ -14,17 +14,33 @@ public class ArtistConfiguration : IEntityTypeConfiguration<Artist>
             .IsRequired()
             .HasMaxLength(200);
 
-        builder.Property(x => x.Genre)
-            .HasMaxLength(100);
-
         builder.Property(x => x.Country)
             .HasMaxLength(100);
             
-        // 1 Artist -> Many MasterReleases
-        builder.HasMany(x => x.MasterReleases)
+        // 1 Artist -> Many Releases (Master)
+        builder.HasMany(x => x.Releases)
             .WithOne(x => x.Artist)
             .HasForeignKey(x => x.ArtistId)
             .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class GenreConfiguration : IEntityTypeConfiguration<Genre>
+{
+    public void Configure(EntityTypeBuilder<Genre> builder)
+    {
+        builder.HasKey(x => x.Id);
+        
+        builder.Property(x => x.Name)
+            .IsRequired()
+            .HasMaxLength(100);
+
+        builder.Property(x => x.Slug)
+            .IsRequired()
+            .HasMaxLength(100);
+
+        builder.HasIndex(x => x.Name).IsUnique();
+        builder.HasIndex(x => x.Slug).IsUnique();
     }
 }
 
@@ -38,17 +54,17 @@ public class LabelConfiguration : IEntityTypeConfiguration<Label>
             .IsRequired()
             .HasMaxLength(200);
 
-        // 1 Label -> Many Releases
-        builder.HasMany(x => x.Releases)
+        // 1 Label -> Many ReleaseVersions
+        builder.HasMany(x => x.ReleaseVersions)
             .WithOne(x => x.Label)
             .HasForeignKey(x => x.LabelId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }
 
-public class MasterReleaseConfiguration : IEntityTypeConfiguration<MasterRelease>
+public class ReleaseConfiguration : IEntityTypeConfiguration<Release>
 {
-    public void Configure(EntityTypeBuilder<MasterRelease> builder)
+    public void Configure(EntityTypeBuilder<Release> builder)
     {
         builder.HasKey(x => x.Id);
         
@@ -59,39 +75,33 @@ public class MasterReleaseConfiguration : IEntityTypeConfiguration<MasterRelease
         builder.Property(x => x.Year)
             .IsRequired();
 
-        builder.Property(x => x.Genre)
-            .HasMaxLength(150);
+        builder.HasIndex(x => x.Title);
 
-        builder.Property(x => x.CoverUrl)
-            .HasMaxLength(500);
-
-        builder.Property(x => x.Description)
-            .HasMaxLength(2000);
-
-        builder.HasIndex(x => x.Title); // Index for faster searching of master releases
-
-        // 1 Master -> Many Releases
-        builder.HasMany(x => x.Releases)
-            .WithOne(x => x.Master)
-            .HasForeignKey(x => x.MasterId)
+        // 1 Release -> Many Versions
+        builder.HasMany(x => x.Versions)
+            .WithOne(x => x.Release)
+            .HasForeignKey(x => x.ReleaseId)
             .OnDelete(DeleteBehavior.Cascade);
-    }
-}
-
-public class ReleaseConfiguration : IEntityTypeConfiguration<Release>
-{
-    public void Configure(EntityTypeBuilder<Release> builder)
-    {
-        builder.HasKey(x => x.Id);
-        
-        builder.Property(x => x.Format)
-            .HasConversion<string>(); // Store ReleaseFormat enum as text in the database
 
         // 1 Release -> Many Tracks
         builder.HasMany(x => x.Tracks)
             .WithOne(x => x.Release)
             .HasForeignKey(x => x.ReleaseId)
             .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class ReleaseVersionConfiguration : IEntityTypeConfiguration<ReleaseVersion>
+{
+    public void Configure(EntityTypeBuilder<ReleaseVersion> builder)
+    {
+        builder.HasKey(x => x.Id);
+        
+        builder.Property(x => x.Format)
+            .HasConversion<string>();
+
+        builder.Property(x => x.CatalogNumber)
+            .HasMaxLength(100);
     }
 }
 
@@ -104,5 +114,40 @@ public class TrackConfiguration : IEntityTypeConfiguration<Track>
         builder.Property(x => x.Title)
             .IsRequired()
             .HasMaxLength(300);
+
+        builder.Property(x => x.Side)
+            .HasMaxLength(10);
+    }
+}
+
+public class ArtistGenreConfiguration : IEntityTypeConfiguration<ArtistGenre>
+{
+    public void Configure(EntityTypeBuilder<ArtistGenre> builder)
+    {
+        builder.HasKey(x => new { x.ArtistId, x.GenreId });
+
+        builder.HasOne(x => x.Artist)
+            .WithMany(x => x.ArtistGenres)
+            .HasForeignKey(x => x.ArtistId);
+
+        builder.HasOne(x => x.Genre)
+            .WithMany()
+            .HasForeignKey(x => x.GenreId);
+    }
+}
+
+public class ReleaseGenreConfiguration : IEntityTypeConfiguration<ReleaseGenre>
+{
+    public void Configure(EntityTypeBuilder<ReleaseGenre> builder)
+    {
+        builder.HasKey(x => new { x.ReleaseId, x.GenreId });
+
+        builder.HasOne(x => x.Release)
+            .WithMany()
+            .HasForeignKey(x => x.ReleaseId);
+
+        builder.HasOne(x => x.Genre)
+            .WithMany()
+            .HasForeignKey(x => x.GenreId);
     }
 }

@@ -1,12 +1,11 @@
+using MusicShop.Domain.Common;
+
 namespace MusicShop.Domain.Entities.Shop;
 
-/// <summary>
-/// Junction table for M:N relationship between Product and ProductCollection
-/// </summary>
-public class ProductCollectionItem
+public class CuratedCollectionItem : BaseEntity
 {
     public Guid CollectionId { get; set; }
-    public ProductCollection Collection { get; set; } = null!;
+    public CuratedCollection Collection { get; set; } = null!;
 
     public Guid ProductId { get; set; }
     public Product Product { get; set; } = null!;

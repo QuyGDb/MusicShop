@@ -1,28 +1,25 @@
 using System.Collections.Generic;
 using MusicShop.Domain.Common;
 
-using MusicShop.Domain.Enums;
-
 namespace MusicShop.Domain.Entities.Catalog;
 
 /// <summary>
-/// Specific pressing - e.g.: "Dark Side of the Moon - US 1973 first press"
-/// or "Japan OBI 1976", "2011 remaster 180g"...
+/// Original album - e.g.: "Dark Side of the Moon" (1973)
 /// </summary>
 public class Release : BaseEntity
 {
-    public string? Country { get; set; }
-    public int? Year { get; set; }
-    public ReleaseFormat Format { get; set; }
-    public string? CatalogNumber { get; set; }
+    public string Title { get; set; } = string.Empty;
+    public int Year { get; set; } // Original release year
+    public string? CoverUrl { get; set; }
+    public string? Description { get; set; }
 
     // FK
-    public Guid MasterId { get; set; }
-    public MasterRelease Master { get; set; } = null!;
+    public Guid ArtistId { get; set; }
+    public Artist Artist { get; set; } = null!;
 
-    public Guid LabelId { get; set; }
-    public Label Label { get; set; } = null!;
+    // Navigation: 1 Release (Master) has many Versions (Pressings)
+    public ICollection<ReleaseVersion> Versions { get; set; } = new List<ReleaseVersion>();
 
-    // Navigation
+    // Navigation: Tracks belong to the original release
     public ICollection<Track> Tracks { get; set; } = new List<Track>();
 }

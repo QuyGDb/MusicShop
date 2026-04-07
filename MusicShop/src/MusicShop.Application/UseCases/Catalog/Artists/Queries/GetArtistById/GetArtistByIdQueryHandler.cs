@@ -26,7 +26,7 @@ public sealed class GetArtistByIdQueryHandler(IRepository<Artist> artistReposito
             Id = artist.Id,
             Name = artist.Name,
             Bio = artist.Bio,
-            Genre = artist.Genre,
+            Genre = null, // TODO: Map from ArtistGenres Many-to-Many
             Country = artist.Country,
             ImageUrl = artist.ImageUrl
         });

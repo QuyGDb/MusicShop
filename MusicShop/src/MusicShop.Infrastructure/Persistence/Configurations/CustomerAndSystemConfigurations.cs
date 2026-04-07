@@ -5,21 +5,23 @@ using MusicShop.Domain.Entities.System;
 
 namespace MusicShop.Infrastructure.Persistence.Configurations;
 
-public class WishlistConfiguration : IEntityTypeConfiguration<Wishlist>
+public class WantlistItemConfiguration : IEntityTypeConfiguration<WantlistItem>
 {
-    public void Configure(EntityTypeBuilder<Wishlist> builder)
-    {
-        builder.HasKey(x => x.Id);
-    }
-}
-
-public class CollectionConfiguration : IEntityTypeConfiguration<Collection>
-{
-    public void Configure(EntityTypeBuilder<Collection> builder)
+    public void Configure(EntityTypeBuilder<WantlistItem> builder)
     {
         builder.HasKey(x => x.Id);
         
-        builder.Property(x => x.PurchasePrice).HasPrecision(18, 2);
+        builder.HasIndex(x => new { x.UserId, x.ProductId }).IsUnique();
+    }
+}
+
+public class UserCollectionConfiguration : IEntityTypeConfiguration<UserCollection>
+{
+    public void Configure(EntityTypeBuilder<UserCollection> builder)
+    {
+        builder.HasKey(x => x.Id);
+        
+        builder.HasIndex(x => new { x.UserId, x.ProductId }).IsUnique();
     }
 }
 
@@ -30,6 +32,9 @@ public class ReviewConfiguration : IEntityTypeConfiguration<Review>
         builder.HasKey(x => x.Id);
         
         builder.Property(x => x.Comment).HasMaxLength(1000);
+
+        // Unique review per user, order, and product
+        builder.HasIndex(x => new { x.UserId, x.OrderId, x.ProductId }).IsUnique();
     }
 }
 
@@ -44,10 +49,46 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasMaxLength(255);
 
         builder.HasIndex(x => x.Email)
-            .IsUnique(); // Email must be unique
+            .IsUnique();
 
         builder.Property(x => x.FullName).IsRequired().HasMaxLength(200);
         builder.Property(x => x.Role).HasConversion<string>();
+    }
+}
+
+public class AIConversationConfiguration : IEntityTypeConfiguration<AIConversation>
+{
+    public void Configure(EntityTypeBuilder<AIConversation> builder)
+    {
+        builder.HasKey(x => x.Id);
+        
+        builder.HasMany(x => x.Messages)
+            .WithOne(x => x.Conversation)
+            .HasForeignKey(x => x.ConversationId)
+            .OnDelete(DeleteBehavior.Cascade);
+    }
+}
+
+public class AIMessageConfiguration : IEntityTypeConfiguration<AIMessage>
+{
+    public void Configure(EntityTypeBuilder<AIMessage> builder)
+    {
+        builder.HasKey(x => x.Id);
+        
+        builder.Property(x => x.Role).IsRequired().HasMaxLength(50);
+        builder.Property(x => x.Content).IsRequired();
+    }
+}
+
+public class NotificationLogConfiguration : IEntityTypeConfiguration<NotificationLog>
+{
+    public void Configure(EntityTypeBuilder<NotificationLog> builder)
+    {
+        builder.HasKey(x => x.Id);
+        
+        builder.Property(x => x.Type).IsRequired().HasMaxLength(100);
+        builder.Property(x => x.Status).IsRequired().HasMaxLength(50);
+        builder.Property(x => x.Channel).IsRequired().HasMaxLength(50);
     }
 }
 

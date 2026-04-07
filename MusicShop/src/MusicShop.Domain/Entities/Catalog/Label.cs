@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using MusicShop.Domain.Common;
 
-
 namespace MusicShop.Domain.Entities.Catalog;
 
 public class Label : BaseEntity
@@ -11,6 +10,6 @@ public class Label : BaseEntity
     public int? FoundedYear { get; set; }
     public string? Website { get; set; }
 
-    // Navigation: 1 Label publishes many Releases
-    public ICollection<Release> Releases { get; set; } = new List<Release>();
+    // Navigation: 1 Label has many specific ReleaseVersions (pressings)
+    public ICollection<ReleaseVersion> ReleaseVersions { get; set; } = new List<ReleaseVersion>();
 }

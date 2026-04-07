@@ -54,6 +54,8 @@ public class CartConfiguration : IEntityTypeConfiguration<Cart>
     {
         builder.HasKey(x => x.Id);
         
+        builder.HasIndex(x => x.UserId).IsUnique();
+
         // 1 Cart -> Many Items
         builder.HasMany(x => x.Items)
             .WithOne(x => x.Cart)

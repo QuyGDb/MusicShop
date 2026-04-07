@@ -26,7 +26,7 @@ public sealed class CreateArtistCommandHandler(
         {
             Name = request.Name,
             Bio = request.Bio,
-            Genre = request.Genre,
+            // Genre is now Many-to-Many
             Country = request.Country,
             ImageUrl = request.ImageUrl
         };
@@ -40,7 +40,7 @@ public sealed class CreateArtistCommandHandler(
             Id = artist.Id,
             Name = artist.Name,
             Bio = artist.Bio,
-            Genre = artist.Genre,
+            Genre = null, // TODO: Map from ArtistGenres
             Country = artist.Country,
             ImageUrl = artist.ImageUrl
         });
