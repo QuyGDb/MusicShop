@@ -4,6 +4,7 @@ using MusicShop.Application.DTOs.Catalog;
 using MusicShop.Domain.Common;
 using MusicShop.Domain.Entities.Catalog;
 using MusicShop.Domain.Interfaces;
+using System.Linq.Expressions;
 
 namespace MusicShop.Application.UseCases.Catalog.Labels.Queries.GetLabels;
 
@@ -14,9 +15,19 @@ public sealed class GetLabelsQueryHandler(IRepository<Label> labelRepository)
         GetLabelsQuery request, 
         CancellationToken cancellationToken)
     {
+        Expression<Func<Label, bool>>? predicate = null;
+
+        if (!string.IsNullOrWhiteSpace(request.Q) || !string.IsNullOrWhiteSpace(request.Country))
+        {
+            predicate = x => 
+                (string.IsNullOrWhiteSpace(request.Q) || x.Name.Contains(request.Q)) &&
+                (string.IsNullOrWhiteSpace(request.Country) || x.Country == request.Country);
+        }
+
         var (items, totalCount) = await labelRepository.GetPagedAsync(
             request.PageNumber, 
-            request.PageSize);
+            request.PageSize,
+            predicate);
 
         var labelResponses = items.Select(label => new LabelResponse
         {

@@ -14,9 +14,11 @@ public class LabelsController(IMediator mediator) : BaseApiController
     [HttpGet]
     public async Task<IActionResult> GetLabels(
         [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 20)
+        [FromQuery] int pageSize = 20,
+        [FromQuery] string? q = null,
+        [FromQuery] string? country = null)
     {
-        var query = new GetLabelsQuery(pageNumber, pageSize);
+        var query = new GetLabelsQuery(pageNumber, pageSize, q, country);
         var result = await mediator.Send(query);
 
         return HandlePaginatedResult(result);

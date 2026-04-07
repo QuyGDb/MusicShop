@@ -1,6 +1,128 @@
-@MusicShop.API_HostAddress = http://localhost:5016
+@hostname = localhost
+@port = 5273
+@baseUrl = http://{{hostname}}:{{port}}/api/v1
+@authToken = <Paste_Your_Token_Here>
 
-GET {{MusicShop.API_HostAddress}}/weatherforecast/
-Accept: application/json
+### 1. AUTHENTICATION
+
+# @name register
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+    "email": "admin@musicshop.com",
+    "password": "Password123!",
+    "confirmPassword": "Password123!",
+    "firstName": "Admin",
+    "lastName": "User"
+}
 
 ###
+
+# @name login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "admin@musicshop.com",
+    "password": "Password123!"
+}
+
+### 2. GENRES
+
+# @name getGenres
+GET {{baseUrl}}/genres
+
+###
+
+# @name createGenre
+POST {{baseUrl}}/genres
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "name": "Progressive Rock",
+    "slug": "progressive-rock"
+}
+
+### 3. ARTISTS
+
+# @name getArtists
+GET {{baseUrl}}/artists?pageNumber=1&pageSize=10
+
+###
+
+# @name createArtist
+POST {{baseUrl}}/artists
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "name": "Pink Floyd",
+    "bio": "English rock band formed in London in 1965.",
+    "country": "UK"
+}
+
+### 4. LABELS
+
+# @name getLabels
+GET {{baseUrl}}/labels?country=UK
+
+###
+
+# @name createLabel
+POST {{baseUrl}}/labels
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "name": "Harvest Records",
+    "country": "UK",
+    "foundedYear": 1969,
+    "website": "https://www.harvestrecords.com"
+}
+
+### 5. RELEASES (Master Albums)
+
+# @name getReleases
+GET {{baseUrl}}/releases?genre=progressive-rock&year=1973
+
+###
+
+# @name createRelease
+POST {{baseUrl}}/releases
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "artistId": "79b4dada-7693-4556-9003-87f5e888636a",
+    "title": "The Dark Side of the Moon",
+    "year": 1973,
+    "description": "The eighth studio album by the English rock band Pink Floyd.",
+    "genreIds": ["4d5308ce-3294-473d-82d8-963f458e0a11"],
+    "tracks": [
+        { "position": 1, "title": "Speak to Me", "durationSeconds": 68, "side": "A" },
+        { "position": 2, "title": "Breathe", "durationSeconds": 163, "side": "A" }
+    ]
+}
+
+###
+
+# @name getReleaseDetail
+GET {{baseUrl}}/releases/79b4dada-7693-4556-9003-87f5e888636a
+
+### 6. RELEASE VERSIONS (Pressings)
+
+# @name createVersion
+POST {{baseUrl}}/release-versions
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "releaseId": "79b4dada-7693-4556-9003-87f5e888636a",
+    "labelId": "4d5308ce-3294-473d-82d8-963f458e0a11",
+    "pressingCountry": "UK",
+    "pressingYear": 1973,
+    "format": 0,
+    "notes": "First UK pressing, solid blue triangle label."
+}

@@ -22,6 +22,7 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IReleaseRepository, ReleaseRepository>();
+        services.AddScoped<IReleaseVersionRepository, ReleaseVersionRepository>();
 
         // 3. Register Security Services
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
