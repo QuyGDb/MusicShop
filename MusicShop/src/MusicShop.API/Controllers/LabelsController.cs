@@ -52,7 +52,7 @@ public class LabelsController(IMediator mediator) : BaseApiController
             return BadRequest(ApiResponse<object>.FailureResult("ID_MISMATCH", "Route id does not match the body id."));
         }
 
-        MusicShop.Domain.Common.Result<MusicShop.Application.DTOs.Catalog.LabelResponse> result = await mediator.Send(command);
+        Domain.Common.Result<Application.DTOs.Catalog.LabelResponse> result = await mediator.Send(command);
 
         return HandleResult(result);
     }
@@ -61,7 +61,7 @@ public class LabelsController(IMediator mediator) : BaseApiController
     public async Task<IActionResult> DeleteLabel(Guid id)
     {
         DeleteLabelCommand command = new DeleteLabelCommand(id);
-        MusicShop.Domain.Common.Result<bool> result = await mediator.Send(command);
+        Domain.Common.Result<bool> result = await mediator.Send(command);
 
         return result.Match(
             _ => Ok(ApiResponse<object>.SuccessResult(null!)),

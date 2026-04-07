@@ -40,7 +40,7 @@ public sealed class CreateArtistCommandHandler(
             Id = artist.Id,
             Name = artist.Name,
             Bio = artist.Bio,
-            Genre = null, // TODO: Map from ArtistGenres
+            Genres = new List<GenreResponse>(), // NO Genres on initial creation usually, or map if added to command
             Country = artist.Country,
             ImageUrl = artist.ImageUrl
         });

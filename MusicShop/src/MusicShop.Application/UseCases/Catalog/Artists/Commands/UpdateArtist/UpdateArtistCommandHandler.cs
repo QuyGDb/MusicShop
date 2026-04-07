@@ -47,7 +47,7 @@ public sealed class UpdateArtistCommandHandler(
             Id = artist.Id,
             Name = artist.Name,
             Bio = artist.Bio,
-            Genre = null, // TODO: Map from ArtistGenres
+            Genres = new List<GenreResponse>(), // Genres handled by separate command or loaded on request
             Country = artist.Country,
             ImageUrl = artist.ImageUrl
         });

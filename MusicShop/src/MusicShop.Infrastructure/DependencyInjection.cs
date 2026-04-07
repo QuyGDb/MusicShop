@@ -22,6 +22,7 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped(typeof(IRepository<>), typeof(GenericRepository<>));
         services.AddScoped<IReleaseRepository, ReleaseRepository>();
+        services.AddScoped<IArtistRepository, ArtistRepository>();
         services.AddScoped<IReleaseVersionRepository, ReleaseVersionRepository>();
 
         // 3. Register Security Services

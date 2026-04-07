@@ -7,17 +7,18 @@ using MusicShop.Domain.Interfaces;
 
 namespace MusicShop.Application.UseCases.Catalog.Artists.Queries.GetArtists;
 
-public sealed class GetArtistsQueryHandler(IRepository<Artist> artistRepository)
+public sealed class GetArtistsQueryHandler(IArtistRepository artistRepository)
     : IRequestHandler<GetArtistsQuery, Result<PaginatedResult<ArtistResponse>>>
 {
     public async Task<Result<PaginatedResult<ArtistResponse>>> Handle(
         GetArtistsQuery request,
         CancellationToken cancellationToken)
     {
-        // 1. Call GetPagedAsync from Infrastructure layer
-        (IReadOnlyList<Artist> items, int totalCount) = await artistRepository.GetPagedAsync(
+        // 1. Call GetPagedWithGenresAsync from Infrastructure layer
+        (IReadOnlyList<Artist> items, int totalCount) = await artistRepository.GetPagedWithGenresAsync(
             request.PageNumber,
-            request.PageSize);
+            request.PageSize,
+            cancellationToken);
 
         // 2. Map Entity to DTO
         List<ArtistResponse> artistResponses = items.Select(artist => new ArtistResponse
@@ -25,7 +26,12 @@ public sealed class GetArtistsQueryHandler(IRepository<Artist> artistRepository)
             Id = artist.Id,
             Name = artist.Name,
             Bio = artist.Bio,
-            Genre = null, // TODO: Map from ArtistGenres Many-to-Many
+            Genres = artist.ArtistGenres.Select(ag => new GenreResponse
+            {
+                Id = ag.GenreId,
+                Name = ag.Genre?.Name ?? string.Empty,
+                Slug = ag.Genre?.Slug ?? string.Empty
+            }).ToList(),
             Country = artist.Country,
             ImageUrl = artist.ImageUrl
         }).ToList();

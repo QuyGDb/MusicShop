@@ -13,12 +13,12 @@ public class ArtistsController(IMediator mediator) : BaseApiController
 {
     [HttpGet]
     public async Task<IActionResult> GetArtists(
-        [FromQuery] int pageNumber = 1, 
+        [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 20)
     {
         GetArtistsQuery query = new GetArtistsQuery(pageNumber, pageSize);
-        MusicShop.Domain.Common.Result<MusicShop.Application.Common.PaginatedResult<MusicShop.Application.DTOs.Catalog.ArtistResponse>> result = await mediator.Send(query);
-        
+        Domain.Common.Result<Application.Common.PaginatedResult<MusicShop.Application.DTOs.Catalog.ArtistResponse>> result = await mediator.Send(query);
+
         return HandlePaginatedResult(result);
     }
 
@@ -26,7 +26,7 @@ public class ArtistsController(IMediator mediator) : BaseApiController
     public async Task<IActionResult> GetArtist(Guid id)
     {
         GetArtistByIdQuery query = new GetArtistByIdQuery(id);
-        MusicShop.Domain.Common.Result<MusicShop.Application.DTOs.Catalog.ArtistResponse> result = await mediator.Send(query);
+        Domain.Common.Result<Application.DTOs.Catalog.ArtistResponse> result = await mediator.Send(query);
 
         return HandleResult(result);
     }
