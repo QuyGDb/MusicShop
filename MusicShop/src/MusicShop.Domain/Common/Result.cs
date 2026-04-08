@@ -1,10 +1,8 @@
 namespace MusicShop.Domain.Common;
 
-public class Result<TValue>
+public class Result
 {
-    private readonly TValue? _value;
-
-    private Result(TValue? value, bool isSuccess, Error error)
+    protected Result(bool isSuccess, Error error)
     {
         if (isSuccess && error != Error.None ||
             !isSuccess && error == Error.None)
@@ -14,23 +12,30 @@ public class Result<TValue>
 
         IsSuccess = isSuccess;
         Error = error;
-        _value = value;
     }
 
     public bool IsSuccess { get; }
     public bool IsFailure => !IsSuccess;
     public Error Error { get; }
+
+    public static Result Success() => new(true, Error.None);
+    public static Result Failure(Error error) => new(false, error);
+}
+
+public class Result<TValue> : Result
+{
+    private readonly TValue? _value;
+
+    protected internal Result(TValue? value, bool isSuccess, Error error)
+        : base(isSuccess, error)
+    {
+        _value = value;
+    }
+
     public TValue Value => IsSuccess
         ? _value!
         : throw new InvalidOperationException("Cannot access Value when Result failed.");
 
     public static Result<TValue> Success(TValue value) => new(value, true, Error.None);
-    public static Result<TValue> Failure(Error error) => new(default, false, error);
-
-    public TResult Match<TResult>(
-        Func<TValue, TResult> onSuccess,
-        Func<Error, TResult> onFailure)
-    {
-        return IsSuccess ? onSuccess(_value!) : onFailure(Error);
-    }
+    public static new Result<TValue> Failure(Error error) => new(default, false, error);
 }

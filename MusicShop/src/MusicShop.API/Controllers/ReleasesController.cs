@@ -7,13 +7,14 @@ using MusicShop.Application.UseCases.Catalog.Releases.Commands.CreateRelease;
 using MusicShop.Application.UseCases.Catalog.Releases.Queries.GetReleaseById;
 using MusicShop.Application.UseCases.Catalog.Releases.Queries.GetReleases;
 using MusicShop.Domain.Common;
+using MusicShop.API.Infrastructure;
 
 namespace MusicShop.API.Controllers;
 
 public class ReleasesController(IMediator mediator) : BaseApiController
 {
     [HttpGet]
-    public async Task<IActionResult> GetReleases(
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<ReleaseResponse>>>> GetReleases(
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 20,
         [FromQuery] Guid? artistId = null,
@@ -27,7 +28,7 @@ public class ReleasesController(IMediator mediator) : BaseApiController
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetRelease(Guid id)
+    public async Task<ActionResult<ApiResponse<ReleaseDetailResponse>>> GetRelease(Guid id)
     {
         Result<ReleaseDetailResponse> result = await mediator.Send(new GetReleaseByIdQuery(id));
         return HandleResult(result);
@@ -35,9 +36,9 @@ public class ReleasesController(IMediator mediator) : BaseApiController
 
     [HttpPost]
     [Authorize(Roles = "admin")]
-    public async Task<IActionResult> CreateRelease([FromBody] CreateReleaseCommand command)
+    public async Task<ActionResult<ApiResponse<ReleaseResponse>>> CreateRelease([FromBody] CreateReleaseCommand command)
     {
         Result<ReleaseResponse> result = await mediator.Send(command);
-        return HandleResult(result);
+        return HandleCreatedResult(result, nameof(GetRelease), new { id = result.Value.Id });
     }
 }

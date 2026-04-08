@@ -13,7 +13,7 @@ namespace MusicShop.API.Controllers;
 public class ArtistsController(IMediator mediator) : BaseApiController
 {
     [HttpGet]
-    public async Task<IActionResult> GetArtists(
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<MusicShop.Application.DTOs.Catalog.ArtistResponse>>>> GetArtists(
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 20)
     {
@@ -24,7 +24,7 @@ public class ArtistsController(IMediator mediator) : BaseApiController
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetArtist(Guid id)
+    public async Task<ActionResult<ApiResponse<MusicShop.Application.DTOs.Catalog.ArtistResponse>>> GetArtist(Guid id)
     {
         GetArtistByIdQuery query = new GetArtistByIdQuery(id);
         Domain.Common.Result<Application.DTOs.Catalog.ArtistResponse> result = await mediator.Send(query);
@@ -34,20 +34,16 @@ public class ArtistsController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpPost]
-    public async Task<IActionResult> CreateArtist([FromBody] CreateArtistCommand command)
+    public async Task<ActionResult<ApiResponse<MusicShop.Application.DTOs.Catalog.ArtistResponse>>> CreateArtist([FromBody] CreateArtistCommand command)
     {
         MusicShop.Domain.Common.Result<MusicShop.Application.DTOs.Catalog.ArtistResponse> result = await mediator.Send(command);
 
-        // For Create, if successful, we return 201 Created and the wrapped object
-        return result.Match(
-            value => CreatedAtAction(nameof(GetArtist), new { id = value.Id }, ApiResponse<object>.SuccessResult(value)),
-            error => HandleResult(result) // This will properly map the failure
-        );
+        return HandleCreatedResult(result, nameof(GetArtist), new { id = result.Value?.Id });
     }
 
     [Authorize(Roles = "admin")]
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> UpdateArtist(Guid id, [FromBody] UpdateArtistCommand command)
+    public async Task<ActionResult<ApiResponse<MusicShop.Application.DTOs.Catalog.ArtistResponse>>> UpdateArtist(Guid id, [FromBody] UpdateArtistCommand command)
     {
         if (id != command.Id)
         {
@@ -61,14 +57,11 @@ public class ArtistsController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> DeleteArtist(Guid id)
+    public async Task<ActionResult<ApiResponse<object>>> DeleteArtist(Guid id)
     {
         DeleteArtistCommand command = new DeleteArtistCommand(id);
         MusicShop.Domain.Common.Result<bool> result = await mediator.Send(command);
 
-        return result.Match(
-            _ => Ok(ApiResponse<object>.SuccessResult(null!)),
-            _ => HandleResult(result)
-        );
+        return HandleNonGenericResult(result);
     }
 }

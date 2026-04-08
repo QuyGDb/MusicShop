@@ -12,7 +12,7 @@ namespace MusicShop.API.Controllers;
 public class LabelsController(IMediator mediator) : BaseApiController
 {
     [HttpGet]
-    public async Task<IActionResult> GetLabels(
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<Application.DTOs.Catalog.LabelResponse>>>> GetLabels(
         [FromQuery] int pageNumber = 1,
         [FromQuery] int pageSize = 20,
         [FromQuery] string? q = null,
@@ -25,7 +25,7 @@ public class LabelsController(IMediator mediator) : BaseApiController
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetLabel(Guid id)
+    public async Task<ActionResult<ApiResponse<MusicShop.Application.DTOs.Catalog.LabelResponse>>> GetLabel(Guid id)
     {
         GetLabelByIdQuery query = new GetLabelByIdQuery(id);
         MusicShop.Domain.Common.Result<MusicShop.Application.DTOs.Catalog.LabelResponse> result = await mediator.Send(query);
@@ -34,18 +34,15 @@ public class LabelsController(IMediator mediator) : BaseApiController
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateLabel([FromBody] CreateLabelCommand command)
+    public async Task<ActionResult<ApiResponse<Application.DTOs.Catalog.LabelResponse>>> CreateLabel([FromBody] CreateLabelCommand command)
     {
         Domain.Common.Result<Application.DTOs.Catalog.LabelResponse> result = await mediator.Send(command);
 
-        return result.Match(
-            value => CreatedAtAction(nameof(GetLabel), new { id = value.Id }, ApiResponse<object>.SuccessResult(value)),
-            error => HandleResult(result)
-        );
+        return HandleCreatedResult(result, nameof(GetLabel), new { id = result.Value?.Id });
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> UpdateLabel(Guid id, [FromBody] UpdateLabelCommand command)
+    public async Task<ActionResult<ApiResponse<Application.DTOs.Catalog.LabelResponse>>> UpdateLabel(Guid id, [FromBody] UpdateLabelCommand command)
     {
         if (id != command.Id)
         {
@@ -58,14 +55,11 @@ public class LabelsController(IMediator mediator) : BaseApiController
     }
 
     [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> DeleteLabel(Guid id)
+    public async Task<ActionResult<ApiResponse<object>>> DeleteLabel(Guid id)
     {
         DeleteLabelCommand command = new DeleteLabelCommand(id);
         Domain.Common.Result<bool> result = await mediator.Send(command);
 
-        return result.Match(
-            _ => Ok(ApiResponse<object>.SuccessResult(null!)),
-            _ => HandleResult(result)
-        );
+        return HandleNonGenericResult(result);
     }
 }

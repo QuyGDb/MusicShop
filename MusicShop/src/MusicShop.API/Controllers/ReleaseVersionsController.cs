@@ -3,13 +3,14 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MusicShop.Application.UseCases.Catalog.ReleaseVersions.Commands.CreateReleaseVersion;
 using MusicShop.Application.UseCases.Catalog.ReleaseVersions.Queries.GetReleaseVersionsByRelease;
+using MusicShop.API.Infrastructure;
 
 namespace MusicShop.API.Controllers;
 
 public class ReleaseVersionsController(IMediator mediator) : BaseApiController
 {
     [HttpGet("by-release/{releaseId:guid}")]
-    public async Task<IActionResult> GetByRelease(Guid releaseId)
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<Application.DTOs.Catalog.ReleaseVersionDto>>>> GetByRelease(Guid releaseId)
     {
         Domain.Common.Result<IReadOnlyList<Application.DTOs.Catalog.ReleaseVersionDto>> result = await mediator.Send(new GetReleaseVersionsByReleaseQuery(releaseId));
         return HandleResult(result);
@@ -17,9 +18,9 @@ public class ReleaseVersionsController(IMediator mediator) : BaseApiController
 
     [HttpPost]
     [Authorize(Roles = "admin")]
-    public async Task<IActionResult> CreateReleaseVersion([FromBody] CreateReleaseVersionCommand command)
+    public async Task<ActionResult<ApiResponse<Application.DTOs.Catalog.ReleaseVersionDto>>> CreateReleaseVersion([FromBody] CreateReleaseVersionCommand command)
     {
         Domain.Common.Result<Application.DTOs.Catalog.ReleaseVersionDto> result = await mediator.Send(command);
-        return HandleResult(result);
+        return HandleCreatedResult(result, nameof(GetByRelease), new { releaseId = command.ReleaseId });
     }
 }
