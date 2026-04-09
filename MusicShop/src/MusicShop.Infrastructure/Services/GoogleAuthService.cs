@@ -1,0 +1,47 @@
+using Google.Apis.Auth;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using MusicShop.Application.Common.Interfaces;
+using MusicShop.Domain.Common;
+using MusicShop.Infrastructure.Security;
+
+namespace MusicShop.Infrastructure.Services;
+
+public sealed class GoogleAuthService(
+    IOptions<GoogleSettings> googleSettings,
+    ILogger<GoogleAuthService> logger) : IGoogleAuthService
+{
+    public async Task<Result<GoogleUserPayload>> VerifyTokenAsync(string idToken, CancellationToken cancellationToken)
+    {
+        try
+        {
+            GoogleJsonWebSignature.ValidationSettings? settings = new GoogleJsonWebSignature.ValidationSettings
+            {
+                Audience = [googleSettings.Value.ClientId]
+            };
+
+            GoogleJsonWebSignature.Payload? payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
+
+            if (payload == null)
+            {
+                return Result<GoogleUserPayload>.Failure(new Error("Auth.GoogleInvalidToken", "Invalid Google token payload."));
+            }
+
+            return Result<GoogleUserPayload>.Success(new GoogleUserPayload(
+                payload.Email,
+                payload.Name,
+                payload.Subject // Google sub ID
+            ));
+        }
+        catch (InvalidJwtException ex)
+        {
+            logger.LogWarning(ex, "Invalid Google ID Token provided");
+            return Result<GoogleUserPayload>.Failure(new Error("Auth.GoogleInvalidToken", "Invalid Google ID Token."));
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error while verifying Google Token");
+            return Result<GoogleUserPayload>.Failure(new Error("Auth.GoogleError", "Error while verifying Google Token."));
+        }
+    }
+}

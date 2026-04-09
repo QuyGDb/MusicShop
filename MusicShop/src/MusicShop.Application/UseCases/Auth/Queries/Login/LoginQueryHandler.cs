@@ -29,6 +29,12 @@ public class LoginQueryHandler(
         }
 
         // Verify the provided password
+        if (existingUser.PasswordHash == null)
+        {
+            // User registered via external provider and hasn't set a local password
+            return Result<AuthResponse>.Failure(AuthErrors.InvalidCredentials);
+        }
+
         bool isPasswordValid = passwordHasher.Verify(request.Password, existingUser.PasswordHash);
 
         if (!isPasswordValid)

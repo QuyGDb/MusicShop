@@ -31,7 +31,7 @@ public class ChangePasswordCommandHandler(
             return Result<Unit>.Failure(AuthErrors.UserNotFound);
         }
 
-        if (!passwordHasher.Verify(request.CurrentPassword, user.PasswordHash))
+        if (user.PasswordHash == null || !passwordHasher.Verify(request.CurrentPassword, user.PasswordHash))
         {
             return Result<Unit>.Failure(AuthErrors.InvalidCredentials);
         }

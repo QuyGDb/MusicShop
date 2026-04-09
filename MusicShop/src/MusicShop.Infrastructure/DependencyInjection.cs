@@ -32,12 +32,18 @@ public static class DependencyInjection
         services.AddSingleton<IRefreshTokenHasher, RefreshTokenHasher>();
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 
         // 4. Register JWT Services
         // ValidateOnStart: crash immediately at startup if config is missing/invalid
         services.AddOptions<JwtSettings>()
             .Bind(configuration.GetSection(JwtSettings.SectionName))
             .ValidateOnStart();
+
+        services.AddOptions<GoogleSettings>()
+            .Bind(configuration.GetSection(GoogleSettings.SectionName))
+            .ValidateOnStart();
+
         services.AddScoped<ITokenService, JwtTokenService>();
         
         // 5. Register Redis & Caching
