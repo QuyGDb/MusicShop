@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using MusicShop.API.Infrastructure;
+using MusicShop.Application.DTOs.Catalog;
 using MusicShop.Application.UseCases.Catalog.Artists.Commands.CreateArtist;
 using MusicShop.Application.UseCases.Catalog.Artists.Commands.DeleteArtist;
 using MusicShop.Application.UseCases.Catalog.Artists.Commands.UpdateArtist;
@@ -13,45 +14,34 @@ namespace MusicShop.API.Controllers;
 public class ArtistsController(IMediator mediator) : BaseApiController
 {
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<IReadOnlyList<MusicShop.Application.DTOs.Catalog.ArtistResponse>>>> GetArtists(
-        [FromQuery] int pageNumber = 1,
-        [FromQuery] int pageSize = 20)
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<ArtistResponse>>>> GetArtists([FromQuery] GetArtistsQuery query)
     {
-        GetArtistsQuery query = new GetArtistsQuery(pageNumber, pageSize);
-        Domain.Common.Result<Application.Common.PaginatedResult<Application.DTOs.Catalog.ArtistResponse>> result = await mediator.Send(query);
-
+        var result = await mediator.Send(query);
         return HandlePaginatedResult(result);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<ApiResponse<MusicShop.Application.DTOs.Catalog.ArtistResponse>>> GetArtist(Guid id)
+    public async Task<ActionResult<ApiResponse<ArtistResponse>>> GetArtist(Guid id)
     {
-        GetArtistByIdQuery query = new GetArtistByIdQuery(id);
-        Domain.Common.Result<Application.DTOs.Catalog.ArtistResponse> result = await mediator.Send(query);
-
+        var result = await mediator.Send(new GetArtistByIdQuery(id));
         return HandleResult(result);
     }
 
     [Authorize(Roles = "admin")]
     [HttpPost]
-    public async Task<ActionResult<ApiResponse<MusicShop.Application.DTOs.Catalog.ArtistResponse>>> CreateArtist([FromBody] CreateArtistCommand command)
+    public async Task<ActionResult<ApiResponse<Guid>>> CreateArtist([FromBody] CreateArtistCommand command)
     {
-        MusicShop.Domain.Common.Result<MusicShop.Application.DTOs.Catalog.ArtistResponse> result = await mediator.Send(command);
-
-        return HandleCreatedResult(result, nameof(GetArtist), new { id = result.Value?.Id });
+        var result = await mediator.Send(command);
+        return HandleCreatedResult(result, nameof(GetArtist), new { id = result.Value });
     }
 
     [Authorize(Roles = "admin")]
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<ApiResponse<MusicShop.Application.DTOs.Catalog.ArtistResponse>>> UpdateArtist(Guid id, [FromBody] UpdateArtistCommand command)
+    public async Task<ActionResult<ApiResponse<Guid>>> UpdateArtist(Guid id, [FromBody] UpdateArtistCommand command)
     {
-        if (id != command.Id)
-        {
-            return BadRequest(ApiResponse<object>.FailureResult("ID_MISMATCH", "Route id does not match the body id."));
-        }
+        if (id != command.Id) return BadRequest();
 
-        MusicShop.Domain.Common.Result<MusicShop.Application.DTOs.Catalog.ArtistResponse> result = await mediator.Send(command);
-
+        var result = await mediator.Send(command);
         return HandleResult(result);
     }
 
@@ -59,9 +49,7 @@ public class ArtistsController(IMediator mediator) : BaseApiController
     [HttpDelete("{id:guid}")]
     public async Task<ActionResult<ApiResponse<object>>> DeleteArtist(Guid id)
     {
-        DeleteArtistCommand command = new DeleteArtistCommand(id);
-        MusicShop.Domain.Common.Result<bool> result = await mediator.Send(command);
-
+        var result = await mediator.Send(new DeleteArtistCommand(id));
         return HandleNonGenericResult(result);
     }
 }

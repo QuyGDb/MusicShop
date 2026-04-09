@@ -2,38 +2,29 @@ using MediatR;
 using MusicShop.Application.DTOs.Catalog;
 using MusicShop.Domain.Common;
 using MusicShop.Domain.Entities.Catalog;
-using MusicShop.Domain.Errors;
 using MusicShop.Domain.Interfaces;
+using AutoMapper;
 
 namespace MusicShop.Application.UseCases.Catalog.Artists.Queries.GetArtistById;
 
-public sealed class GetArtistByIdQueryHandler(IArtistRepository artistRepository)
+public sealed class GetArtistByIdQueryHandler(
+    IArtistRepository artistRepository,
+    IMapper mapper)
     : IRequestHandler<GetArtistByIdQuery, Result<ArtistResponse>>
 {
     public async Task<Result<ArtistResponse>> Handle(
-        GetArtistByIdQuery request, 
+        GetArtistByIdQuery request,
         CancellationToken cancellationToken)
     {
-        Artist? artist = await artistRepository.GetWithGenresAsync(request.Id, cancellationToken);
+        var artist = await artistRepository.GetWithGenresAsync(request.Id, cancellationToken);
 
         if (artist == null)
         {
-            return Result<ArtistResponse>.Failure(ArtistErrors.NotFound);
+            return Result<ArtistResponse>.Failure(new Error("Artist.NotFound", "Artist not found."));
         }
 
-        return Result<ArtistResponse>.Success(new ArtistResponse
-        {
-            Id = artist.Id,
-            Name = artist.Name,
-            Bio = artist.Bio,
-            Genres = artist.ArtistGenres.Select(ag => new GenreResponse
-            {
-                Id = ag.GenreId,
-                Name = ag.Genre?.Name ?? string.Empty,
-                Slug = ag.Genre?.Slug ?? string.Empty
-            }).ToList(),
-            Country = artist.Country,
-            ImageUrl = artist.ImageUrl
-        });
+        var response = mapper.Map<ArtistResponse>(artist);
+
+        return Result<ArtistResponse>.Success(response);
     }
 }
