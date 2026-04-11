@@ -2,21 +2,18 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MusicShop.Infrastructure.Persistence;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace MusicShop.Infrastructure.Persistence.Migrations
+namespace MusicShop.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260407033838_Migration_ERD_Alignment_V1")]
-    partial class Migration_ERD_Alignment_V1
+    partial class AppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,10 +46,18 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
 
                     b.ToTable("Artists");
                 });
@@ -125,6 +130,11 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -132,6 +142,9 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
 
                     b.ToTable("Labels");
                 });
@@ -158,6 +171,9 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1007,9 +1023,6 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("AvatarUrl")
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -1018,13 +1031,19 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<string>("ExternalId")
+                        .HasColumnType("text");
+
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<string>("IdentityProvider")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PasswordHash")
                         .HasColumnType("text");
 
                     b.Property<string>("Role")
@@ -1051,7 +1070,7 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.HasOne("MusicShop.Domain.Entities.Catalog.Genre", "Genre")
-                        .WithMany()
+                        .WithMany("ArtistGenres")
                         .HasForeignKey("GenreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1066,7 +1085,7 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.HasOne("MusicShop.Domain.Entities.Catalog.Artist", "Artist")
                         .WithMany("Releases")
                         .HasForeignKey("ArtistId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Artist");
@@ -1075,13 +1094,13 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.ReleaseGenre", b =>
                 {
                     b.HasOne("MusicShop.Domain.Entities.Catalog.Genre", "Genre")
-                        .WithMany()
+                        .WithMany("ReleaseGenres")
                         .HasForeignKey("GenreId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("MusicShop.Domain.Entities.Catalog.Release", "Release")
-                        .WithMany()
+                        .WithMany("ReleaseGenres")
                         .HasForeignKey("ReleaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -1225,7 +1244,7 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("MusicShop.Domain.Entities.Shop.Product", b =>
                 {
                     b.HasOne("MusicShop.Domain.Entities.Catalog.ReleaseVersion", "ReleaseVersion")
-                        .WithMany()
+                        .WithMany("Products")
                         .HasForeignKey("ReleaseVersionId")
                         .OnDelete(DeleteBehavior.SetNull);
 
@@ -1272,6 +1291,13 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.Navigation("Releases");
                 });
 
+            modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Genre", b =>
+                {
+                    b.Navigation("ArtistGenres");
+
+                    b.Navigation("ReleaseGenres");
+                });
+
             modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Label", b =>
                 {
                     b.Navigation("ReleaseVersions");
@@ -1279,9 +1305,16 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Release", b =>
                 {
+                    b.Navigation("ReleaseGenres");
+
                     b.Navigation("Tracks");
 
                     b.Navigation("Versions");
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.ReleaseVersion", b =>
+                {
+                    b.Navigation("Products");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Customer.AIConversation", b =>

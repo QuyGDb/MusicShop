@@ -9,11 +9,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace MusicShop.Infrastructure.Persistence.Migrations
+namespace MusicShop.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260405093510_AddMasterReleaseFields")]
-    partial class AddMasterReleaseFields
+    [Migration("20260411093320_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,14 +41,15 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Genre")
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
                     b.Property<string>("ImageUrl")
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
@@ -58,7 +59,58 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
                     b.ToTable("Artists");
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.ArtistGenre", b =>
+                {
+                    b.Property<Guid>("ArtistId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("GenreId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ArtistId", "GenreId");
+
+                    b.HasIndex("GenreId");
+
+                    b.ToTable("ArtistGenres");
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Genre", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
+                    b.ToTable("Genres");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Label", b =>
@@ -81,6 +133,11 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -89,10 +146,13 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Slug")
+                        .IsUnique();
+
                     b.ToTable("Labels");
                 });
 
-            modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.MasterRelease", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Release", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -102,24 +162,21 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<string>("CoverUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Description")
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<string>("Genre")
-                        .HasMaxLength(150)
-                        .HasColumnType("character varying(150)");
+                        .HasColumnType("text");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -133,20 +190,33 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Title");
 
-                    b.ToTable("MasterReleases");
+                    b.ToTable("Releases");
                 });
 
-            modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Release", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.ReleaseGenre", b =>
+                {
+                    b.Property<Guid>("ReleaseId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("GenreId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("ReleaseId", "GenreId");
+
+                    b.HasIndex("GenreId");
+
+                    b.ToTable("ReleaseGenres");
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.ReleaseVersion", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("CatalogNumber")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Country")
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -158,22 +228,28 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("LabelId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("MasterId")
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
+
+                    b.Property<string>("PressingCountry")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("PressingYear")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("ReleaseId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("Year")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("LabelId");
 
-                    b.HasIndex("MasterId");
+                    b.HasIndex("ReleaseId");
 
-                    b.ToTable("Releases");
+                    b.ToTable("ReleaseVersions");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Track", b =>
@@ -185,7 +261,7 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("Duration")
+                    b.Property<int?>("DurationSeconds")
                         .HasColumnType("integer");
 
                     b.Property<int>("Position")
@@ -193,6 +269,10 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
 
                     b.Property<Guid>("ReleaseId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Side")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -209,41 +289,64 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.ToTable("Tracks");
                 });
 
-            modelBuilder.Entity("MusicShop.Domain.Entities.Customer.Collection", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Customer.AIConversation", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("AcquiredAt")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Condition")
+                    b.Property<DateTime?>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("LastActiveAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("SessionToken")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AIConversations");
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Customer.AIMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Content")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<Guid>("ConversationId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("text");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid");
-
-                    b.Property<decimal>("PurchasePrice")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                    b.Property<string>("Role")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.ToTable("Collections");
+                    b.HasIndex("ConversationId");
+
+                    b.ToTable("AIMessages");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Customer.Review", b =>
@@ -259,10 +362,10 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("CustomerId")
+                    b.Property<Guid>("OrderId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("OrderId")
+                    b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
                     b.Property<int>("Rating")
@@ -271,12 +374,18 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId", "OrderId", "ProductId")
+                        .IsUnique();
 
                     b.ToTable("Reviews");
                 });
 
-            modelBuilder.Entity("MusicShop.Domain.Entities.Customer.Wishlist", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Customer.UserCollection", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -285,11 +394,8 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uuid");
-
-                    b.Property<bool>("NotifyByEmail")
-                        .HasColumnType("boolean");
+                    b.Property<string>("Notes")
+                        .HasColumnType("text");
 
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
@@ -297,9 +403,44 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
 
-                    b.ToTable("Wishlists");
+                    b.HasIndex("UserId", "ProductId")
+                        .IsUnique();
+
+                    b.ToTable("UserCollections");
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Customer.WantlistItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime?>("LastNotifiedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "ProductId")
+                        .IsUnique();
+
+                    b.ToTable("WantlistItems");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Orders.Cart", b =>
@@ -311,13 +452,16 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
 
                     b.ToTable("Carts");
                 });
@@ -478,37 +622,120 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.ToTable("Payments");
                 });
 
-            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.PriceHistory", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.CassetteAttributes", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Condition")
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<decimal>("Price")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("numeric(18,2)");
+                    b.Property<string>("Edition")
+                        .HasColumnType("text");
 
-                    b.Property<Guid>("ProductId")
+                    b.Property<Guid>("ProductVariantId")
                         .HasColumnType("uuid");
 
-                    b.Property<DateTime>("SoldAt")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<string>("TapeColor")
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("VariantId")
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductVariantId")
+                        .IsUnique();
+
+                    b.ToTable("cassette_attributes", (string)null);
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.CdAttributes", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Edition")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsJapanEdition")
+                        .HasColumnType("boolean");
+
+                    b.Property<Guid>("ProductVariantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.ToTable("PriceHistories");
+                    b.HasIndex("ProductVariantId")
+                        .IsUnique();
+
+                    b.ToTable("cd_attributes", (string)null);
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.CuratedCollection", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsPublished")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CuratedCollections");
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.CuratedCollectionItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("CollectionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ProductId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CollectionId");
+
+                    b.HasIndex("ProductId");
+
+                    b.ToTable("CuratedCollectionItems");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Shop.Product", b =>
@@ -526,16 +753,20 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
+                    b.Property<string>("Format")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsLimitedEdition")
+                    b.Property<bool>("IsLimited")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsPreOrder")
+                    b.Property<bool>("IsPreorder")
                         .HasColumnType("boolean");
 
-                    b.Property<int?>("LimitedQuantity")
+                    b.Property<int?>("LimitedQty")
                         .HasColumnType("integer");
 
                     b.Property<string>("Name")
@@ -543,15 +774,11 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("character varying(300)");
 
-                    b.Property<DateTime?>("ReleaseDate")
+                    b.Property<DateTime?>("PreorderReleaseDate")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid?>("ReleaseId")
+                    b.Property<Guid?>("ReleaseVersionId")
                         .HasColumnType("uuid");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -560,58 +787,9 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
 
                     b.HasIndex("Name");
 
-                    b.HasIndex("ReleaseId");
+                    b.HasIndex("ReleaseVersionId");
 
                     b.ToTable("Products");
-                });
-
-            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.ProductCollection", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("CoverUrl")
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ProductCollections");
-                });
-
-            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.ProductCollectionItem", b =>
-                {
-                    b.Property<Guid>("CollectionId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ProductId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("SortOrder")
-                        .HasColumnType("integer");
-
-                    b.HasKey("CollectionId", "ProductId");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductCollectionItems");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Shop.ProductVariant", b =>
@@ -620,21 +798,14 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Colorway")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Condition")
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<bool>("IsSigned")
+                        .HasColumnType("boolean");
 
                     b.Property<decimal>("Price")
                         .HasPrecision(18, 2)
@@ -643,25 +814,96 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
-                    b.Property<string>("Sku")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<int>("Stock")
+                    b.Property<int>("StockQty")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("VariantName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ProductId");
 
-                    b.HasIndex("Sku")
+                    b.ToTable("ProductVariants");
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.Recommendation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("GeneratedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("ProductVariantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<float>("Score")
+                        .HasColumnType("real");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductVariantId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Recommendations");
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.VinylAttributes", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DiscColor")
+                        .HasColumnType("text");
+
+                    b.Property<string>("DiscCount")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ProductVariantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("SleeveType")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("SpeedRpm")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("WeightGrams")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProductVariantId")
                         .IsUnique();
 
-                    b.ToTable("ProductVariants");
+                    b.ToTable("vinyl_attributes", (string)null);
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.System.AdminActivityLog", b =>
@@ -699,6 +941,50 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AdminActivityLogs");
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.System.NotificationLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Channel")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("ReferenceId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime?>("SentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NotificationLogs");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.System.RefreshToken", b =>
@@ -740,9 +1026,6 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("AvatarUrl")
-                        .HasColumnType("text");
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -751,13 +1034,19 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
 
+                    b.Property<string>("ExternalId")
+                        .HasColumnType("text");
+
                     b.Property<string>("FullName")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<string>("IdentityProvider")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("PasswordHash")
                         .HasColumnType("text");
 
                     b.Property<string>("Role")
@@ -775,34 +1064,72 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.MasterRelease", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.ArtistGenre", b =>
                 {
                     b.HasOne("MusicShop.Domain.Entities.Catalog.Artist", "Artist")
-                        .WithMany("MasterReleases")
+                        .WithMany("ArtistGenres")
                         .HasForeignKey("ArtistId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MusicShop.Domain.Entities.Catalog.Genre", "Genre")
+                        .WithMany("ArtistGenres")
+                        .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Artist");
+
+                    b.Navigation("Genre");
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Release", b =>
+                {
+                    b.HasOne("MusicShop.Domain.Entities.Catalog.Artist", "Artist")
+                        .WithMany("Releases")
+                        .HasForeignKey("ArtistId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Artist");
                 });
 
-            modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Release", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.ReleaseGenre", b =>
+                {
+                    b.HasOne("MusicShop.Domain.Entities.Catalog.Genre", "Genre")
+                        .WithMany("ReleaseGenres")
+                        .HasForeignKey("GenreId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("MusicShop.Domain.Entities.Catalog.Release", "Release")
+                        .WithMany("ReleaseGenres")
+                        .HasForeignKey("ReleaseId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Genre");
+
+                    b.Navigation("Release");
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.ReleaseVersion", b =>
                 {
                     b.HasOne("MusicShop.Domain.Entities.Catalog.Label", "Label")
-                        .WithMany("Releases")
+                        .WithMany("ReleaseVersions")
                         .HasForeignKey("LabelId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MusicShop.Domain.Entities.Catalog.MasterRelease", "Master")
-                        .WithMany("Releases")
-                        .HasForeignKey("MasterId")
+                    b.HasOne("MusicShop.Domain.Entities.Catalog.Release", "Release")
+                        .WithMany("Versions")
+                        .HasForeignKey("ReleaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Label");
 
-                    b.Navigation("Master");
+                    b.Navigation("Release");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Track", b =>
@@ -814,6 +1141,17 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                         .IsRequired();
 
                     b.Navigation("Release");
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Customer.AIMessage", b =>
+                {
+                    b.HasOne("MusicShop.Domain.Entities.Customer.AIConversation", "Conversation")
+                        .WithMany("Messages")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Conversation");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Orders.CartItem", b =>
@@ -865,18 +1203,31 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.Navigation("Order");
                 });
 
-            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.Product", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.CassetteAttributes", b =>
                 {
-                    b.HasOne("MusicShop.Domain.Entities.Catalog.Release", "Release")
-                        .WithMany()
-                        .HasForeignKey("ReleaseId");
+                    b.HasOne("MusicShop.Domain.Entities.Shop.ProductVariant", "ProductVariant")
+                        .WithOne("CassetteAttributes")
+                        .HasForeignKey("MusicShop.Domain.Entities.Shop.CassetteAttributes", "ProductVariantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Release");
+                    b.Navigation("ProductVariant");
                 });
 
-            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.ProductCollectionItem", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.CdAttributes", b =>
                 {
-                    b.HasOne("MusicShop.Domain.Entities.Shop.ProductCollection", "Collection")
+                    b.HasOne("MusicShop.Domain.Entities.Shop.ProductVariant", "ProductVariant")
+                        .WithOne("CdAttributes")
+                        .HasForeignKey("MusicShop.Domain.Entities.Shop.CdAttributes", "ProductVariantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductVariant");
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.CuratedCollectionItem", b =>
+                {
+                    b.HasOne("MusicShop.Domain.Entities.Shop.CuratedCollection", "Collection")
                         .WithMany("Items")
                         .HasForeignKey("CollectionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -893,6 +1244,16 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.Product", b =>
+                {
+                    b.HasOne("MusicShop.Domain.Entities.Catalog.ReleaseVersion", "ReleaseVersion")
+                        .WithMany("Products")
+                        .HasForeignKey("ReleaseVersionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("ReleaseVersion");
+                });
+
             modelBuilder.Entity("MusicShop.Domain.Entities.Shop.ProductVariant", b =>
                 {
                     b.HasOne("MusicShop.Domain.Entities.Shop.Product", "Product")
@@ -904,24 +1265,64 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.Navigation("Product");
                 });
 
+            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.Recommendation", b =>
+                {
+                    b.HasOne("MusicShop.Domain.Entities.Shop.ProductVariant", "ProductVariant")
+                        .WithMany()
+                        .HasForeignKey("ProductVariantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductVariant");
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.VinylAttributes", b =>
+                {
+                    b.HasOne("MusicShop.Domain.Entities.Shop.ProductVariant", "ProductVariant")
+                        .WithOne("VinylAttributes")
+                        .HasForeignKey("MusicShop.Domain.Entities.Shop.VinylAttributes", "ProductVariantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ProductVariant");
+                });
+
             modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Artist", b =>
                 {
-                    b.Navigation("MasterReleases");
+                    b.Navigation("ArtistGenres");
+
+                    b.Navigation("Releases");
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Genre", b =>
+                {
+                    b.Navigation("ArtistGenres");
+
+                    b.Navigation("ReleaseGenres");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Label", b =>
                 {
-                    b.Navigation("Releases");
-                });
-
-            modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.MasterRelease", b =>
-                {
-                    b.Navigation("Releases");
+                    b.Navigation("ReleaseVersions");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Release", b =>
                 {
+                    b.Navigation("ReleaseGenres");
+
                     b.Navigation("Tracks");
+
+                    b.Navigation("Versions");
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.ReleaseVersion", b =>
+                {
+                    b.Navigation("Products");
+                });
+
+            modelBuilder.Entity("MusicShop.Domain.Entities.Customer.AIConversation", b =>
+                {
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Orders.Cart", b =>
@@ -936,6 +1337,11 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.Navigation("Payment");
                 });
 
+            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.CuratedCollection", b =>
+                {
+                    b.Navigation("Items");
+                });
+
             modelBuilder.Entity("MusicShop.Domain.Entities.Shop.Product", b =>
                 {
                     b.Navigation("CollectionItems");
@@ -943,9 +1349,13 @@ namespace MusicShop.Infrastructure.Persistence.Migrations
                     b.Navigation("Variants");
                 });
 
-            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.ProductCollection", b =>
+            modelBuilder.Entity("MusicShop.Domain.Entities.Shop.ProductVariant", b =>
                 {
-                    b.Navigation("Items");
+                    b.Navigation("CassetteAttributes");
+
+                    b.Navigation("CdAttributes");
+
+                    b.Navigation("VinylAttributes");
                 });
 #pragma warning restore 612, 618
         }
