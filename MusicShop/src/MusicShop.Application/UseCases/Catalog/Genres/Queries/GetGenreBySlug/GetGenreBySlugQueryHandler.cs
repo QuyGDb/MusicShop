@@ -4,17 +4,17 @@ using MusicShop.Application.DTOs.Catalog;
 using MusicShop.Domain.Common;
 using MusicShop.Domain.Entities.Catalog;
 using MusicShop.Domain.Errors;
-using MusicShop.Domain.Interfaces;
+using MusicShop.Application.Common.Interfaces;
 
 namespace MusicShop.Application.UseCases.Catalog.Genres.Queries.GetGenreBySlug;
 
-public sealed class GetGenreBySlugQueryHandler(IRepository<Genre> genreRepository) 
+public sealed class GetGenreBySlugQueryHandler(IGenreRepository genreRepository) 
     : IRequestHandler<GetGenreBySlugQuery, Result<GenreResponse>>
 {
     public async Task<Result<GenreResponse>> Handle(GetGenreBySlugQuery request, CancellationToken cancellationToken)
     {
-        Genre? genre = await genreRepository.FirstOrDefaultAsync(
-            x => x.Slug == request.Slug, 
+        Genre? genre = await genreRepository.GetBySlugAsync(
+            request.Slug, 
             cancellationToken);
 
         if (genre is null)

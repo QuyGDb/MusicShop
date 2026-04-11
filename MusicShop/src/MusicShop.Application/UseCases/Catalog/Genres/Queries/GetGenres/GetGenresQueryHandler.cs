@@ -3,22 +3,19 @@ using MusicShop.Application.Common;
 using MusicShop.Application.DTOs.Catalog;
 using MusicShop.Domain.Common;
 using MusicShop.Domain.Entities.Catalog;
-using MusicShop.Domain.Interfaces;
+using MusicShop.Application.Common.Interfaces;
 using MusicShop.Application.Common.Mappings;
 
 namespace MusicShop.Application.UseCases.Catalog.Genres.Queries.GetGenres;
 
-public sealed class GetGenresQueryHandler(IRepository<Genre> genreRepository)
+public sealed class GetGenresQueryHandler(IGenreRepository genreRepository)
     : IRequestHandler<GetGenresQuery, Result<PaginatedResult<GenreResponse>>>
 {
     public async Task<Result<PaginatedResult<GenreResponse>>> Handle(
         GetGenresQuery request, 
         CancellationToken cancellationToken)
     {
-        (IReadOnlyList<Genre> items, int totalCount) = await genreRepository.GetPagedAsync(
-            request.PageNumber, 
-            request.PageSize, 
-            cancellationToken: cancellationToken);
+        var (items, totalCount) = await genreRepository.GetPagedAsync(request, cancellationToken);
 
         List<GenreResponse> dtos = items.Select(x => x.ToResponse()).ToList();
 
