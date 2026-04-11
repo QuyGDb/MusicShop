@@ -3,40 +3,21 @@ using MusicShop.Application.Common;
 using MusicShop.Application.DTOs.Catalog;
 using MusicShop.Domain.Common;
 using MusicShop.Domain.Entities.Catalog;
-using MusicShop.Domain.Interfaces;
-using System.Linq.Expressions;
+using MusicShop.Application.Common.Interfaces;
+using MusicShop.Application.Common.Mappings;
 
 namespace MusicShop.Application.UseCases.Catalog.Labels.Queries.GetLabels;
 
-public sealed class GetLabelsQueryHandler(IRepository<Label> labelRepository)
+public sealed class GetLabelsQueryHandler(ILabelRepository labelRepository)
     : IRequestHandler<GetLabelsQuery, Result<PaginatedResult<LabelResponse>>>
 {
     public async Task<Result<PaginatedResult<LabelResponse>>> Handle(
         GetLabelsQuery request, 
         CancellationToken cancellationToken)
     {
-        Expression<Func<Label, bool>>? predicate = null;
+        var (items, totalCount) = await labelRepository.GetPagedAsync(request, cancellationToken);
 
-        if (!string.IsNullOrWhiteSpace(request.Q) || !string.IsNullOrWhiteSpace(request.Country))
-        {
-            predicate = x => 
-                (string.IsNullOrWhiteSpace(request.Q) || x.Name.Contains(request.Q)) &&
-                (string.IsNullOrWhiteSpace(request.Country) || x.Country == request.Country);
-        }
-
-        (IReadOnlyList<Label> items, int totalCount) = await labelRepository.GetPagedAsync(
-            request.PageNumber, 
-            request.PageSize,
-            predicate);
-
-        List<LabelResponse> labelResponses = items.Select(label => new LabelResponse
-        {
-            Id = label.Id,
-            Name = label.Name,
-            Country = label.Country,
-            FoundedYear = label.FoundedYear,
-            Website = label.Website
-        }).ToList();
+        List<LabelResponse> labelResponses = items.Select(label => label.ToResponse()).ToList();
 
         PaginatedResult<LabelResponse> result = new PaginatedResult<LabelResponse>(
             labelResponses, 

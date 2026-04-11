@@ -1,0 +1,48 @@
+using Microsoft.EntityFrameworkCore;
+using MusicShop.Application.Common.Interfaces;
+using MusicShop.Application.UseCases.Catalog.Labels.Queries.GetLabels;
+using MusicShop.Domain.Entities.Catalog;
+using MusicShop.Domain.Interfaces;
+
+namespace MusicShop.Infrastructure.Persistence.Repositories;
+
+public sealed class LabelRepository : GenericRepository<Label>, ILabelRepository
+{
+    public LabelRepository(AppDbContext context) : base(context)
+    {
+    }
+
+    public async Task<(IReadOnlyList<Label> Items, int TotalCount)> GetPagedAsync(
+        GetLabelsQuery request, 
+        CancellationToken ct = default)
+    {
+        IQueryable<Label> query = _context.Set<Label>().AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(request.Q))
+        {
+            query = query.Where(x => x.Name.Contains(request.Q));
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Country))
+        {
+            query = query.Where(x => x.Country == request.Country);
+        }
+
+        int totalCount = await query.CountAsync(ct);
+
+        List<Label> items = await query
+            .OrderBy(x => x.Name)
+            .Skip((request.PageNumber - 1) * request.PageSize)
+            .Take(request.PageSize)
+            .ToListAsync(ct);
+
+        return (items, totalCount);
+    }
+
+    public async Task<Label?> GetBySlugAsync(string slug, CancellationToken ct = default)
+    {
+        return await _context.Set<Label>()
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Slug == slug, ct);
+    }
+}

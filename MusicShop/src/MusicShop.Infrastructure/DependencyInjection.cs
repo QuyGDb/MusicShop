@@ -27,6 +27,7 @@ public static class DependencyInjection
         services.AddScoped<IArtistRepository, ArtistRepository>();
         services.AddScoped<IReleaseVersionRepository, ReleaseVersionRepository>();
         services.AddScoped<IGenreRepository, GenreRepository>();
+        services.AddScoped<ILabelRepository, LabelRepository>();
 
         // 3. Register Security Services
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
