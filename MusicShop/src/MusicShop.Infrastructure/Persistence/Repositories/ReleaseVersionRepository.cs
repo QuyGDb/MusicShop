@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using MusicShop.Application.Common.Interfaces;
 using MusicShop.Domain.Entities.Catalog;
 using MusicShop.Domain.Interfaces;
 
@@ -10,7 +11,7 @@ public sealed class ReleaseVersionRepository : GenericRepository<ReleaseVersion>
     {
     }
 
-    public async Task<IReadOnlyList<ReleaseVersion>> GetByReleaseIdAsync(Guid releaseId, CancellationToken ct = default)
+    public async Task<List<ReleaseVersion>> GetByReleaseIdWithLabelAsync(Guid releaseId, CancellationToken ct = default)
     {
         return await _context.Set<ReleaseVersion>()
             .Include(v => v.Label)

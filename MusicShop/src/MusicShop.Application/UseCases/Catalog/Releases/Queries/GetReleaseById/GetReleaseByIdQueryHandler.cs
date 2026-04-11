@@ -15,7 +15,7 @@ public sealed class GetReleaseByIdQueryHandler(IReleaseRepository releaseReposit
         GetReleaseByIdQuery request,
         CancellationToken cancellationToken)
     {
-        Release? release = await releaseRepository.GetWithDetailsAsync(request.Id, cancellationToken);
+        Release? release = await releaseRepository.GetWithDetailsAsync(request.Id, ct: cancellationToken);
 
         if (release == null)
         {

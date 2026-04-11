@@ -1,15 +1,15 @@
 using MediatR;
 using MusicShop.Domain.Common;
 using MusicShop.Domain.Entities.Catalog;
+using MusicShop.Application.Common.Interfaces;
 using MusicShop.Domain.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using MusicShop.Application.UseCases.Catalog.Releases.Commands.CreateRelease;
 using MusicShop.Domain.Errors;
 
 namespace MusicShop.Application.UseCases.Catalog.Releases.Commands.UpdateRelease;
 
 public sealed class UpdateReleaseCommandHandler(
-    IRepository<Release> releaseRepository,
+    IReleaseRepository releaseRepository,
     IRepository<Artist> artistRepository,
     IUnitOfWork unitOfWork)
     : IRequestHandler<UpdateReleaseCommand, Result<Guid>>
@@ -19,10 +19,7 @@ public sealed class UpdateReleaseCommandHandler(
         CancellationToken cancellationToken)
     {
         // 1. Fetch Release with all related data
-        Release? release = await releaseRepository.AsQueryable()
-            .Include(r => r.ReleaseGenres)
-            .Include(r => r.Tracks)
-            .FirstOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
+        Release? release = await releaseRepository.GetWithDetailsAsync(request.Id, track: true, cancellationToken);
 
         if (release == null)
         {

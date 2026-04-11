@@ -1,14 +1,14 @@
 using MediatR;
 using MusicShop.Domain.Common;
 using MusicShop.Domain.Entities.Catalog;
+using MusicShop.Application.Common.Interfaces;
 using MusicShop.Domain.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using MusicShop.Domain.Errors;
 
 namespace MusicShop.Application.UseCases.Catalog.Releases.Commands.DeleteRelease;
 
 public sealed class DeleteReleaseCommandHandler(
-    IRepository<Release> releaseRepository,
+    IReleaseRepository releaseRepository,
     IUnitOfWork unitOfWork)
     : IRequestHandler<DeleteReleaseCommand, Result>
 {
@@ -17,11 +17,7 @@ public sealed class DeleteReleaseCommandHandler(
         CancellationToken cancellationToken)
     {
         // 1. Fetch with Versions to check associations
-        Release? release = await releaseRepository.AsQueryable()
-            .Include(r => r.Versions)
-            .Include(r => r.Tracks)
-            .Include(r => r.ReleaseGenres)
-            .FirstOrDefaultAsync(r => r.Id == request.Id, cancellationToken);
+        Release? release = await releaseRepository.GetWithDetailsAsync(request.Id, track: true, cancellationToken);
 
         if (release == null)
         {
