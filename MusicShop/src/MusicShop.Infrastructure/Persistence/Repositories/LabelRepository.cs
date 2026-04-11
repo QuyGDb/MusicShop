@@ -45,4 +45,11 @@ public sealed class LabelRepository : GenericRepository<Label>, ILabelRepository
             .AsNoTracking()
             .FirstOrDefaultAsync(x => x.Slug == slug, ct);
     }
+
+    public async Task<Label?> GetWithVersionsBySlugAsync(string slug, CancellationToken ct = default)
+    {
+        return await _context.Set<Label>()
+            .Include(x => x.ReleaseVersions)
+            .FirstOrDefaultAsync(x => x.Slug == slug, ct);
+    }
 }

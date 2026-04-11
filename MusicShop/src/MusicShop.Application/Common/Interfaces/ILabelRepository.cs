@@ -14,4 +14,5 @@ public interface ILabelRepository : IRepository<Label>
         CancellationToken ct = default);
 
     Task<Label?> GetBySlugAsync(string slug, CancellationToken ct = default);
+    Task<Label?> GetWithVersionsBySlugAsync(string slug, CancellationToken ct = default);
 }
