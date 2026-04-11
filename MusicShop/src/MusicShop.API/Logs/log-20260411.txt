@@ -1012,3 +1012,8 @@ CREATE UNIQUE INDEX "IX_WantlistItems_UserId_ProductId" ON "WantlistItems" ("Use
 2026-04-11 16:34:18.639 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
 INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
 VALUES ('20260411093320_InitialCreate', '10.0.5');
+2026-04-11 22:36:16.926 +07:00 [INF] User profile is available. Using 'C:\Users\usopp\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-04-11 22:36:17.048 +07:00 [INF] Now listening on: http://localhost:5016
+2026-04-11 22:36:17.049 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-04-11 22:36:17.049 +07:00 [INF] Hosting environment: Development
+2026-04-11 22:36:17.049 +07:00 [INF] Content root path: D:\Pine tree\MusicShop\src\MusicShop.Api
