@@ -3,12 +3,12 @@ using MusicShop.Domain.Common;
 using MusicShop.Domain.Entities.Catalog;
 using MusicShop.Domain.Errors;
 using MusicShop.Domain.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using MusicShop.Application.Common.Interfaces;
 
 namespace MusicShop.Application.UseCases.Catalog.Artists.Commands.UpdateArtist;
 
 public sealed class UpdateArtistCommandHandler(
-    IRepository<Artist> artistRepository,
+    IArtistRepository artistRepository,
     IRepository<Genre> genreRepository,
     IUnitOfWork unitOfWork)
     : IRequestHandler<UpdateArtistCommand, Result<string>>
@@ -18,9 +18,7 @@ public sealed class UpdateArtistCommandHandler(
         CancellationToken cancellationToken)
     {
         // 1. Fetch artist including Genres
-        Artist? artist = await artistRepository.AsQueryable()
-            .Include(x => x.ArtistGenres)
-            .FirstOrDefaultAsync(x => x.Slug == request.OldSlug, cancellationToken);
+        Artist? artist = await artistRepository.GetWithGenresBySlugAsync(request.OldSlug, cancellationToken);
 
         if (artist == null)
         {
@@ -50,8 +48,8 @@ public sealed class UpdateArtistCommandHandler(
         {
             List<Guid> distinctGenreIds = request.GenreIds.Distinct().ToList();
             
-            int existingGenresCount = await genreRepository.AsQueryable()
-                .CountAsync(g => distinctGenreIds.Contains(g.Id), cancellationToken);
+            int existingGenresCount = await genreRepository.CountAsync(
+                g => distinctGenreIds.Contains(g.Id), cancellationToken);
 
             if (existingGenresCount != distinctGenreIds.Count)
             {

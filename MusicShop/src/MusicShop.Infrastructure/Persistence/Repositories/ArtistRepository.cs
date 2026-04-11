@@ -28,6 +28,14 @@ public sealed class ArtistRepository : GenericRepository<Artist>, IArtistReposit
             .FirstOrDefaultAsync(x => x.Slug == slug, cancellationToken);
     }
 
+    public async Task<Artist?> GetWithReleasesBySlugAsync(string slug, CancellationToken cancellationToken = default)
+    {
+        return await _context.Set<Artist>()
+            .Include(x => x.Releases)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.Slug == slug, cancellationToken);
+    }
+
     public async Task<(IReadOnlyList<Artist> Items, int TotalCount)> GetPagedAsync(
         GetArtistsQuery request,
         CancellationToken cancellationToken = default)

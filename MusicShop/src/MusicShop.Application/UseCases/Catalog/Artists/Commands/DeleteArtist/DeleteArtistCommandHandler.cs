@@ -1,14 +1,14 @@
 using MediatR;
 using MusicShop.Domain.Common;
 using MusicShop.Domain.Entities.Catalog;
+using MusicShop.Application.Common.Interfaces;
 using MusicShop.Domain.Interfaces;
-using Microsoft.EntityFrameworkCore;
 using MusicShop.Domain.Errors;
 
 namespace MusicShop.Application.UseCases.Catalog.Artists.Commands.DeleteArtist;
 
 public sealed class DeleteArtistCommandHandler(
-    IRepository<Artist> artistRepository,
+    IArtistRepository artistRepository,
     IUnitOfWork unitOfWork)
     : IRequestHandler<DeleteArtistCommand, Result>
 {
@@ -16,9 +16,7 @@ public sealed class DeleteArtistCommandHandler(
         DeleteArtistCommand request, 
         CancellationToken cancellationToken)
     {
-        Artist? artist = await artistRepository.AsQueryable()
-            .Include(x => x.Releases)
-            .FirstOrDefaultAsync(x => x.Slug == request.Slug, cancellationToken);
+        Artist? artist = await artistRepository.GetWithReleasesBySlugAsync(request.Slug, cancellationToken);
 
         if (artist == null)
         {

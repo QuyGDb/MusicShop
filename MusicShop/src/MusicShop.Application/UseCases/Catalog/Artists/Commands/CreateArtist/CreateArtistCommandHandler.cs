@@ -1,5 +1,4 @@
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using MusicShop.Domain.Common;
 using MusicShop.Domain.Entities.Catalog;
 using MusicShop.Domain.Errors;
@@ -37,8 +36,8 @@ public sealed class CreateArtistCommandHandler(
             // Remove duplicates from request to avoid double count
             List<Guid> distinctGenreIds = request.GenreIds.Distinct().ToList();
             
-            int existingGenresCount = await genreRepository.AsQueryable()
-                .CountAsync(g => distinctGenreIds.Contains(g.Id), cancellationToken);
+            int existingGenresCount = await genreRepository.CountAsync(
+                g => distinctGenreIds.Contains(g.Id), cancellationToken);
 
             if (existingGenresCount != distinctGenreIds.Count)
             {

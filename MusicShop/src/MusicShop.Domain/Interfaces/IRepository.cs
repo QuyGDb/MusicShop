@@ -12,6 +12,8 @@ public interface IRepository<T> where T : BaseEntity
         Expression<Func<T, bool>>? predicate = null,
         CancellationToken cancellationToken = default);
     Task<T?> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
+    Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
+    Task<int> CountAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
     IQueryable<T> AsQueryable();
     void Add(T entity);
     void Update(T entity);
