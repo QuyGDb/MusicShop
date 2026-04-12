@@ -37,20 +37,20 @@ public class LabelsController(IMediator mediator) : BaseApiController
     }
 
     [Authorize(Roles = "admin")]
-    [HttpPut("{slug}")]
-    public async Task<ActionResult<ApiResponse<string>>> UpdateLabel(string slug, [FromBody] UpdateLabelCommand command)
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<ApiResponse<string>>> UpdateLabel(Guid id, [FromBody] UpdateLabelCommand command)
     {
-        if (slug != command.OldSlug) return BadRequest();
+        if (id != command.Id) return BadRequest();
         
         var result = await mediator.Send(command);
         return HandleResult(result);
     }
 
     [Authorize(Roles = "admin")]
-    [HttpDelete("{slug}")]
-    public async Task<ActionResult<ApiResponse<object>>> DeleteLabel(string slug)
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<ApiResponse<object>>> DeleteLabel(Guid id)
     {
-        var result = await mediator.Send(new DeleteLabelCommand(slug));
+        var result = await mediator.Send(new DeleteLabelCommand(id));
         return HandleNonGenericResult(result);
     }
 }

@@ -13,7 +13,7 @@ public sealed class UpdateGenreCommandHandler(
 {
     public async Task<Result<GenreResponse>> Handle(UpdateGenreCommand request, CancellationToken cancellationToken)
     {
-        Genre? genre = await genreRepository.FirstOrDefaultAsync(x => x.Slug == request.Slug, cancellationToken);
+        Genre? genre = await genreRepository.GetByIdAsync(request.Id, cancellationToken);
         
         if (genre == null)
         {

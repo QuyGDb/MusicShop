@@ -38,20 +38,20 @@ public class ArtistsController(IMediator mediator) : BaseApiController
     }
 
     [Authorize(Roles = "admin")]
-    [HttpPut("{slug}")]
-    public async Task<ActionResult<ApiResponse<string>>> UpdateArtist(string slug, [FromBody] UpdateArtistCommand command)
+    [HttpPut("{id:guid}")]
+    public async Task<ActionResult<ApiResponse<string>>> UpdateArtist(Guid id, [FromBody] UpdateArtistCommand command)
     {
-        if (slug != command.OldSlug) return BadRequest();
+        if (id != command.Id) return BadRequest();
 
         Result<string> result = await mediator.Send(command);
         return HandleResult(result);
     }
 
     [Authorize(Roles = "admin")]
-    [HttpDelete("{slug}")]
-    public async Task<ActionResult<ApiResponse<object>>> DeleteArtist(string slug)
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<ApiResponse<object>>> DeleteArtist(Guid id)
     {
-        Result result = await mediator.Send(new DeleteArtistCommand(slug));
+        Result result = await mediator.Send(new DeleteArtistCommand(id));
         return HandleNonGenericResult(result);
     }
 }

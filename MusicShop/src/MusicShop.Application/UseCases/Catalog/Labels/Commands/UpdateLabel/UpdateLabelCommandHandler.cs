@@ -15,8 +15,8 @@ public sealed class UpdateLabelCommandHandler(
         UpdateLabelCommand request, 
         CancellationToken cancellationToken)
     {
-        // 1. Find by old slug
-        Label? label = await labelRepository.FirstOrDefaultAsync(x => x.Slug == request.OldSlug, cancellationToken);
+        // 1. Find by Id
+        Label? label = await labelRepository.GetByIdAsync(request.Id, cancellationToken);
         if (label == null)
         {
             return Result<string>.Failure(LabelErrors.NotFound);

@@ -6,8 +6,8 @@ public sealed class UpdateArtistCommandValidator : AbstractValidator<UpdateArtis
 {
     public UpdateArtistCommandValidator()
     {
-        RuleFor(x => x.OldSlug)
-            .NotEmpty().WithMessage("Old slug is required.");
+        RuleFor(x => x.Id)
+            .NotEmpty().WithMessage("Artist ID is required.");
 
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Artist name is required.")

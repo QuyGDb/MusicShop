@@ -13,7 +13,7 @@ public sealed class DeleteGenreCommandHandler(
 {
     public async Task<Result> Handle(DeleteGenreCommand request, CancellationToken cancellationToken)
     {
-        Genre? genre = await genreRepository.GetWithAssociationsBySlugAsync(request.Slug, cancellationToken);
+        Genre? genre = await genreRepository.GetWithAssociationsAsync(request.Id, cancellationToken);
 
         if (genre is null)
         {

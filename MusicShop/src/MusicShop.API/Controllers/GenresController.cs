@@ -38,19 +38,19 @@ public class GenresController(IMediator mediator) : BaseApiController
 
 
     [Authorize(Roles = "admin")]
-    [HttpPut("{slug}")]
+    [HttpPut("{id:guid}")]
     [ProducesResponseType(typeof(ApiResponse<GenreResponse>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ApiResponse<GenreResponse>>> UpdateGenre(string slug, [FromBody] UpdateGenreRequest request)
+    public async Task<ActionResult<ApiResponse<GenreResponse>>> UpdateGenre(Guid id, [FromBody] UpdateGenreRequest request)
     {
-        var result = await mediator.Send(new UpdateGenreCommand(slug, request.Name));
+        var result = await mediator.Send(new UpdateGenreCommand(id, request.Name));
         return HandleResult(result);
     }
 
     [Authorize(Roles = "admin")]
-    [HttpDelete("{slug}")]
-    public async Task<ActionResult<ApiResponse<object>>> DeleteGenre(string slug)
+    [HttpDelete("{id:guid}")]
+    public async Task<ActionResult<ApiResponse<object>>> DeleteGenre(Guid id)
     {
-        var result = await mediator.Send(new DeleteGenreCommand(slug));
+        var result = await mediator.Send(new DeleteGenreCommand(id));
         return HandleNonGenericResult(result);
     }
 }

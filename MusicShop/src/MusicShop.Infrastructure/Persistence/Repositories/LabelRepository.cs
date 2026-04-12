@@ -46,6 +46,13 @@ public sealed class LabelRepository : GenericRepository<Label>, ILabelRepository
             .FirstOrDefaultAsync(x => x.Slug == slug, ct);
     }
 
+    public async Task<Label?> GetWithVersionsAsync(Guid id, CancellationToken ct = default)
+    {
+        return await _context.Set<Label>()
+            .Include(x => x.ReleaseVersions)
+            .FirstOrDefaultAsync(x => x.Id == id, ct);
+    }
+
     public async Task<Label?> GetWithVersionsBySlugAsync(string slug, CancellationToken ct = default)
     {
         return await _context.Set<Label>()

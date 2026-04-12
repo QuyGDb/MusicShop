@@ -41,6 +41,14 @@ public sealed class GenreRepository : GenericRepository<Genre>, IGenreRepository
             .FirstOrDefaultAsync(x => x.Slug == slug, ct);
     }
 
+    public async Task<Genre?> GetWithAssociationsAsync(Guid id, CancellationToken ct = default)
+    {
+        return await _context.Set<Genre>()
+            .Include(x => x.ArtistGenres)
+            .Include(x => x.ReleaseGenres)
+            .FirstOrDefaultAsync(x => x.Id == id, ct);
+    }
+
     public async Task<Genre?> GetWithAssociationsBySlugAsync(string slug, CancellationToken ct = default)
     {
         return await _context.Set<Genre>()

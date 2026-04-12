@@ -4,7 +4,7 @@ using MusicShop.Domain.Common;
 namespace MusicShop.Application.UseCases.Catalog.Artists.Commands.UpdateArtist;
 
 public record UpdateArtistCommand(
-    string OldSlug,
+    Guid Id,
     string Name,
     string Slug,
     string? Bio,

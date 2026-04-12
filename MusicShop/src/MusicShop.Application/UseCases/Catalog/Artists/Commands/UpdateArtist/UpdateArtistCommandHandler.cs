@@ -18,7 +18,7 @@ public sealed class UpdateArtistCommandHandler(
         CancellationToken cancellationToken)
     {
         // 1. Fetch artist including Genres
-        Artist? artist = await artistRepository.GetWithGenresBySlugAsync(request.OldSlug, cancellationToken);
+        Artist? artist = await artistRepository.GetWithGenresAsync(request.Id, cancellationToken);
 
         if (artist == null)
         {

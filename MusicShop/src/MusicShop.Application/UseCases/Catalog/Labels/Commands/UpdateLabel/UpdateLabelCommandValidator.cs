@@ -6,8 +6,8 @@ public sealed class UpdateLabelCommandValidator : AbstractValidator<UpdateLabelC
 {
     public UpdateLabelCommandValidator()
     {
-        RuleFor(x => x.OldSlug)
-            .NotEmpty().WithMessage("Old slug is required.");
+        RuleFor(x => x.Id)
+            .NotEmpty().WithMessage("Label ID is required.");
 
         RuleFor(x => x.Name)
             .NotEmpty().WithMessage("Label name is required.")
