@@ -128,7 +128,7 @@ Request → Controller → MediatR → Handler → Repository → DB
 |---|---|---|
 | 16 | AI Chat — Claude SSE streaming | Phase 7 |
 | 17 | AI Recommendation (content-based filtering) | Phase 7 |
-| 18 | Wantlist / Collection / Reviews | Phase 5 |
+| 18 | Wantlist / Collection | Phase 5 |
 | 19 | Sentry error tracking | Phase 1 |
 | 20 | Curated collections | Phase 2 |
 
@@ -531,8 +531,7 @@ public static class ProductMappings
             CoverUrl = p.CoverUrl,
             MinPrice = p.Variants.Any() ? p.Variants.Min(v => v.Price) : 0,
             MaxPrice = p.Variants.Any() ? p.Variants.Max(v => v.Price) : 0,
-            InStock = p.Variants.Any(v => v.StockQty > 0 && v.IsAvailable),
-            AvgRating = p.Reviews.Any() ? p.Reviews.Average(r => r.Rating) : (double?)null
+            InStock = p.Variants.Any(v => v.StockQty > 0 && v.IsAvailable)
         });
     }
 }
@@ -639,7 +638,7 @@ public class ProductSearchService : IProductSearchService
 ### 3.1 EF Core Migration 3
 
 ```
-carts, cart_items, orders, order_items, reviews
+carts, cart_items, orders, order_items
 ```
 
 ---

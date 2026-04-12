@@ -101,13 +101,7 @@ Audit dựa trên code thực tế trong `MusicShop.Api/Controllers/`.
 | 40 | `PUT /products/:id/variants/:variantId` | ✅ | Vừa implement |
 | 41 | `DELETE /products/:id/variants/:variantId` | ✅ | Vừa implement |
 
-### Product Reviews
-
-| # | Endpoint | Code | Ghi chú |
-|---|---|---|---|
-| 42 | `GET /products/:id/reviews` | ❌ | **Chưa implement** |
-
-**Products: 9/10 done** — Thiếu: GET reviews.
+**Products: 9/9 done**
 
 ---
 
@@ -151,7 +145,6 @@ Audit dựa trên code thực tế trong `MusicShop.Api/Controllers/`.
 | 58 | `GET /admin/orders` | ❌ | |
 | 59 | `PATCH /admin/orders/:id/status` | ❌ | |
 | 60 | `POST /admin/orders/:id/cancel` | ❌ | |
-| 61 | `POST /orders/:id/reviews` | ❌ | |
 
 **Orders: 0/8 done**
 
@@ -202,14 +195,14 @@ Audit dựa trên code thực tế trong `MusicShop.Api/Controllers/`.
 |---|---|---|---|
 | Auth | 6 | 8 | 75% |
 | Catalog | 21 | 24 | 88% |
-| Products | 9 | 10 | 90% |
+| Products | 9 | 9 | 100% |
 | Curated Collections | 0 | 6 | 0% |
 | Cart | 4 | 5 | 80% |
-| Orders | 0 | 8 | 0% |
+| Orders | 0 | 7 | 0% |
 | Payment | 0 | 4 | 0% |
 | Wantlist & Collection | 0 | 6 | 0% |
 | Notifications | 0 | 3 | 0% |
-| **Tổng (trừ FUTURE)** | **40** | **74** | **54%** |
+| **Tổng (trừ FUTURE)** | **40** | **72** | **55%** |
 
 ---
 
@@ -240,9 +233,7 @@ Không có Orders + Payment thì Cart vô nghĩa.
 |---|---|---|
 | 53 | `DELETE /cart` | Clear cart — UX cơ bản |
 | 17 | `PUT /genres/:id` | Admin sửa genre — module Catalog gần hoàn thiện mà thiếu cái này |
-| 42 | `GET /products/:id/reviews` | Product detail page cần hiển thị reviews |
 | 58 | `GET /admin/orders` | Admin dashboard |
-| 61 | `POST /orders/:id/reviews` | Customer review sau khi nhận hàng |
 
 ### Priority 3 — Curated Collections (admin marketing)
 
