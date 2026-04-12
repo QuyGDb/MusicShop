@@ -13,6 +13,7 @@ using MusicShop.Application.UseCases.Shop.Products.Commands.UpdateProductVariant
 using MusicShop.Application.UseCases.Shop.Products.Queries.GetProductById;
 using MusicShop.Application.UseCases.Shop.Products.Queries.GetProductVariants;
 using MusicShop.Application.UseCases.Shop.Products.Queries.GetProducts;
+using MusicShop.Application.UseCases.Shop.Reviews.Queries.GetProductReviews;
 
 namespace MusicShop.API.Controllers;
 
@@ -80,6 +81,18 @@ public sealed class ProductsController(IMediator mediator) : BaseApiController
     {
         var result = await mediator.Send(new DeactivateProductCommand(id), cancellationToken);
         return HandleNonGenericResult(result);
+    }
+
+    [HttpGet("{id:guid}/reviews")]
+    [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<ReviewDto>>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<ReviewDto>>>> GetProductReviews(
+        Guid id,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await mediator.Send(new GetProductReviewsQuery(id, pageNumber, pageSize), cancellationToken);
+        return HandlePaginatedResult(result);
     }
 
     // ── Variants ────────────────────────────────────────────────────────────

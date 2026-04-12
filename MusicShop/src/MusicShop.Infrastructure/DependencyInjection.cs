@@ -31,6 +31,7 @@ public static class DependencyInjection
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<ICartRepository, CartRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
+        services.AddScoped<IReviewRepository, ReviewRepository>();
 
         // 3. Register Security Services
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
