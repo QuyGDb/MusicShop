@@ -7,7 +7,6 @@ using MusicShop.Application.DTOs.Shop;
 using MusicShop.Application.UseCases.Admin.Orders.Commands.UpdateOrderStatus;
 using MusicShop.Application.UseCases.Admin.Orders.Queries.GetAdminOrders;
 using MusicShop.Application.UseCases.Shop.Orders.Commands.CancelOrder;
-using MusicShop.Application.UseCases.Shop.Orders.Commands.CreateReview;
 using MusicShop.Application.UseCases.Shop.Orders.Commands.CreateOrder;
 using MusicShop.Application.UseCases.Shop.Orders.Queries.GetOrderDetail;
 using MusicShop.Application.UseCases.Shop.Orders.Queries.GetOrderHistory;
@@ -46,18 +45,18 @@ public sealed class OrdersController(IMediator mediator) : BaseApiController
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<ActionResult<ApiResponse<object>>> CancelOrder([FromRoute] Guid id)
     {
-            Result result = await mediator.Send(new CancelOrderCommand(id));
-            return HandleNonGenericResult(result);
-        }
+        Result result = await mediator.Send(new CancelOrderCommand(id));
+        return HandleNonGenericResult(result);
+    }
 
-        [Authorize(Roles = "admin")]
-        [HttpGet("/api/v1/admin/orders")]
-        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<OrderListItemDto>>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<ApiResponse<IReadOnlyList<OrderListItemDto>>>> GetAdminOrders([FromQuery] GetAdminOrdersQuery query)
-        {
-            var result = await mediator.Send(query);
-            return HandlePaginatedResult(result);
-        }
+    [Authorize(Roles = "admin")]
+    [HttpGet("/api/v1/admin/orders")]
+    [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<OrderListItemDto>>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<OrderListItemDto>>>> GetAdminOrders([FromQuery] GetAdminOrdersQuery query)
+    {
+        Result<PaginatedResult<OrderListItemDto>> result = await mediator.Send(query);
+        return HandlePaginatedResult(result);
+    }
 
     [Authorize(Roles = "admin")]
     [HttpPatch("/api/v1/admin/orders/{id:guid}/status")]
@@ -74,21 +73,4 @@ public sealed class OrdersController(IMediator mediator) : BaseApiController
         Result result = await mediator.Send(command);
         return HandleNonGenericResult(result);
     }
-
-    [HttpPost("{id:guid}/reviews")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<ApiResponse<object>>> CreateReview(
-        [FromRoute] Guid id, 
-        [FromBody] CreateReviewRequest request)
-    {
-        var result = await mediator.Send(new CreateReviewCommand(
-            id, 
-            request.ProductId, 
-            request.Rating, 
-            request.Comment));
-        
-        return HandleNonGenericResult(result);
-    }
 }
-
-public sealed record CreateReviewRequest(Guid ProductId, int Rating, string? Comment);

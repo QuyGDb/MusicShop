@@ -29,9 +29,7 @@ public sealed class GetCuratedCollectionByIdQueryHandler(
                 CoverUrl = p.ReleaseVersion.Release.CoverUrl,
                 MinPrice = p.Variants.Any() ? p.Variants.Min(v => v.Price) : 0,
                 MaxPrice = p.Variants.Any() ? p.Variants.Max(v => v.Price) : 0,
-                InStock = p.Variants.Any(v => v.StockQty > 0 && v.IsAvailable),
-                AvgRating = p.Reviews.Any() ? p.Reviews.Average(r => r.Rating) : null,
-                ReviewCount = p.Reviews.Count
+                InStock = p.Variants.Any(v => v.StockQty > 0 && v.IsAvailable)
             })
             .ToList();
 

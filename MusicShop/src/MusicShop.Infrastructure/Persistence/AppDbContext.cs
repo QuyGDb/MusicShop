@@ -41,7 +41,6 @@ public class AppDbContext : DbContext
     public DbSet<CartItem> CartItems => Set<CartItem>();
     public DbSet<Order> Orders => Set<Order>();
     public DbSet<OrderItem> OrderItems => Set<OrderItem>();
-    public DbSet<Review> Reviews => Set<Review>();
 
     // 5. Payments
     public DbSet<Payment> Payments => Set<Payment>();

@@ -27,9 +27,6 @@ public sealed class CuratedCollectionRepository(AppDbContext context) : ICurated
             .Include(c => c.Items)
                 .ThenInclude(i => i.Product)
                     .ThenInclude(p => p.Variants)
-            .Include(c => c.Items)
-                .ThenInclude(i => i.Product)
-                    .ThenInclude(p => p.Reviews)
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == id, ct);
     }

@@ -21,11 +21,7 @@ public static class ProductMapping
             CoverUrl = p.CoverUrl,
             MinPrice = p.Variants.Any() ? p.Variants.Min(v => v.Price) : 0,
             MaxPrice = p.Variants.Any() ? p.Variants.Max(v => v.Price) : 0,
-            InStock = p.Variants.Any(v => v.StockQty > 0 && v.IsAvailable),
-            
-            // Placeholder logic for review summaries (not yet implemented)
-            AvgRating = 0, 
-            ReviewCount = 0
+            InStock = p.Variants.Any(v => v.StockQty > 0 && v.IsAvailable)
         });
     }
 
@@ -60,9 +56,7 @@ public static class ProductMapping
                 StockQty = v.StockQty,
                 IsAvailable = v.IsAvailable,
                 IsSigned = v.IsSigned
-            }).ToList(), // EF Core handles collection projection
-            AvgRating = 0,
-            ReviewCount = 0
+            }).ToList() // EF Core handles collection projection
         });
     }
 }

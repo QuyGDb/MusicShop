@@ -14,6 +14,4 @@ public class ProductListItemDto
     public decimal MinPrice { get; set; }
     public decimal MaxPrice { get; set; }
     public bool InStock { get; set; }
-    public double? AvgRating { get; set; }
-    public int ReviewCount { get; set; }
 }

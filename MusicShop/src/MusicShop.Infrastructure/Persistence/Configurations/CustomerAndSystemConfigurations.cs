@@ -25,18 +25,7 @@ public class UserCollectionConfiguration : IEntityTypeConfiguration<UserCollecti
     }
 }
 
-public class ReviewConfiguration : IEntityTypeConfiguration<Review>
-{
-    public void Configure(EntityTypeBuilder<Review> builder)
-    {
-        builder.HasKey(x => x.Id);
-        
-        builder.Property(x => x.Comment).HasMaxLength(1000);
 
-        // Unique review per user, order, and product
-        builder.HasIndex(x => new { x.UserId, x.OrderId, x.ProductId }).IsUnique();
-    }
-}
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
 {

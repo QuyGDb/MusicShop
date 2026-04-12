@@ -16,7 +16,4 @@ public class ProductDetailDto
     
     public ArtistShortDto Artist { get; set; } = null!;
     public IEnumerable<ProductVariantDto> Variants { get; set; } = new List<ProductVariantDto>();
-    
-    public double? AvgRating { get; set; }
-    public int ReviewCount { get; set; }
 }

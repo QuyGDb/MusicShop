@@ -31,7 +31,6 @@ public static class DependencyInjection
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<ICartRepository, CartRepository>();
         services.AddScoped<IOrderRepository, OrderRepository>();
-        services.AddScoped<IReviewRepository, ReviewRepository>();
         services.AddScoped<ICuratedCollectionRepository, CuratedCollectionRepository>();
 
         // 3. Register Security Services
