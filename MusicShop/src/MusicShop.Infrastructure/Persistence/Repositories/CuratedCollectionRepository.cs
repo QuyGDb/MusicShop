@@ -15,4 +15,22 @@ public sealed class CuratedCollectionRepository(AppDbContext context) : ICurated
             .OrderBy(c => c.CreatedAt)
             .ToListAsync(ct);
     }
+
+    public async Task<CuratedCollection?> GetByIdWithItemsAsync(Guid id, CancellationToken ct = default)
+    {
+        return await context.CuratedCollections
+            .Include(c => c.Items.OrderBy(i => i.SortOrder))
+                .ThenInclude(i => i.Product)
+                    .ThenInclude(p => p.ReleaseVersion)
+                        .ThenInclude(rv => rv.Release)
+                            .ThenInclude(r => r.Artist)
+            .Include(c => c.Items)
+                .ThenInclude(i => i.Product)
+                    .ThenInclude(p => p.Variants)
+            .Include(c => c.Items)
+                .ThenInclude(i => i.Product)
+                    .ThenInclude(p => p.Reviews)
+            .AsNoTracking()
+            .FirstOrDefaultAsync(c => c.Id == id, ct);
+    }
 }

@@ -28,4 +28,5 @@ public class Product : BaseEntity
     // Navigation
     public ICollection<ProductVariant> Variants { get; set; } = new List<ProductVariant>();
     public ICollection<CuratedCollectionItem> CollectionItems { get; set; } = new List<CuratedCollectionItem>();
+    public ICollection<Customer.Review> Reviews { get; set; } = new List<Customer.Review>();
 }
