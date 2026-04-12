@@ -2,8 +2,10 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MusicShop.API.Infrastructure;
+using MusicShop.Application.Common;
 using MusicShop.Application.DTOs.Shop;
 using MusicShop.Application.UseCases.Shop.Orders.Commands.CreateOrder;
+using MusicShop.Application.UseCases.Shop.Orders.Queries.GetOrderHistory;
 using MusicShop.Domain.Common;
 
 namespace MusicShop.API.Controllers;
@@ -11,6 +13,14 @@ namespace MusicShop.API.Controllers;
     [Authorize]
     public sealed class OrdersController(IMediator mediator) : BaseApiController
     {
+        [HttpGet]
+        [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<OrderListItemDto>>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<ApiResponse<IReadOnlyList<OrderListItemDto>>>> GetOrderHistory([FromQuery] GetOrderHistoryQuery query)
+        {
+            Result<PaginatedResult<OrderListItemDto>> result = await mediator.Send(query);
+            return HandlePaginatedResult(result);
+        }
+
         [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<CreateOrderResponse>), StatusCodes.Status201Created)]
     public async Task<ActionResult<ApiResponse<CreateOrderResponse>>> CreateOrder([FromBody] CreateOrderCommand command)
