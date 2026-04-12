@@ -16,7 +16,7 @@
 | Queue | **Hangfire** (PostgreSQL-backed) | Background jobs, cron, retry, dashboard UI |
 | Auth | **JWT Bearer** + **Google Auth** + **Identity (tùy chọn)** | Auth đa phương thức (Local + Google) |
 | Validation | **FluentValidation** | Validation tách biệt khỏi controller |
-| Mapping | **AutoMapper** | DTO ↔ Entity mapping |
+| Mapping | **Manual Mapping** | Transparency, performance, no magic |
 | Storage | **AWS S3 / Cloudflare R2** (AWSSDK.S3) | File upload |
 | Email | **MailKit** + **SMTP / SendGrid** | Transactional email |
 | Payment | **VNPAY SDK / tự implement** | HMAC-SHA512, tích hợp nội địa |
@@ -167,7 +167,7 @@ Tuần 4    Tier 2 #9 → #14   Backend mở rộng
   <!-- Application -->
   <PackageReference Include="MediatR" />
   <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
-  <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" />
+  <!-- No AutoMapper: Using Manual Mapping -->
 
   <!-- Infrastructure -->
   <PackageReference Include="Microsoft.EntityFrameworkCore" />
@@ -513,23 +513,27 @@ builder.Entity<CassetteAttributes>().ToTable("cassette_attributes");
 
 ---
 
-### 2.2 Products Module — Computed Fields
+### 2.2 Products Module — Manual Mapping
 
-**AutoMapper — tính computed fields khi map:**
+**Sử dụng static Extension methods hoặc Select trực tiếp trong Query:**
 ```csharp
-public class ProductProfile : Profile
+public static class ProductMappings
 {
-    public ProductProfile()
+    public static IQueryable<ProductListDto> ProjectToDto(this IQueryable<Product> query)
     {
-        CreateMap<Product, ProductListDto>()
-            .ForMember(d => d.MinPrice, o => o.MapFrom(s =>
-                s.Variants.Any() ? s.Variants.Min(v => v.Price) : 0))
-            .ForMember(d => d.MaxPrice, o => o.MapFrom(s =>
-                s.Variants.Any() ? s.Variants.Max(v => v.Price) : 0))
-            .ForMember(d => d.InStock, o => o.MapFrom(s =>
-                s.Variants.Any(v => v.StockQty > 0 && v.IsAvailable)))
-            .ForMember(d => d.AvgRating, o => o.MapFrom(s =>
-                s.Reviews.Any() ? s.Reviews.Average(r => r.Rating) : (double?)null));
+        return query.Select(p => new ProductListDto
+        {
+            Id = p.Id,
+            Name = p.Name,
+            Format = p.Format,
+            IsLimited = p.IsLimited,
+            IsPreorder = p.IsPreorder,
+            CoverUrl = p.CoverUrl,
+            MinPrice = p.Variants.Any() ? p.Variants.Min(v => v.Price) : 0,
+            MaxPrice = p.Variants.Any() ? p.Variants.Max(v => v.Price) : 0,
+            InStock = p.Variants.Any(v => v.StockQty > 0 && v.IsAvailable),
+            AvgRating = p.Reviews.Any() ? p.Reviews.Average(r => r.Rating) : (double?)null
+        });
     }
 }
 ```

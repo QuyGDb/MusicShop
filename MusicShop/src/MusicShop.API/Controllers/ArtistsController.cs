@@ -42,7 +42,7 @@ public class ArtistsController(IMediator mediator) : BaseApiController
     public async Task<ActionResult<ApiResponse<string>>> UpdateArtist(string slug, [FromBody] UpdateArtistCommand command)
     {
         if (slug != command.OldSlug) return BadRequest();
-        
+
         Result<string> result = await mediator.Send(command);
         return HandleResult(result);
     }

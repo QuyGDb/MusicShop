@@ -1,6 +1,6 @@
 using MediatR;
 using MusicShop.Domain.Common;
-using MusicShop.Application.UseCases.Catalog.Releases.Commands.CreateRelease;
+using MusicShop.Application.DTOs.Catalog;
 
 namespace MusicShop.Application.UseCases.Catalog.Releases.Commands.UpdateRelease;
 

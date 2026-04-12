@@ -96,7 +96,7 @@ public class ReleaseConfiguration : IEntityTypeConfiguration<Release>
             .WithOne(x => x.Release)
             .HasForeignKey(x => x.ReleaseId)
             .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         // 1 Release -> Many Tracks
         builder.HasMany(x => x.Tracks)
@@ -123,7 +123,7 @@ public class ReleaseVersionConfiguration : IEntityTypeConfiguration<ReleaseVersi
             .WithMany(x => x.Versions)
             .HasForeignKey(x => x.ReleaseId)
             .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne(x => x.Label)
             .WithMany(x => x.ReleaseVersions)

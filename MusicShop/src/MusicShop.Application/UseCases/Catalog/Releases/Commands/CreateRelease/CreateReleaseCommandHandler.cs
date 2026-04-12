@@ -3,6 +3,7 @@ using MusicShop.Domain.Common;
 using MusicShop.Domain.Entities.Catalog;
 using MusicShop.Domain.Interfaces;
 using MusicShop.Domain.Errors;
+using MusicShop.Application.DTOs.Catalog;
 
 namespace MusicShop.Application.UseCases.Catalog.Releases.Commands.CreateRelease;
 
