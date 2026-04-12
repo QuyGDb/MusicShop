@@ -20,7 +20,12 @@ public sealed class CreateOrderCommandHandler(
 {
     public async Task<Result<CreateOrderResponse>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
-        Guid userId = Guid.Parse(currentUserService.UserId!);
+        if (string.IsNullOrEmpty(currentUserService.UserId))
+        {
+            return Result<CreateOrderResponse>.Failure(new Error("Auth.Unauthorized", "User is not authenticated."));
+        }
+
+        Guid userId = Guid.Parse(currentUserService.UserId);
 
         // 1. Fetch cart with items
         CartEntity? cart = await cartRepository.GetByUserIdAsync(userId, cancellationToken);

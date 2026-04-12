@@ -38,7 +38,7 @@ public sealed class OrdersController(IMediator mediator) : BaseApiController
     public async Task<ActionResult<ApiResponse<CreateOrderResponse>>> CreateOrder([FromBody] CreateOrderCommand command)
     {
         Result<CreateOrderResponse> result = await mediator.Send(command);
-        return HandleResult(result);
+        return HandleCreatedResult(result, nameof(GetOrderDetail), new { id = result.IsSuccess ? result.Value.Order.Id : Guid.Empty });
     }
 
     [HttpPost("{id:guid}/cancel")]
