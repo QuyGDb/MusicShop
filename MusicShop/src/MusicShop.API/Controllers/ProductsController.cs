@@ -11,6 +11,7 @@ using MusicShop.Application.UseCases.Shop.Products.Commands.DeleteProductVariant
 using MusicShop.Application.UseCases.Shop.Products.Commands.UpdateProduct;
 using MusicShop.Application.UseCases.Shop.Products.Commands.UpdateProductVariant;
 using MusicShop.Application.UseCases.Shop.Products.Queries.GetProductById;
+using MusicShop.Application.UseCases.Shop.Products.Queries.GetProductBySlug;
 using MusicShop.Application.UseCases.Shop.Products.Queries.GetProductVariants;
 using MusicShop.Application.UseCases.Shop.Products.Queries.GetProducts;
 
@@ -30,14 +31,14 @@ public sealed class ProductsController(IMediator mediator) : BaseApiController
         return HandlePaginatedResult(result);
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{slug}")]
     [ProducesResponseType(typeof(ApiResponse<ProductDetailDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ApiResponse<ProductDetailDto>>> GetProductById(
-        Guid id,
+    public async Task<ActionResult<ApiResponse<ProductDetailDto>>> GetProductBySlug(
+        string slug,
         CancellationToken cancellationToken)
     {
-        var result = await mediator.Send(new GetProductByIdQuery(id), cancellationToken);
+        var result = await mediator.Send(new GetProductBySlugQuery(slug), cancellationToken);
         return HandleResult(result);
     }
 
@@ -50,7 +51,7 @@ public sealed class ProductsController(IMediator mediator) : BaseApiController
         CancellationToken cancellationToken)
     {
         var result = await mediator.Send(command, cancellationToken);
-        return HandleCreatedResult(result, nameof(GetProductById), new { id = result.Value });
+        return HandleCreatedResult(result, nameof(GetProductBySlug), new { slug = command.Slug });
     }
 
     [Authorize(Roles = "admin")]
@@ -85,15 +86,23 @@ public sealed class ProductsController(IMediator mediator) : BaseApiController
 
 
     // ── Variants ────────────────────────────────────────────────────────────
+    // Not using GetBySlug for variants internal query as it's more efficient by ID if we have it, 
+    // but the route should be SEO friendly. 
+    // Actually, variants are sub-resources. We can keep ID for simplicity or use Slug.
+    // Let's use Slug for the parent product in the route.
 
-    [HttpGet("{id:guid}/variants")]
+    [HttpGet("{slug}/variants")]
     [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<ProductVariantDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<IReadOnlyList<ProductVariantDto>>>> GetVariants(
-        Guid id,
+        string slug,
         CancellationToken cancellationToken)
     {
-        var result = await mediator.Send(new GetProductVariantsQuery(id), cancellationToken);
+        // We might need GetProductBySlug internal logic first to get the Product ID
+        var productResult = await mediator.Send(new GetProductBySlugQuery(slug), cancellationToken);
+        if (productResult.IsFailure) return MapError(productResult.Error);
+
+        var result = await mediator.Send(new GetProductVariantsQuery(productResult.Value.Id), cancellationToken);
         return HandleResult(result);
     }
 

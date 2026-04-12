@@ -38,6 +38,16 @@ public sealed class UpdateReleaseCommandHandler(
         }
 
         // 3. Update Basic Info
+        if (release.Slug != request.Slug)
+        {
+            bool slugExists = await releaseRepository.AnyAsync(x => x.Slug == request.Slug && x.Id != request.Id, cancellationToken);
+            if (slugExists)
+            {
+                return Result<Guid>.Failure(ReleaseErrors.DuplicateSlug);
+            }
+            release.Slug = request.Slug;
+        }
+
         release.Title = request.Title;
         release.Year = request.Year;
         release.Type = request.Type;

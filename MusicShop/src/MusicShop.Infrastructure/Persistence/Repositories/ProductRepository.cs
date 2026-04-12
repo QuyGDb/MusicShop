@@ -92,6 +92,16 @@ public sealed class ProductRepository : GenericRepository<Product>, IProductRepo
             .FirstOrDefaultAsync(p => p.Id == id && p.IsActive, ct);
     }
 
+    public async Task<Product?> GetBySlugWithDetailsAsync(string slug, CancellationToken ct = default)
+    {
+        return await _dbSet.AsNoTracking()
+            .Include(p => p.Variants)
+            .Include(p => p.ReleaseVersion)
+                .ThenInclude(rv => rv!.Release)
+                    .ThenInclude(r => r!.Artist)
+            .FirstOrDefaultAsync(p => p.Slug == slug && p.IsActive, ct);
+    }
+
     public async Task<bool> HasOrdersAsync(Guid productId, CancellationToken ct = default)
     {
         return await _context.Set<Domain.Entities.Orders.OrderItem>()

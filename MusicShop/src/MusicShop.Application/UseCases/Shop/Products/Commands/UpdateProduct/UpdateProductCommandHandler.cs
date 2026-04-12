@@ -30,6 +30,17 @@ public sealed class UpdateProductCommandHandler(
         }
 
         if (request.Name is not null) product.Name = request.Name;
+        
+        if (request.Slug is not null && request.Slug != product.Slug)
+        {
+            bool slugExists = await productRepository.AnyAsync(x => x.Slug == request.Slug && x.Id != request.Id, cancellationToken);
+            if (slugExists)
+            {
+                return Result.Failure(ProductErrors.DuplicateSlug);
+            }
+            product.Slug = request.Slug;
+        }
+
         if (request.Description is not null) product.Description = request.Description;
         if (request.IsActive.HasValue) product.IsActive = request.IsActive.Value;
         if (request.IsPreorder.HasValue) product.IsPreorder = request.IsPreorder.Value;

@@ -7,6 +7,7 @@ namespace MusicShop.Application.UseCases.Catalog.Releases.Commands.UpdateRelease
 public record UpdateReleaseCommand(
     Guid Id,
     string Title,
+    string Slug,
     int Year,
     string? Type,
     Guid ArtistId,

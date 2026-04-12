@@ -88,6 +88,28 @@ public sealed class ReleaseRepository : GenericRepository<Release>, IReleaseRepo
         return await query.FirstOrDefaultAsync(x => x.Id == id, ct);
     }
 
+    public async Task<Release?> GetBySlugWithDetailsAsync(string slug, bool track = false, CancellationToken ct = default)
+    {
+        var query = _context.Set<Release>()
+            .Include(x => x.Artist)
+            .Include(x => x.ReleaseGenres)
+                .ThenInclude(x => x.Genre)
+            .Include(x => x.Tracks.OrderBy(t => t.Position))
+            .Include(x => x.Versions)
+                .ThenInclude(x => x.Label)
+            .Include(x => x.Versions)
+                .ThenInclude(v => v.Products)
+                    .ThenInclude(p => p.Variants)
+            .AsQueryable();
+
+        if (!track)
+        {
+            query = query.AsNoTracking();
+        }
+
+        return await query.FirstOrDefaultAsync(x => x.Slug == slug, ct);
+    }
+
     public async Task<List<Release>> SearchByTitleAsync(string searchTerm, int limit, CancellationToken ct = default)
     {
         searchTerm = searchTerm.ToLower();

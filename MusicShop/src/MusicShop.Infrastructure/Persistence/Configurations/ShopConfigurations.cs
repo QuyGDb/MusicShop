@@ -17,7 +17,12 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.Property(x => x.Format)
             .HasConversion<string>(); // Map ReleaseFormat Enum to string
 
+        builder.Property(x => x.Slug)
+            .IsRequired()
+            .HasMaxLength(300);
+
         builder.HasIndex(x => x.Name);
+        builder.HasIndex(x => x.Slug).IsUnique();
 
         // 1 Product -> Many Variants
         builder.HasMany(x => x.Variants)

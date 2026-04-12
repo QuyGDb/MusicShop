@@ -9,6 +9,7 @@ namespace MusicShop.Domain.Entities.Catalog;
 public class Release : BaseEntity
 {
     public string Title { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
     public int Year { get; set; } // Original release year
     public string? CoverUrl { get; set; }
     public string? Description { get; set; }

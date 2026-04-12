@@ -24,10 +24,18 @@ public sealed class CreateReleaseCommandHandler(
             return Result<Guid>.Failure(ArtistErrors.NotFound);
         }
 
-        // 2. Map Command to Entity
+        // 2. Check for duplicate slug
+        bool slugExists = await releaseRepository.AnyAsync(x => x.Slug == request.Slug, cancellationToken);
+        if (slugExists)
+        {
+            return Result<Guid>.Failure(ReleaseErrors.DuplicateSlug);
+        }
+
+        // 3. Map Command to Entity
         Release release = new Release
         {
             Title = request.Title,
+            Slug = request.Slug,
             Year = request.Year,
             Type = request.Type,
             ArtistId = request.ArtistId,

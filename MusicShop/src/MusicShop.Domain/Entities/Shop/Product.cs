@@ -8,6 +8,7 @@ namespace MusicShop.Domain.Entities.Shop;
 public class Product : BaseEntity
 {
     public string Name { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string? CoverUrl { get; set; }
     public ReleaseFormat Format { get; set; } // Renamed from Type, matching ReleaseFormat enum

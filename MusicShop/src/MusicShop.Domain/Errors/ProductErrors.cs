@@ -30,4 +30,8 @@ public static class ProductErrors
     public static readonly Error InsufficientStock = new(
         "Product.InsufficientStock",
         "Not enough stock available for the selected variant.");
+
+    public static readonly Error DuplicateSlug = new(
+        "Product.DuplicateSlug",
+        "The specified slug is already in use by another product.");
 }

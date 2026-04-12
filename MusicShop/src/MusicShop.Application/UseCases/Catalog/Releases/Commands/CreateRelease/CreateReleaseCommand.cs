@@ -6,6 +6,7 @@ namespace MusicShop.Application.UseCases.Catalog.Releases.Commands.CreateRelease
 
 public record CreateReleaseCommand(
     string Title,
+    string Slug,
     int Year,
     string? Type,
     Guid ArtistId,

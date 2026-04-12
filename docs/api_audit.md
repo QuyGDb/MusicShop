@@ -109,14 +109,14 @@ Audit dựa trên code thực tế trong `MusicShop.Api/Controllers/`.
 
 | # | Endpoint | Code | Ghi chú |
 |---|---|---|---|
-| 43 | `GET /curated-collections` | ❌ | **Không có CuratedCollectionsController** |
-| 44 | `GET /curated-collections/:id` | ❌ | |
-| 45 | `POST /curated-collections` | ❌ | |
-| 46 | `PATCH /curated-collections/:id` | ❌ | |
-| 47 | `POST /curated-collections/:id/items` | ❌ | |
-| 48 | `DELETE /curated-collections/:id/items/:productId` | ❌ | |
+| 43 | `GET /curated-collections` | ✅ | |
+| 44 | `GET /curated-collections/:id` | ✅ | |
+| 45 | `POST /curated-collections` | ✅ | |
+| 46 | `PATCH /curated-collections/:id` | ✅ | |
+| 47 | `POST /curated-collections/:id/items` | ✅ | |
+| 48 | `DELETE /curated-collections/:id/items/:productId` | ✅ | |
 
-**Curated Collections: 0/6 done**
+**Curated Collections: 6/6 done**
 
 ---
 
@@ -196,13 +196,13 @@ Audit dựa trên code thực tế trong `MusicShop.Api/Controllers/`.
 | Auth | 6 | 8 | 75% |
 | Catalog | 21 | 24 | 88% |
 | Products | 9 | 9 | 100% |
-| Curated Collections | 0 | 6 | 0% |
+| Curated Collections | 6 | 6 | 100% |
 | Cart | 4 | 5 | 80% |
 | Orders | 0 | 7 | 0% |
 | Payment | 0 | 4 | 0% |
 | Wantlist & Collection | 0 | 6 | 0% |
 | Notifications | 0 | 3 | 0% |
-| **Tổng (trừ FUTURE)** | **40** | **72** | **55%** |
+| **Tổng (trừ FUTURE)** | **46** | **72** | **63%** |
 
 ---
 
@@ -235,11 +235,6 @@ Không có Orders + Payment thì Cart vô nghĩa.
 | 17 | `PUT /genres/:id` | Admin sửa genre — module Catalog gần hoàn thiện mà thiếu cái này |
 | 58 | `GET /admin/orders` | Admin dashboard |
 
-### Priority 3 — Curated Collections (admin marketing)
-
-| # | Endpoint | Lý do |
-|---|---|---|
-| 43–48 | Curated Collections (6) | Homepage cần bộ sưu tập để showcase |
 
 ### Có thể bỏ qua ở 80%
 

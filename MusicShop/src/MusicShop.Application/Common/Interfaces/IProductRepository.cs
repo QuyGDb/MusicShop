@@ -10,6 +10,7 @@ public interface IProductRepository : IRepository<Product>
         CancellationToken ct = default);
 
     Task<Product?> GetByIdWithDetailsAsync(Guid id, CancellationToken ct = default);
+    Task<Product?> GetBySlugWithDetailsAsync(string slug, CancellationToken ct = default);
 
     Task<bool> HasOrdersAsync(Guid productId, CancellationToken ct = default);
 

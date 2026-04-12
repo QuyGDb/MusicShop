@@ -7,6 +7,7 @@ using MusicShop.Application.UseCases.Catalog.Releases.Commands.CreateRelease;
 using MusicShop.Application.UseCases.Catalog.Releases.Commands.DeleteRelease;
 using MusicShop.Application.UseCases.Catalog.Releases.Commands.UpdateRelease;
 using MusicShop.Application.UseCases.Catalog.Releases.Queries.GetReleaseById;
+using MusicShop.Application.UseCases.Catalog.Releases.Queries.GetReleaseBySlug;
 using MusicShop.Application.UseCases.Catalog.Releases.Queries.GetReleases;
 
 namespace MusicShop.API.Controllers;
@@ -20,10 +21,10 @@ public class ReleasesController(IMediator mediator) : BaseApiController
         return HandlePaginatedResult(result);
     }
 
-    [HttpGet("{id:guid}")]
-    public async Task<ActionResult<ApiResponse<ReleaseDetailResponse>>> GetRelease(Guid id)
+    [HttpGet("{slug}")]
+    public async Task<ActionResult<ApiResponse<ReleaseDetailResponse>>> GetRelease(string slug)
     {
-        var result = await mediator.Send(new GetReleaseByIdQuery(id));
+        var result = await mediator.Send(new GetReleaseBySlugQuery(slug));
         return HandleResult(result);
     }
 
@@ -32,7 +33,7 @@ public class ReleasesController(IMediator mediator) : BaseApiController
     public async Task<ActionResult<ApiResponse<Guid>>> CreateRelease([FromBody] CreateReleaseCommand command)
     {
         var result = await mediator.Send(command);
-        return HandleCreatedResult(result, nameof(GetRelease), new { id = result.Value });
+        return HandleCreatedResult(result, nameof(GetRelease), new { slug = command.Slug });
     }
 
     [Authorize(Roles = "admin")]

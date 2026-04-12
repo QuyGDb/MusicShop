@@ -7,6 +7,7 @@ namespace MusicShop.Application.UseCases.Shop.Products.Commands.CreateProduct;
 public sealed record CreateProductCommand(
     Guid ReleaseVersionId,
     string Name,
+    string Slug,
     string? Description,
     string? CoverUrl,
     ReleaseFormat Format,

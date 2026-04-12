@@ -15,6 +15,7 @@ public interface IReleaseRepository : IRepository<Release>
 
 
     Task<Release?> GetWithDetailsAsync(Guid id, bool track = false, CancellationToken ct = default);
+    Task<Release?> GetBySlugWithDetailsAsync(string slug, bool track = false, CancellationToken ct = default);
 
     Task<List<Release>> SearchByTitleAsync(string searchTerm, int limit, CancellationToken ct = default);
 }

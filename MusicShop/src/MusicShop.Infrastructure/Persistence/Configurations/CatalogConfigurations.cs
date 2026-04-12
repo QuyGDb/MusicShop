@@ -89,7 +89,12 @@ public class ReleaseConfiguration : IEntityTypeConfiguration<Release>
         builder.Property(x => x.Year)
             .IsRequired();
 
+        builder.Property(x => x.Slug)
+            .IsRequired()
+            .HasMaxLength(300);
+
         builder.HasIndex(x => x.Title);
+        builder.HasIndex(x => x.Slug).IsUnique();
 
         // 1 Release -> Many Versions
         builder.HasMany(x => x.Versions)
