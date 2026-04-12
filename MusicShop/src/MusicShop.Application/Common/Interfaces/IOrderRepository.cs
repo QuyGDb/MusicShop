@@ -15,4 +15,9 @@ public interface IOrderRepository : IRepository<Order>
         int page, 
         int limit, 
         CancellationToken ct = default);
+    Task<(IReadOnlyList<Order> Items, int TotalCount)> GetPagedAllAsync(
+        OrderStatus? status,
+        int page,
+        int limit,
+        CancellationToken ct = default);
 }

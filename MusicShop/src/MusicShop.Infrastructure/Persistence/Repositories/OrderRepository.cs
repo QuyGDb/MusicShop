@@ -57,4 +57,29 @@ public sealed class OrderRepository : GenericRepository<Order>, IOrderRepository
 
         return (items, totalCount);
     }
+
+    public async Task<(IReadOnlyList<Order> Items, int TotalCount)> GetPagedAllAsync(
+        OrderStatus? status, 
+        int page, 
+        int limit, 
+        CancellationToken ct = default)
+    {
+        var query = _dbSet.AsNoTracking().AsQueryable();
+
+        if (status.HasValue)
+        {
+            query = query.Where(o => o.Status == status.Value);
+        }
+
+        int totalCount = await query.CountAsync(ct);
+
+        var items = await query
+            .Include(o => o.OrderItems)
+            .OrderByDescending(o => o.CreatedAt)
+            .Skip((page - 1) * limit)
+            .Take(limit)
+            .ToListAsync(ct);
+
+        return (items, totalCount);
+    }
 }
