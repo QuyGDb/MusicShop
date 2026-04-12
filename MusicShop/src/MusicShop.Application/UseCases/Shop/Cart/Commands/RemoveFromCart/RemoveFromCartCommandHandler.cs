@@ -1,6 +1,7 @@
 using MediatR;
 using MusicShop.Application.Common.Interfaces;
 using MusicShop.Domain.Common;
+using MusicShop.Domain.Errors;
 using MusicShop.Domain.Interfaces;
 
 namespace MusicShop.Application.UseCases.Shop.Cart.Commands.RemoveFromCart;
@@ -25,14 +26,14 @@ public sealed class RemoveFromCartCommandHandler : IRequestHandler<RemoveFromCar
         var cart = await _cartRepository.GetByUserIdForUpdateAsync(request.UserId, cancellationToken);
         if (cart == null)
         {
-            return Result.Failure(new Error("Cart.NotFound", "Shopping cart not found for this user."));
+            return Result.Failure(CartErrors.NotFound);
         }
 
         // 2. Find and remove item
         var item = cart.Items.FirstOrDefault(i => i.Id == request.CartItemId);
         if (item == null)
         {
-            return Result.Failure(new Error("Cart.ItemNotFound", "The specified item was not found in the cart."));
+            return Result.Failure(CartErrors.ItemNotFound);
         }
 
         cart.Items.Remove(item);

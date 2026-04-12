@@ -1,6 +1,7 @@
 using MediatR;
 using MusicShop.Application.Common.Interfaces;
 using MusicShop.Domain.Common;
+using MusicShop.Domain.Errors;
 using MusicShop.Domain.Entities.Orders;
 using MusicShop.Domain.Entities.Shop;
 using MusicShop.Domain.Interfaces;
@@ -33,12 +34,12 @@ public sealed class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, 
         var variant = await _variantRepository.FirstOrDefaultAsync(v => v.Id == request.ProductVariantId, cancellationToken);
         if (variant == null)
         {
-            return Result<Guid>.Failure(new Error("Cart.VariantNotFound", "The selected product variant does not exist."));
+            return Result<Guid>.Failure(ProductErrors.VariantNotFound);
         }
 
         if (!variant.IsAvailable || variant.StockQty < request.Quantity)
         {
-            return Result<Guid>.Failure(new Error("Cart.InsufficientStock", $"Insufficient stock for {variant.VariantName}."));
+            return Result<Guid>.Failure(CartErrors.InsufficientStock);
         }
 
         // 2. Get or Create Cart (Tracked)
@@ -62,7 +63,7 @@ public sealed class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, 
             int newQuantity = existingItem.Quantity + request.Quantity;
             if (variant.StockQty < newQuantity)
             {
-                return Result<Guid>.Failure(new Error("Cart.InsufficientStock", $"Cannot add more items. Total requested quantity exceeds stock."));
+                return Result<Guid>.Failure(CartErrors.InsufficientStock);
             }
             existingItem.Quantity = newQuantity;
         }

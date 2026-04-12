@@ -1,6 +1,7 @@
 using MediatR;
 using MusicShop.Application.Common.Interfaces;
 using MusicShop.Domain.Common;
+using MusicShop.Domain.Errors;
 using MusicShop.Domain.Entities.Shop;
 using MusicShop.Domain.Interfaces;
 
@@ -32,14 +33,14 @@ public sealed class UpdateCartItemCommandHandler : IRequestHandler<UpdateCartIte
         var cart = await _cartRepository.GetByUserIdForUpdateAsync(request.UserId, cancellationToken);
         if (cart == null)
         {
-            return Result.Failure(new Error("Cart.NotFound", "Shopping cart not found for this user."));
+            return Result.Failure(CartErrors.NotFound);
         }
 
         // 2. Find item
         var item = cart.Items.FirstOrDefault(i => i.Id == request.CartItemId);
         if (item == null)
         {
-            return Result.Failure(new Error("Cart.ItemNotFound", "The specified item was not found in the cart."));
+            return Result.Failure(CartErrors.ItemNotFound);
         }
 
         // 3. Handle deletion if quantity is 0 or less
@@ -53,12 +54,12 @@ public sealed class UpdateCartItemCommandHandler : IRequestHandler<UpdateCartIte
             var variant = await _variantRepository.FirstOrDefaultAsync(v => v.Id == item.VariantId, cancellationToken);
             if (variant == null)
             {
-                return Result.Failure(new Error("Cart.VariantNotFound", "The product variant no longer exists."));
+                return Result.Failure(ProductErrors.VariantNotFound);
             }
 
             if (!variant.IsAvailable || variant.StockQty < request.NewQuantity)
             {
-                return Result.Failure(new Error("Cart.InsufficientStock", $"Insufficient stock for {variant.VariantName}. Available: {variant.StockQty}"));
+                return Result.Failure(CartErrors.InsufficientStock);
             }
 
             item.Quantity = request.NewQuantity;

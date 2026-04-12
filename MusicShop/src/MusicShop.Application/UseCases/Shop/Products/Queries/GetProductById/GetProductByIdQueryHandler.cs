@@ -3,6 +3,7 @@ using MusicShop.Application.Common.Interfaces;
 using MusicShop.Application.Common.Mappings;
 using MusicShop.Application.DTOs.Shop;
 using MusicShop.Domain.Common;
+using MusicShop.Domain.Errors;
 
 namespace MusicShop.Application.UseCases.Shop.Products.Queries.GetProductById;
 
@@ -24,7 +25,7 @@ public sealed class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQ
 
         if (product == null)
         {
-            return Result<ProductDetailDto>.Failure(new Error("Product.NotFound", "The requested product was not found or is inactive."));
+            return Result<ProductDetailDto>.Failure(ProductErrors.NotFound);
         }
 
         // Manual mapping from Entity to DTO
