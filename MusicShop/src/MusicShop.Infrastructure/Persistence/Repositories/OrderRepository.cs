@@ -17,6 +17,7 @@ public sealed class OrderRepository : GenericRepository<Order>, IOrderRepository
         return await _dbSet
             .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Variant)
+                    .ThenInclude(v => v.Product)
             .Include(o => o.Payment)
             .FirstOrDefaultAsync(o => o.Id == orderId, ct);
     }

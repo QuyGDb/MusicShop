@@ -5,6 +5,7 @@ using MusicShop.API.Infrastructure;
 using MusicShop.Application.Common;
 using MusicShop.Application.DTOs.Shop;
 using MusicShop.Application.UseCases.Shop.Orders.Commands.CreateOrder;
+using MusicShop.Application.UseCases.Shop.Orders.Queries.GetOrderDetail;
 using MusicShop.Application.UseCases.Shop.Orders.Queries.GetOrderHistory;
 using MusicShop.Domain.Common;
 
@@ -19,6 +20,14 @@ namespace MusicShop.API.Controllers;
         {
             Result<PaginatedResult<OrderListItemDto>> result = await mediator.Send(query);
             return HandlePaginatedResult(result);
+        }
+
+        [HttpGet("{id:guid}")]
+        [ProducesResponseType(typeof(ApiResponse<OrderDetailDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<ApiResponse<OrderDetailDto>>> GetOrderDetail([FromRoute] Guid id)
+        {
+            Result<OrderDetailDto> result = await mediator.Send(new GetOrderDetailQuery(id));
+            return HandleResult(result);
         }
 
         [HttpPost]

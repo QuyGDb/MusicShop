@@ -14,6 +14,7 @@ public class Order : BaseEntity
     public string ShippingName { get; set; } = string.Empty;
     public string ShippingPhone { get; set; } = string.Empty;
     public string ShippingAddress { get; set; } = string.Empty;
+    public string? TrackingNumber { get; set; }
     public string? Note { get; set; }
 
     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
