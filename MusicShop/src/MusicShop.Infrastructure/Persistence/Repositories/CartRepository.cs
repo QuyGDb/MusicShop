@@ -29,4 +29,13 @@ public sealed class CartRepository : GenericRepository<Cart>, ICartRepository
             .Include(c => c.Items)
             .FirstOrDefaultAsync(c => c.UserId == userId, ct);
     }
+
+    public async Task ClearCartAsync(Guid cartId, CancellationToken ct = default)
+    {
+        var items = await _context.Set<CartItem>()
+            .Where(i => i.CartId == cartId)
+            .ToListAsync(ct);
+
+        _context.Set<CartItem>().RemoveRange(items);
+    }
 }
