@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using MusicShop.Application.Common.Interfaces;
 using MusicShop.Application.UseCases.Shop.Products.Queries.GetProducts;
 using MusicShop.Domain.Entities.Shop;
+using MusicShop.Domain.Enums;
 using MusicShop.Infrastructure.Persistence;
 
 namespace MusicShop.Infrastructure.Persistence.Repositories;
@@ -90,4 +91,39 @@ public sealed class ProductRepository : GenericRepository<Product>, IProductRepo
                     .ThenInclude(r => r!.Artist)
             .FirstOrDefaultAsync(p => p.Id == id && p.IsActive, ct);
     }
+
+    public async Task<bool> HasOrdersAsync(Guid productId, CancellationToken ct = default)
+    {
+        return await _context.Set<Domain.Entities.Orders.OrderItem>()
+            .AnyAsync(oi =>
+                oi.Variant.ProductId == productId &&
+                (oi.Order.Status == OrderStatus.Pending || oi.Order.Status == OrderStatus.Confirmed),
+                ct);
+    }
+
+    public async Task<IReadOnlyList<ProductVariant>> GetVariantsAsync(Guid productId, CancellationToken ct = default)
+    {
+        return await _context.Set<ProductVariant>()
+            .AsNoTracking()
+            .Include(v => v.VinylAttributes)
+            .Include(v => v.CdAttributes)
+            .Include(v => v.CassetteAttributes)
+            .Where(v => v.ProductId == productId)
+            .ToListAsync(ct);
+    }
+
+    public async Task<ProductVariant?> GetVariantByIdAsync(Guid productId, Guid variantId, CancellationToken ct = default)
+    {
+        return await _context.Set<ProductVariant>()
+            .Include(v => v.VinylAttributes)
+            .Include(v => v.CdAttributes)
+            .Include(v => v.CassetteAttributes)
+            .FirstOrDefaultAsync(v => v.Id == variantId && v.ProductId == productId, ct);
+    }
+
+    public void DeleteVariant(ProductVariant variant)
+    {
+        _context.Set<ProductVariant>().Remove(variant);
+    }
 }
+

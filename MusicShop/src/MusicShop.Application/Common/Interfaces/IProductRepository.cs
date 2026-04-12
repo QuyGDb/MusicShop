@@ -10,4 +10,12 @@ public interface IProductRepository : IRepository<Product>
         CancellationToken ct = default);
 
     Task<Product?> GetByIdWithDetailsAsync(Guid id, CancellationToken ct = default);
+
+    Task<bool> HasOrdersAsync(Guid productId, CancellationToken ct = default);
+
+    Task<IReadOnlyList<ProductVariant>> GetVariantsAsync(Guid productId, CancellationToken ct = default);
+
+    Task<ProductVariant?> GetVariantByIdAsync(Guid productId, Guid variantId, CancellationToken ct = default);
+
+    void DeleteVariant(ProductVariant variant);
 }

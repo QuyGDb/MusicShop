@@ -1543,7 +1543,56 @@ Xóa sản phẩm khỏi collection.
 
 ---
 
-## Mục 8 — AI Assistant
+## Mục 8 — Notifications
+
+### `GET /api/v1/notifications`
+
+Lịch sử thông báo của user hiện tại.
+
+**Auth:** Customer
+
+**Query params:** `type`, `status`, `page`, `limit`
+
+**Response `200`:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "uuid",
+      "type": "order_shipped",
+      "channel": "email",
+      "status": "sent",
+      "sentAt": "2024-01-15T10:05:00Z",
+      "referenceId": "order_uuid"
+    }
+  ]
+}
+```
+
+---
+
+### `GET /api/v1/admin/notifications`
+
+Admin xem toàn bộ notification log trong hệ thống.
+
+**Auth:** Admin
+
+**Query params:** `status`, `type`, `userId`, `dateFrom`, `dateTo`, `page`, `limit`
+
+---
+
+### `POST /api/v1/admin/notifications/:id/retry`
+
+Admin retry gửi lại email thất bại (`status = failed`).
+
+**Auth:** Admin
+
+**Response `200`:** Trả về notification log đã cập nhật.
+
+---
+
+## Mục 9 — [FUTURE] AI Features
 
 ### `POST /api/v1/ai/conversations`
 
@@ -1673,55 +1722,6 @@ Lấy danh sách gợi ý cá nhân hóa (đã cache, làm mới mỗi 24 giờ)
 
 ---
 
-## Mục 9 — Notifications
-
-### `GET /api/v1/notifications`
-
-Lịch sử thông báo của user hiện tại.
-
-**Auth:** Customer
-
-**Query params:** `type`, `status`, `page`, `limit`
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "uuid",
-      "type": "order_shipped",
-      "channel": "email",
-      "status": "sent",
-      "sentAt": "2024-01-15T10:05:00Z",
-      "referenceId": "order_uuid"
-    }
-  ]
-}
-```
-
----
-
-### `GET /api/v1/admin/notifications`
-
-Admin xem toàn bộ notification log trong hệ thống.
-
-**Auth:** Admin
-
-**Query params:** `status`, `type`, `userId`, `dateFrom`, `dateTo`, `page`, `limit`
-
----
-
-### `POST /api/v1/admin/notifications/:id/retry`
-
-Admin retry gửi lại email thất bại (`status = failed`).
-
-**Auth:** Admin
-
-**Response `200`:** Trả về notification log đã cập nhật.
-
----
-
 ## Tổng hợp endpoints
 
 | # | Method | Endpoint | Auth |
@@ -1797,14 +1797,14 @@ Admin retry gửi lại email thất bại (`status = failed`).
 | 69 | GET | `/collection` | Customer |
 | 70 | POST | `/collection` | Customer |
 | 71 | DELETE | `/collection/:productId` | Customer |
-| 72 | POST | `/ai/conversations` | Public |
-| 73 | GET | `/ai/conversations` | Customer |
-| 74 | GET | `/ai/conversations/:id/messages` | Public |
-| 75 | POST | `/ai/conversations/:id/messages` | Public |
-| 76 | DELETE | `/ai/conversations/:id` | Customer |
-| 77 | GET | `/recommendations` | Customer |
-| 78 | GET | `/notifications` | Customer |
-| 79 | GET | `/admin/notifications` | Admin |
-| 80 | POST | `/admin/notifications/:id/retry` | Admin |
+| 72 | GET | `/notifications` | Customer |
+| 73 | GET | `/admin/notifications` | Admin |
+| 74 | POST | `/admin/notifications/:id/retry` | Admin |
+| 75 | POST | `/ai/conversations` | [FUTURE] |
+| 76 | GET | `/ai/conversations` | [FUTURE] |
+| 77 | GET | `/ai/conversations/:id/messages` | [FUTURE] |
+| 78 | POST | `/ai/conversations/:id/messages` | [FUTURE] |
+| 79 | DELETE | `/ai/conversations/:id` | [FUTURE] |
+| 80 | GET | `/recommendations` | [FUTURE] |
 
 **Tổng: 80 endpoints**
