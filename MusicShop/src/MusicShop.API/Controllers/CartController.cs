@@ -6,6 +6,7 @@ using MusicShop.API.Infrastructure;
 using MusicShop.Application.Common.Interfaces;
 using MusicShop.Application.DTOs.Shop;
 using MusicShop.Application.UseCases.Shop.Cart.Commands.AddToCart;
+using MusicShop.Application.UseCases.Shop.Cart.Commands.ClearCart;
 using MusicShop.Application.UseCases.Shop.Cart.Commands.RemoveFromCart;
 using MusicShop.Application.UseCases.Shop.Cart.Commands.UpdateCartItem;
 using MusicShop.Application.UseCases.Shop.Cart.Queries.GetCart;
@@ -56,6 +57,14 @@ public sealed class CartController(
     public async Task<ActionResult<ApiResponse<object>>> RemoveFromCart(Guid id)
     {
         var result = await mediator.Send(new RemoveFromCartCommand(GetUserId(), id));
+        return HandleNonGenericResult(result);
+    }
+
+    [HttpDelete]
+    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status204NoContent)]
+    public async Task<ActionResult<ApiResponse<object>>> ClearCart()
+    {
+        var result = await mediator.Send(new ClearCartCommand());
         return HandleNonGenericResult(result);
     }
 }
