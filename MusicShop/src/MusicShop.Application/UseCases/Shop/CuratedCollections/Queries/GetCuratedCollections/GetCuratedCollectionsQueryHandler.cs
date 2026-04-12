@@ -15,8 +15,7 @@ public sealed class GetCuratedCollectionsQueryHandler(
         var response = collections.Select(c => new CuratedCollectionResponse(
             c.Id,
             c.Title,
-            c.Description,
-            c.CoverUrl))
+            c.Description))
             .ToList();
 
         return Result<IReadOnlyList<CuratedCollectionResponse>>.Success(response);
