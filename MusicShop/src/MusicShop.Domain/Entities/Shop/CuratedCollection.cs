@@ -10,6 +10,7 @@ public class CuratedCollection : BaseEntity
 {
     public string Title { get; set; } = string.Empty;
     public string? Description { get; set; }
+    public string? CoverUrl { get; set; }
     public bool IsPublished { get; set; } = false;
 
     public ICollection<CuratedCollectionItem> Items { get; set; } = new List<CuratedCollectionItem>();
