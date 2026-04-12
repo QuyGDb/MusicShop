@@ -1,27 +1,22 @@
-using MusicShop.Domain.Enums;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MusicShop.Application.DTOs.Shop;
 
-public class OrderDto
+/// <summary>
+/// Data transfer object for order information
+/// </summary>
+public sealed class OrderDto
 {
     public Guid Id { get; set; }
-    public OrderStatus Status { get; set; }
-    public decimal TotalAmount { get; set; }
-    public string ShippingAddress { get; set; } = string.Empty;
-    public string RecipientName { get; set; } = string.Empty;
-    public string Phone { get; set; } = string.Empty;
-    public string? TrackingNumber { get; set; }
+    public string OrderNumber { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
-    public IEnumerable<OrderItemDto> Items { get; set; } = new List<OrderItemDto>();
-}
+    public string Status { get; set; } = string.Empty;
+    public decimal TotalAmount { get; set; }
+    public ICollection<OrderItemDto> Items { get; set; } = new List<OrderItemDto>();
 
-public class OrderItemDto
-{
-    public Guid Id { get; set; }
-    public Guid VariantId { get; set; }
-    public string ProductName { get; set; } = string.Empty;
-    public string VariantName { get; set; } = string.Empty;
-    public decimal UnitPrice { get; set; }
-    public int Quantity { get; set; }
-    public decimal Subtotal => UnitPrice * Quantity;
+    // Customer info
+    public string CustomerName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string ShippingAddress { get; set; } = string.Empty;
 }

@@ -28,6 +28,9 @@ public static class DependencyInjection
         services.AddScoped<IReleaseVersionRepository, ReleaseVersionRepository>();
         services.AddScoped<IGenreRepository, GenreRepository>();
         services.AddScoped<ILabelRepository, LabelRepository>();
+        services.AddScoped<IProductRepository, ProductRepository>();
+        services.AddScoped<ICartRepository, CartRepository>();
+        // services.AddScoped<IOrderRepository, OrderRepository>(); // Planned for Phase 4
 
         // 3. Register Security Services
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
