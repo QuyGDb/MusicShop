@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using MusicShop.API.Infrastructure;
 using MusicShop.Application.Common;
 using MusicShop.Application.DTOs.Shop;
+using MusicShop.Application.UseCases.Admin.Orders.Commands.UpdateOrderStatus;
 using MusicShop.Application.UseCases.Shop.Orders.Commands.CancelOrder;
 using MusicShop.Application.UseCases.Shop.Orders.Commands.CreateOrder;
 using MusicShop.Application.UseCases.Shop.Orders.Queries.GetOrderDetail;
@@ -44,6 +45,22 @@ public sealed class OrdersController(IMediator mediator) : BaseApiController
     public async Task<ActionResult<ApiResponse<object>>> CancelOrder([FromRoute] Guid id)
     {
         Result result = await mediator.Send(new CancelOrderCommand(id));
+        return HandleNonGenericResult(result);
+    }
+
+    [Authorize(Roles = "admin")]
+    [HttpPatch("/api/v1/admin/orders/{id:guid}/status")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<ActionResult<ApiResponse<object>>> UpdateOrderStatus(
+        [FromRoute] Guid id, 
+        [FromBody] UpdateOrderStatusCommand command)
+    {
+        if (id != command.OrderId)
+        {
+            return MapError(new MusicShop.Domain.Common.Error("Order.IdMismatch", "Order ID mismatch."));
+        }
+
+        Result result = await mediator.Send(command);
         return HandleNonGenericResult(result);
     }
 }
