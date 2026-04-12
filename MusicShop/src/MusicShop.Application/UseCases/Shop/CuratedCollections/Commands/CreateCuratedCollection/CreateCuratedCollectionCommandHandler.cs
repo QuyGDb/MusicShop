@@ -1,6 +1,6 @@
 using MediatR;
 using MusicShop.Application.Common.Interfaces;
-using MusicShop.Application.Common.Models;
+using MusicShop.Domain.Common;
 using MusicShop.Domain.Entities.Shop;
 
 namespace MusicShop.Application.UseCases.Shop.CuratedCollections.Commands.CreateCuratedCollection;
