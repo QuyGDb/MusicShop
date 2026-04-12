@@ -37,7 +37,7 @@ public sealed class RemoveFromCartCommandHandler : IRequestHandler<RemoveFromCar
         }
 
         cart.Items.Remove(item);
-        cart.Touch();
+        cart.UpdatedAt = DateTime.UtcNow;
 
         // 3. Save Changes
         await _unitOfWork.SaveChangesAsync(cancellationToken);

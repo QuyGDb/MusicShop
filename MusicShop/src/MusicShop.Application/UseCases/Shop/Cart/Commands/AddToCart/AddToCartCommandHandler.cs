@@ -52,7 +52,7 @@ public sealed class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, 
                 UserId = request.UserId,
                 CreatedAt = DateTime.UtcNow
             };
-            cart.Touch();
+            cart.UpdatedAt = DateTime.UtcNow;
             _cartRepository.Add(cart);
         }
 
@@ -78,7 +78,7 @@ public sealed class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, 
             });
         }
 
-        cart.Touch();
+        cart.UpdatedAt = DateTime.UtcNow;
 
         // 4. Persistence
         await _unitOfWork.SaveChangesAsync(cancellationToken);

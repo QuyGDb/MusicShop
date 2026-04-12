@@ -37,7 +37,7 @@ public sealed class GetCartQueryHandler : IRequestHandler<GetCartQuery, Result<C
                 CreatedAt = DateTime.UtcNow
             };
             
-            newCart.Touch();
+            newCart.UpdatedAt = DateTime.UtcNow;
             
             _cartRepository.Add(newCart);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

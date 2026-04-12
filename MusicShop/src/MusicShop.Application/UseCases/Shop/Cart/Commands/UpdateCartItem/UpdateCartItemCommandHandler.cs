@@ -65,7 +65,7 @@ public sealed class UpdateCartItemCommandHandler : IRequestHandler<UpdateCartIte
             item.Quantity = request.NewQuantity;
         }
 
-        cart.Touch();
+        cart.UpdatedAt = DateTime.UtcNow;
 
         // 5. Save Changes
         await _unitOfWork.SaveChangesAsync(cancellationToken);
