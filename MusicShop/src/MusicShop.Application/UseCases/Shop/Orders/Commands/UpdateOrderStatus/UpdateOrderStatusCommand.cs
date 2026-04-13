@@ -2,7 +2,7 @@ using MediatR;
 using MusicShop.Domain.Common;
 using MusicShop.Domain.Enums;
 
-namespace MusicShop.Application.UseCases.Admin.Orders.Commands.UpdateOrderStatus;
+namespace MusicShop.Application.UseCases.Shop.Orders.Commands.UpdateOrderStatus;
 
 public sealed record UpdateOrderStatusCommand(
     Guid OrderId,

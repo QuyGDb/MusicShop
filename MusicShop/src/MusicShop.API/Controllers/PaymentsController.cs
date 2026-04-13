@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MusicShop.Application.Common.Interfaces;
-using MusicShop.Application.UseCases.Admin.Orders.Commands.UpdateOrderStatus;
+using MusicShop.Application.UseCases.Shop.Orders.Commands.UpdateOrderStatus;
 using MusicShop.Domain.Common;
 using MusicShop.Domain.Enums;
 using MediatR;

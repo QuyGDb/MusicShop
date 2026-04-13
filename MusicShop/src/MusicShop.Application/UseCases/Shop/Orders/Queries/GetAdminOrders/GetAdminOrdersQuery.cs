@@ -4,7 +4,7 @@ using MusicShop.Application.DTOs.Shop;
 using MusicShop.Domain.Common;
 using MusicShop.Domain.Enums;
 
-namespace MusicShop.Application.UseCases.Admin.Orders.Queries.GetAdminOrders;
+namespace MusicShop.Application.UseCases.Shop.Orders.Queries.GetAdminOrders;
 
 public sealed record GetAdminOrdersQuery(
     OrderStatus? Status,

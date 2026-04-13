@@ -5,7 +5,7 @@ using MusicShop.Domain.Enums;
 using MusicShop.Domain.Errors;
 using MusicShop.Domain.Interfaces;
 
-namespace MusicShop.Application.UseCases.Admin.Orders.Commands.UpdateOrderStatus;
+namespace MusicShop.Application.UseCases.Shop.Orders.Commands.UpdateOrderStatus;
 
 public sealed class UpdateOrderStatusCommandHandler(
     IOrderRepository orderRepository,

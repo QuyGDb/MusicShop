@@ -79,6 +79,7 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
 
         // 7. Perform Refresh Token Rotation
         existingRefreshToken.ReplacedByTokenHash = newRefreshTokenHash;
+        existingRefreshToken.RevokedAt = DateTime.UtcNow;
         existingRefreshToken.UpdatedAt = DateTime.UtcNow;
         _refreshTokenRepository.Update(existingRefreshToken);
 

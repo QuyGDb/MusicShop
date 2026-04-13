@@ -69,7 +69,7 @@ public sealed class CuratedCollectionRepository(AppDbContext context) : ICurated
     {
         var item = await context.Set<CuratedCollectionItem>()
             .FirstOrDefaultAsync(i => i.CollectionId == collectionId && i.ProductId == productId, ct);
-        
+
         if (item != null)
         {
             context.Set<CuratedCollectionItem>().Remove(item);
@@ -88,7 +88,7 @@ public sealed class CuratedCollectionRepository(AppDbContext context) : ICurated
         var maxOrder = await context.Set<CuratedCollectionItem>()
             .Where(i => i.CollectionId == collectionId)
             .MaxAsync(i => (int?)i.SortOrder, ct) ?? 0;
-        
+
         return maxOrder + 1;
     }
 }

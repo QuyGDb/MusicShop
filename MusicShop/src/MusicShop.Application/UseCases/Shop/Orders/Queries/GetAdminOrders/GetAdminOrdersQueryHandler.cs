@@ -4,7 +4,7 @@ using MusicShop.Application.Common.Interfaces;
 using MusicShop.Application.DTOs.Shop;
 using MusicShop.Domain.Common;
 
-namespace MusicShop.Application.UseCases.Admin.Orders.Queries.GetAdminOrders;
+namespace MusicShop.Application.UseCases.Shop.Orders.Queries.GetAdminOrders;
 
 public sealed class GetAdminOrdersQueryHandler(
     IOrderRepository orderRepository) : IRequestHandler<GetAdminOrdersQuery, Result<PaginatedResult<OrderListItemDto>>>

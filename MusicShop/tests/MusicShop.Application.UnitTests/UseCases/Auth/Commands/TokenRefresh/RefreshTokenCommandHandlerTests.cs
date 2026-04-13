@@ -56,7 +56,7 @@ public class RefreshTokenCommandHandlerTests
         RefreshTokenCommand command = new RefreshTokenCommand("valid-token-string");
         _refreshTokenHasher.Hash(command.RefreshToken).Returns("hash");
         _refreshTokenRepository.FirstOrDefaultAsync(Arg.Any<Expression<Func<MusicShop.Domain.Entities.System.RefreshToken, bool>>>(), Arg.Any<CancellationToken>())
-            .Returns((MusicShop.Domain.Entities.System.RefreshToken?)null);
+            .Returns((RefreshToken?)null);
 
         // Act
         Result<AuthResponse> result = await _handler.Handle(command, CancellationToken.None);
@@ -71,12 +71,12 @@ public class RefreshTokenCommandHandlerTests
     {
         // Arrange
         RefreshTokenCommand command = new RefreshTokenCommand("valid-token-string");
-        var refreshToken = new MusicShop.Domain.Entities.System.RefreshToken 
-        { 
-            TokenHash = "hash", 
-            RevokedAt = DateTime.UtcNow 
+        var refreshToken = new RefreshToken
+        {
+            TokenHash = "hash",
+            RevokedAt = DateTime.UtcNow
         };
-        
+
         _refreshTokenHasher.Hash(command.RefreshToken).Returns("hash");
         _refreshTokenRepository.FirstOrDefaultAsync(Arg.Any<Expression<Func<MusicShop.Domain.Entities.System.RefreshToken, bool>>>(), Arg.Any<CancellationToken>())
             .Returns(refreshToken);
@@ -94,12 +94,12 @@ public class RefreshTokenCommandHandlerTests
     {
         // Arrange
         RefreshTokenCommand command = new RefreshTokenCommand("valid-token-string");
-        var refreshToken = new MusicShop.Domain.Entities.System.RefreshToken 
-        { 
-            TokenHash = "hash", 
-            ExpiresAt = DateTime.UtcNow.AddDays(-1) 
+        var refreshToken = new MusicShop.Domain.Entities.System.RefreshToken
+        {
+            TokenHash = "hash",
+            ExpiresAt = DateTime.UtcNow.AddDays(-1)
         };
-        
+
         _refreshTokenHasher.Hash(command.RefreshToken).Returns("hash");
         _refreshTokenRepository.FirstOrDefaultAsync(Arg.Any<Expression<Func<MusicShop.Domain.Entities.System.RefreshToken, bool>>>(), Arg.Any<CancellationToken>())
             .Returns(refreshToken);
@@ -118,22 +118,22 @@ public class RefreshTokenCommandHandlerTests
         // Arrange
         RefreshTokenCommand command = new RefreshTokenCommand("valid-token-string");
         var userId = Guid.NewGuid();
-        var refreshToken = new MusicShop.Domain.Entities.System.RefreshToken 
-        { 
+        var refreshToken = new MusicShop.Domain.Entities.System.RefreshToken
+        {
             UserId = userId,
-            TokenHash = "hash", 
-            ExpiresAt = DateTime.UtcNow.AddDays(7) 
+            TokenHash = "hash",
+            ExpiresAt = DateTime.UtcNow.AddDays(7)
         };
-        
+
         User user = new User { Id = userId, Email = "test@example.com" };
-        
+
         _refreshTokenHasher.Hash(command.RefreshToken).Returns("hash");
         _refreshTokenRepository.FirstOrDefaultAsync(Arg.Any<Expression<Func<MusicShop.Domain.Entities.System.RefreshToken, bool>>>(), Arg.Any<CancellationToken>())
             .Returns(refreshToken);
-        
+
         _userRepository.GetByIdAsync(userId, Arg.Any<CancellationToken>())
             .Returns(user);
-            
+
         _tokenService.GenerateAccessToken(user).Returns(("new-access", DateTime.UtcNow.AddHours(1)));
         _tokenService.GenerateRefreshToken().Returns(("new-refresh", DateTime.UtcNow.AddDays(7)));
         _refreshTokenHasher.Hash("new-refresh").Returns("new-hash");
@@ -145,7 +145,7 @@ public class RefreshTokenCommandHandlerTests
         result.IsSuccess.Should().BeTrue();
         result.Value.AccessToken.Should().Be("new-access");
         result.Value.RefreshToken.Should().Be("new-refresh");
-        
+
         refreshToken.RevokedAt.Should().NotBeNull();
         _refreshTokenRepository.Received(1).Update(refreshToken);
         _refreshTokenRepository.Received(1).Add(Arg.Is<MusicShop.Domain.Entities.System.RefreshToken>(rt => rt.TokenHash == "new-hash"));

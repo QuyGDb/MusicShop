@@ -23,9 +23,9 @@ public sealed class StripeService : IStripeService
     }
 
     public async Task<Result<StripeCheckoutDto>> CreateCheckoutSessionAsync(
-        Order order, 
-        string successUrl, 
-        string cancelUrl, 
+        Order order,
+        string successUrl,
+        string cancelUrl,
         CancellationToken ct = default)
     {
         try
