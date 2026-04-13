@@ -1,7 +1,9 @@
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MusicShop.Application.Common.Interfaces;
 using MusicShop.Application.DTOs.Shop;
 using MusicShop.Domain.Common;
+using MusicShop.Domain.Errors;
 using MusicShop.Domain.Entities.Orders;
 using Stripe;
 using Stripe.Checkout;
@@ -11,10 +13,12 @@ namespace MusicShop.Infrastructure.Payments;
 public sealed class StripeService : IStripeService
 {
     private readonly StripeSettings _settings;
+    private readonly ILogger<StripeService> _logger;
 
-    public StripeService(IOptions<StripeSettings> settings)
+    public StripeService(IOptions<StripeSettings> settings, ILogger<StripeService> logger)
     {
         _settings = settings.Value;
+        _logger = logger;
         StripeConfiguration.ApiKey = _settings.SecretKey;
     }
 
@@ -64,7 +68,8 @@ public sealed class StripeService : IStripeService
         }
         catch (StripeException ex)
         {
-            return Result<StripeCheckoutDto>.Failure(new Error("Stripe.Error", ex.Message));
+            _logger.LogError(ex, "Stripe session creation failed");
+            return Result<StripeCheckoutDto>.Failure(PaymentErrors.StripeError);
         }
     }
 
@@ -81,11 +86,12 @@ public sealed class StripeService : IStripeService
                 return Result<string>.Success(orderId ?? string.Empty);
             }
 
-            return Result<string>.Failure(new Error("Stripe.Webhook", "Not a checkout.session.completed event"));
+            return Result<string>.Failure(PaymentErrors.InvalidWebhookEvent);
         }
         catch (StripeException ex)
         {
-            return Result<string>.Failure(new Error("Stripe.Webhook.Error", ex.Message));
+            _logger.LogError(ex, "Stripe webhook processing failed");
+            return Result<string>.Failure(PaymentErrors.WebhookError);
         }
     }
 }

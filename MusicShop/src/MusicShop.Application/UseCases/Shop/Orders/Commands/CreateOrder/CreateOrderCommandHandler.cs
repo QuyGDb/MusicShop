@@ -23,7 +23,7 @@ public sealed class CreateOrderCommandHandler(
     {
         if (string.IsNullOrEmpty(currentUserService.UserId))
         {
-            return Result<CreateOrderResponse>.Failure(new Error("Auth.Unauthorized", "User is not authenticated."));
+            return Result<CreateOrderResponse>.Failure(AuthErrors.Unauthorized);
         }
 
         Guid userId = Guid.Parse(currentUserService.UserId);

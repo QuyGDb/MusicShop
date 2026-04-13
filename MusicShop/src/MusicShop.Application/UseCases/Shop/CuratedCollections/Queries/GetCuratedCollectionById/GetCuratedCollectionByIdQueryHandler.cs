@@ -14,7 +14,7 @@ public sealed class GetCuratedCollectionByIdQueryHandler(
         var collection = await repository.GetByIdWithItemsAsync(request.Id, cancellationToken);
 
         if (collection == null)
-            return Result<CuratedCollectionDetailResponse>.Failure(new Error("CuratedCollection.NotFound", "Collection not found."));
+            return Result<CuratedCollectionDetailResponse>.Failure(CuratedCollectionErrors.NotFound);
 
         var products = collection.Items
             .Select(i => i.Product)

@@ -38,4 +38,14 @@ public static class AuthErrors
         "Auth.InvalidToken",
         "The provided token is invalid.",
         ErrorType.Unauthorized);
+
+    public static readonly Error GoogleInvalidToken = new(
+        "Auth.GoogleInvalidToken",
+        "Invalid Google ID Token or payload.",
+        ErrorType.Unauthorized);
+
+    public static readonly Error GoogleError = new(
+        "Auth.GoogleError",
+        "Error while verifying Google Token.",
+        ErrorType.Failure);
 }

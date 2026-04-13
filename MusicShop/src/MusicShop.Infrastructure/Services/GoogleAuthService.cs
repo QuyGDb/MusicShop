@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MusicShop.Application.Common.Interfaces;
 using MusicShop.Domain.Common;
+using MusicShop.Domain.Errors;
 using MusicShop.Infrastructure.Security;
 using MusicShop.Application.DTOs.Auth;
 
@@ -25,7 +26,7 @@ public sealed class GoogleAuthService(
 
             if (payload == null)
             {
-                return Result<GoogleUserPayload>.Failure(new Error("Auth.GoogleInvalidToken", "Invalid Google token payload."));
+                return Result<GoogleUserPayload>.Failure(AuthErrors.GoogleInvalidToken);
             }
 
             return Result<GoogleUserPayload>.Success(new GoogleUserPayload(
@@ -37,12 +38,12 @@ public sealed class GoogleAuthService(
         catch (InvalidJwtException ex)
         {
             logger.LogWarning(ex, "Invalid Google ID Token provided");
-            return Result<GoogleUserPayload>.Failure(new Error("Auth.GoogleInvalidToken", "Invalid Google ID Token."));
+            return Result<GoogleUserPayload>.Failure(AuthErrors.GoogleInvalidToken);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Error while verifying Google Token");
-            return Result<GoogleUserPayload>.Failure(new Error("Auth.GoogleError", "Error while verifying Google Token."));
+            return Result<GoogleUserPayload>.Failure(AuthErrors.GoogleError);
         }
     }
 }
