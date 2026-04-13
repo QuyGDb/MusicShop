@@ -31,7 +31,7 @@ public sealed class CreateArtistCommandHandler(
         }
 
         // 3. Validate Genres existence
-        if (request.GenreIds != null && request.GenreIds.Any())
+        if (request.GenreIds is { Count: > 0 })
         {
             // Remove duplicates from request to avoid double count
             List<Guid> distinctGenreIds = request.GenreIds.Distinct().ToList();
@@ -56,7 +56,7 @@ public sealed class CreateArtistCommandHandler(
         };
 
         // 5. Handle Genres many-to-many
-        if (request.GenreIds != null && request.GenreIds.Any())
+        if (request.GenreIds is { Count: > 0 })
         {
             foreach (Guid genreId in request.GenreIds.Distinct())
             {

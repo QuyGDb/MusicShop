@@ -27,8 +27,8 @@ public sealed class GetCuratedCollectionByIdQueryHandler(
                 IsLimited = p.IsLimited,
                 IsPreorder = p.IsPreorder,
                 CoverUrl = p.ReleaseVersion.Release.CoverUrl,
-                MinPrice = p.Variants.Any() ? p.Variants.Min(v => v.Price) : 0,
-                MaxPrice = p.Variants.Any() ? p.Variants.Max(v => v.Price) : 0,
+                MinPrice = p.Variants.Count > 0 ? p.Variants.Min(v => v.Price) : 0,
+                MaxPrice = p.Variants.Count > 0 ? p.Variants.Max(v => v.Price) : 0,
                 InStock = p.Variants.Any(v => v.StockQty > 0 && v.IsAvailable)
             })
             .ToList();

@@ -14,7 +14,7 @@ public sealed class UpdateArtistCommandHandler(
     : IRequestHandler<UpdateArtistCommand, Result<string>>
 {
     public async Task<Result<string>> Handle(
-        UpdateArtistCommand request, 
+        UpdateArtistCommand request,
         CancellationToken cancellationToken)
     {
         // 1. Fetch artist including Genres
@@ -28,7 +28,7 @@ public sealed class UpdateArtistCommandHandler(
         // 2. Check for duplicate name
         Artist? existingWithSameName = await artistRepository.FirstOrDefaultAsync(
             x => x.Name == request.Name && x.Id != artist.Id, cancellationToken);
-        
+
         if (existingWithSameName != null)
         {
             return Result<string>.Failure(ArtistErrors.DuplicateName);
@@ -37,17 +37,17 @@ public sealed class UpdateArtistCommandHandler(
         // 3. Check for duplicate slug
         Artist? existingWithSameSlug = await artistRepository.FirstOrDefaultAsync(
             x => x.Slug == request.Slug && x.Id != artist.Id, cancellationToken);
-        
+
         if (existingWithSameSlug != null)
         {
             return Result<string>.Failure(ArtistErrors.DuplicateSlug);
         }
 
         // 4. Validate Genres existence
-        if (request.GenreIds != null && request.GenreIds.Any())
+        if (request.GenreIds is { Count: > 0 })
         {
             List<Guid> distinctGenreIds = request.GenreIds.Distinct().ToList();
-            
+
             int existingGenresCount = await genreRepository.CountAsync(
                 g => distinctGenreIds.Contains(g.Id), cancellationToken);
 

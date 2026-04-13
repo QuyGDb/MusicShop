@@ -23,7 +23,7 @@ public sealed class DeleteLabelCommandHandler(
             return Result.Failure(LabelErrors.NotFound);
         }
 
-        if (label.ReleaseVersions.Any())
+        if (label.ReleaseVersions.Count > 0)
         {
             return Result.Failure(LabelErrors.HasAssociations);
         }

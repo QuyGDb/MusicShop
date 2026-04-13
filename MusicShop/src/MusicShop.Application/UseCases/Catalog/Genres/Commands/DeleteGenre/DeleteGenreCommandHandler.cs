@@ -20,7 +20,7 @@ public sealed class DeleteGenreCommandHandler(
             return Result.Failure(GenreErrors.NotFound);
         }
 
-        if (genre.ArtistGenres.Any() || genre.ReleaseGenres.Any())
+        if (genre.ArtistGenres.Count > 0 || genre.ReleaseGenres.Count > 0)
         {
             return Result.Failure(GenreErrors.HasAssociations);
         }

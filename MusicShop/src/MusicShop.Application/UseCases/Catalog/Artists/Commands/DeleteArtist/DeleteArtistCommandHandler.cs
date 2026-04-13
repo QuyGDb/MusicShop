@@ -23,7 +23,7 @@ public sealed class DeleteArtistCommandHandler(
             return Result.Failure(ArtistErrors.NotFound);
         }
 
-        if (artist.Releases.Any())
+        if (artist.Releases.Count > 0)
         {
             return Result.Failure(ArtistErrors.HasAssociations);
         }

@@ -32,8 +32,8 @@ public sealed class StripeService : IStripeService
         {
             var options = new SessionCreateOptions
             {
-                PaymentMethodTypes = new List<string> { "card" },
-                LineItems = new List<SessionLineItemOptions>(),
+                PaymentMethodTypes = ["card"],
+                LineItems = [],
                 Mode = "payment",
                 SuccessUrl = successUrl,
                 CancelUrl = cancelUrl,

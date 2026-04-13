@@ -25,7 +25,7 @@ public sealed class DeleteReleaseCommandHandler(
         }
 
         // 2. Prevent deletion if versions exist
-        if (release.Versions.Any())
+        if (release.Versions.Count > 0)
         {
             return Result.Failure(ReleaseErrors.HasVersions);
         }

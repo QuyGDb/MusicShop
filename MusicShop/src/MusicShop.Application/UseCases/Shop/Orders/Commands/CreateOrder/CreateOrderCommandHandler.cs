@@ -31,7 +31,7 @@ public sealed class CreateOrderCommandHandler(
         // 1. Fetch cart with items
         CartEntity? cart = await cartRepository.GetByUserIdAsync(userId, cancellationToken);
 
-        if (cart == null || !cart.Items.Any())
+        if (cart == null || cart.Items.Count == 0)
         {
             return Result<CreateOrderResponse>.Failure(OrderErrors.CartEmpty);
         }
