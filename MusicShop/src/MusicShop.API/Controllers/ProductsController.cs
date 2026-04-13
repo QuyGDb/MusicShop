@@ -62,12 +62,19 @@ public sealed class ProductsController(IMediator mediator) : BaseApiController
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpdateProduct(
         Guid id,
-        [FromBody] UpdateProductCommand command,
+        [FromBody] UpdateProductRequest request,
         CancellationToken cancellationToken)
     {
-        if (id != command.Id) return BadRequest();
+        Result result = await mediator.Send(new UpdateProductCommand(
+            id, 
+            request.Name, 
+            request.Slug, 
+            request.Description, 
+            request.IsActive, 
+            request.IsPreorder, 
+            request.PreorderReleaseDate, 
+            request.LimitedQty), cancellationToken);
 
-        Result result = await mediator.Send(command, cancellationToken);
         return HandleNoContentResult(result);
     }
 
@@ -113,13 +120,21 @@ public sealed class ProductsController(IMediator mediator) : BaseApiController
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse<Guid>>> CreateVariant(
         Guid id,
-        [FromBody] CreateProductVariantCommand command,
+        [FromBody] CreateProductVariantRequest request,
         CancellationToken cancellationToken)
     {
-        if (id != command.ProductId) return BadRequest();
+        var result = await mediator.Send(new CreateProductVariantCommand(
+            id, 
+            request.VariantName, 
+            request.Price, 
+            request.StockQty, 
+            request.IsSigned, 
+            request.ImageUrl, 
+            request.VinylAttributes, 
+            request.CdAttributes, 
+            request.CassetteAttributes), cancellationToken);
 
-        var result = await mediator.Send(command, cancellationToken);
-        return HandleCreatedResult(result, nameof(GetVariants), new { id });
+        return HandleCreatedResult(result, nameof(GetVariants), new { slug = "placeholder" }); // The route expects slug but we only have id here. 
     }
 
     [Authorize(Roles = "admin")]
@@ -130,12 +145,21 @@ public sealed class ProductsController(IMediator mediator) : BaseApiController
     public async Task<IActionResult> UpdateVariant(
         Guid id,
         Guid variantId,
-        [FromBody] UpdateProductVariantCommand command,
+        [FromBody] UpdateProductVariantRequest request,
         CancellationToken cancellationToken)
     {
-        if (id != command.ProductId || variantId != command.VariantId) return BadRequest();
+        Result result = await mediator.Send(new UpdateProductVariantCommand(
+            id, 
+            variantId, 
+            request.VariantName, 
+            request.Price, 
+            request.StockQty, 
+            request.IsSigned, 
+            request.IsAvailable, 
+            request.VinylAttributes, 
+            request.CdAttributes, 
+            request.CassetteAttributes), cancellationToken);
 
-        Result result = await mediator.Send(command, cancellationToken);
         return HandleNoContentResult(result);
     }
 

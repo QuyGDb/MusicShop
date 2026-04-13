@@ -39,11 +39,17 @@ public class ArtistsController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<ApiResponse<string>>> UpdateArtist(Guid id, [FromBody] UpdateArtistCommand command)
+    public async Task<ActionResult<ApiResponse<string>>> UpdateArtist(Guid id, [FromBody] UpdateArtistRequest request)
     {
-        if (id != command.Id) return BadRequest();
-
-        Result<string> result = await mediator.Send(command);
+        Result<string> result = await mediator.Send(new UpdateArtistCommand(
+            id, 
+            request.Name, 
+            request.Slug, 
+            request.Bio, 
+            request.Country, 
+            request.ImageUrl, 
+            request.GenreIds));
+            
         return HandleResult(result);
     }
 

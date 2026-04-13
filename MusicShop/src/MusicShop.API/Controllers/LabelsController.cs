@@ -39,11 +39,16 @@ public class LabelsController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<ApiResponse<string>>> UpdateLabel(Guid id, [FromBody] UpdateLabelCommand command)
+    public async Task<ActionResult<ApiResponse<string>>> UpdateLabel(Guid id, [FromBody] UpdateLabelRequest request)
     {
-        if (id != command.Id) return BadRequest();
-        
-        var result = await mediator.Send(command);
+        var result = await mediator.Send(new UpdateLabelCommand(
+            id, 
+            request.Name, 
+            request.Slug, 
+            request.Country, 
+            request.FoundedYear, 
+            request.Website));
+
         return HandleResult(result);
     }
 

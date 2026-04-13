@@ -39,11 +39,20 @@ public class ReleasesController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpPut("{id:guid}")]
-    public async Task<ActionResult<ApiResponse<Guid>>> UpdateRelease(Guid id, [FromBody] UpdateReleaseCommand command)
+    public async Task<ActionResult<ApiResponse<Guid>>> UpdateRelease(Guid id, [FromBody] UpdateReleaseRequest request)
     {
-        if (id != command.Id) return BadRequest();
+        var result = await mediator.Send(new UpdateReleaseCommand(
+            id, 
+            request.Title, 
+            request.Slug, 
+            request.Year, 
+            request.Type, 
+            request.ArtistId, 
+            request.CoverUrl, 
+            request.Description, 
+            request.GenreIds, 
+            request.Tracks));
 
-        var result = await mediator.Send(command);
         return HandleResult(result);
     }
 

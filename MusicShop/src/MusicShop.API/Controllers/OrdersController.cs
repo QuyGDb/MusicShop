@@ -63,12 +63,9 @@ public sealed class OrdersController(IMediator mediator) : BaseApiController
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> UpdateOrderStatus(
         [FromRoute] Guid id,
-        [FromBody] UpdateOrderStatusCommand command)
+        [FromBody] UpdateOrderStatusRequest request)
     {
-        if (id != command.OrderId)
-            return MapError(new MusicShop.Domain.Common.Error("Order.IdMismatch", "Order ID mismatch."));
-
-        Result result = await mediator.Send(command);
+        Result result = await mediator.Send(new UpdateOrderStatusCommand(id, request.Status, request.TrackingNumber));
         return HandleNoContentResult(result);
     }
 }
