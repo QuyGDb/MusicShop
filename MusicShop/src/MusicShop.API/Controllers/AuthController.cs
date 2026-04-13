@@ -17,6 +17,7 @@ namespace MusicShop.API.Controllers;
 public class AuthController(IMediator mediator) : BaseApiController
 {
     [HttpPost("register")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse<AuthResponse>>> Register([FromBody] RegisterCommand command)
     {
         Result<AuthResponse> result = await mediator.Send(command);
@@ -24,6 +25,8 @@ public class AuthController(IMediator mediator) : BaseApiController
     }
 
     [HttpPost("login")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ApiResponse<AuthResponse>>> Login([FromBody] LoginQuery query)
     {
         Result<AuthResponse> result = await mediator.Send(query);
@@ -31,6 +34,7 @@ public class AuthController(IMediator mediator) : BaseApiController
     }
 
     [HttpPost("google-login")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse<AuthResponse>>> GoogleLogin([FromBody] GoogleLoginCommand command)
     {
         Result<AuthResponse> result = await mediator.Send(command);
@@ -38,6 +42,8 @@ public class AuthController(IMediator mediator) : BaseApiController
     }
 
     [HttpPost("refresh")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<ActionResult<ApiResponse<AuthResponse>>> RefreshToken([FromBody] RefreshTokenCommand command)
     {
         Result<AuthResponse> result = await mediator.Send(command);

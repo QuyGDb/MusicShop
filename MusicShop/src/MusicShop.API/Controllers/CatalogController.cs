@@ -9,6 +9,7 @@ namespace MusicShop.API.Controllers;
 public class CatalogController(IMediator mediator) : BaseApiController
 {
     [HttpGet("search")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse<CatalogSearchResult>>> Search([FromQuery] string q)
     {
         var result = await mediator.Send(new SearchCatalogQuery(q));

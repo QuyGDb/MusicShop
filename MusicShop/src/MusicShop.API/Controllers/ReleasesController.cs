@@ -23,6 +23,7 @@ public class ReleasesController(IMediator mediator) : BaseApiController
     }
 
     [HttpGet("{slug}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<ReleaseDetailResponse>>> GetRelease(string slug)
     {
         var result = await mediator.Send(new GetReleaseBySlugQuery(slug));
@@ -31,6 +32,8 @@ public class ReleasesController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpPost]
+    [ProducesResponseType(typeof(ApiResponse<Guid>), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse<Guid>>> CreateRelease([FromBody] CreateReleaseCommand command)
     {
         var result = await mediator.Send(command);
@@ -39,6 +42,9 @@ public class ReleasesController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpPut("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<Guid>>> UpdateRelease(Guid id, [FromBody] UpdateReleaseRequest request)
     {
         var result = await mediator.Send(new UpdateReleaseCommand(
@@ -59,6 +65,7 @@ public class ReleasesController(IMediator mediator) : BaseApiController
     [Authorize(Roles = "admin")]
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteRelease(Guid id)
     {
         Result result = await mediator.Send(new DeleteReleaseCommand(id));

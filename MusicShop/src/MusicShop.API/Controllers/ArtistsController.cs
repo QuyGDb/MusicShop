@@ -31,6 +31,9 @@ public class ArtistsController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpPost]
+    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ApiResponse<string>>> CreateArtist([FromBody] CreateArtistCommand command)
     {
         Result<string> result = await mediator.Send(command);
@@ -39,6 +42,10 @@ public class ArtistsController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpPut("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)] // Kept because result is updated slug string
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ApiResponse<string>>> UpdateArtist(Guid id, [FromBody] UpdateArtistRequest request)
     {
         Result<string> result = await mediator.Send(new UpdateArtistCommand(
@@ -56,6 +63,8 @@ public class ArtistsController(IMediator mediator) : BaseApiController
     [Authorize(Roles = "admin")]
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> DeleteArtist(Guid id)
     {
         Result result = await mediator.Send(new DeleteArtistCommand(id));

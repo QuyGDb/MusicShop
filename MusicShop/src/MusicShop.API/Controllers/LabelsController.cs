@@ -23,6 +23,7 @@ public class LabelsController(IMediator mediator) : BaseApiController
     }
 
     [HttpGet("{slug}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<LabelResponse>>> GetLabel(string slug)
     {
         var result = await mediator.Send(new GetLabelBySlugQuery(slug));
@@ -31,6 +32,9 @@ public class LabelsController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpPost]
+    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ApiResponse<string>>> CreateLabel([FromBody] CreateLabelCommand command)
     {
         var result = await mediator.Send(command);
@@ -39,6 +43,9 @@ public class LabelsController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpPut("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ApiResponse<string>>> UpdateLabel(Guid id, [FromBody] UpdateLabelRequest request)
     {
         var result = await mediator.Send(new UpdateLabelCommand(
@@ -55,6 +62,8 @@ public class LabelsController(IMediator mediator) : BaseApiController
     [Authorize(Roles = "admin")]
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteLabel(Guid id)
     {
         Result result = await mediator.Send(new DeleteLabelCommand(id));

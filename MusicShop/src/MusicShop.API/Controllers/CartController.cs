@@ -22,7 +22,6 @@ public sealed class CartController(
     private Guid GetUserId() => Guid.Parse(currentUserService.UserId!);
 
     [HttpGet]
-    [ProducesResponseType(typeof(ApiResponse<CartDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<CartDto>>> GetCart()
     {
         var result = await mediator.Send(new GetCartQuery(GetUserId()));
@@ -30,7 +29,8 @@ public sealed class CartController(
     }
 
     [HttpPost("items")]
-    [ProducesResponseType(typeof(ApiResponse<Guid>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<Guid>>> AddToCart([FromBody] AddToCartRequest request)
     {
         var result = await mediator.Send(new AddToCartCommand(
@@ -43,6 +43,8 @@ public sealed class CartController(
 
     [HttpPut("items/{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateCartItem(Guid id, [FromBody] UpdateCartItemRequest request)
     {
         Result result = await mediator.Send(new UpdateCartItemCommand(
@@ -55,6 +57,7 @@ public sealed class CartController(
 
     [HttpDelete("items/{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> RemoveFromCart(Guid id)
     {
         Result result = await mediator.Send(new RemoveFromCartCommand(GetUserId(), id));

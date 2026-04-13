@@ -23,6 +23,7 @@ public class GenresController(IMediator mediator) : BaseApiController
     }
 
     [HttpGet("{slug}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<GenreResponse>>> GetGenre(string slug)
     {
         var result = await mediator.Send(new GetGenreBySlugQuery(slug));
@@ -31,6 +32,9 @@ public class GenresController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpPost]
+    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ApiResponse<string>>> CreateGenre([FromBody] CreateGenreCommand command)
     {
         var result = await mediator.Send(command);
@@ -40,7 +44,9 @@ public class GenresController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpPut("{id:guid}")]
-    [ProducesResponseType(typeof(ApiResponse<GenreResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ApiResponse<GenreResponse>>> UpdateGenre(Guid id, [FromBody] UpdateGenreRequest request)
     {
         var result = await mediator.Send(new UpdateGenreCommand(id, request.Name));
@@ -50,6 +56,8 @@ public class GenresController(IMediator mediator) : BaseApiController
     [Authorize(Roles = "admin")]
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteGenre(Guid id)
     {
         Result result = await mediator.Send(new DeleteGenreCommand(id));

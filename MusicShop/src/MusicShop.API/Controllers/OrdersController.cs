@@ -18,7 +18,6 @@ namespace MusicShop.API.Controllers;
 public sealed class OrdersController(IMediator mediator) : BaseApiController
 {
     [HttpGet]
-    [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<OrderListItemDto>>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<IReadOnlyList<OrderListItemDto>>>> GetOrderHistory([FromQuery] GetOrderHistoryQuery query)
     {
         Result<PaginatedResult<OrderListItemDto>> result = await mediator.Send(query);
@@ -26,7 +25,7 @@ public sealed class OrdersController(IMediator mediator) : BaseApiController
     }
 
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(typeof(ApiResponse<OrderDetailDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<OrderDetailDto>>> GetOrderDetail([FromRoute] Guid id)
     {
         Result<OrderDetailDto> result = await mediator.Send(new GetOrderDetailQuery(id));
@@ -35,6 +34,7 @@ public sealed class OrdersController(IMediator mediator) : BaseApiController
 
     [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<CreateOrderResponse>), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse<CreateOrderResponse>>> CreateOrder([FromBody] CreateOrderCommand command)
     {
         Result<CreateOrderResponse> result = await mediator.Send(command);
@@ -43,6 +43,8 @@ public sealed class OrdersController(IMediator mediator) : BaseApiController
 
     [HttpPost("{id:guid}/cancel")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> CancelOrder([FromRoute] Guid id)
     {
         Result result = await mediator.Send(new CancelOrderCommand(id));
@@ -51,7 +53,6 @@ public sealed class OrdersController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpGet("/api/v1/admin/orders")]
-    [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<OrderListItemDto>>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<IReadOnlyList<OrderListItemDto>>>> GetAdminOrders([FromQuery] GetAdminOrdersQuery query)
     {
         Result<PaginatedResult<OrderListItemDto>> result = await mediator.Send(query);
@@ -61,6 +62,8 @@ public sealed class OrdersController(IMediator mediator) : BaseApiController
     [Authorize(Roles = "admin")]
     [HttpPatch("/api/v1/admin/orders/{id:guid}/status")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateOrderStatus(
         [FromRoute] Guid id,
         [FromBody] UpdateOrderStatusRequest request)

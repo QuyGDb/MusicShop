@@ -26,6 +26,7 @@ public sealed class PaymentsController : ControllerBase
     }
 
     [HttpPost("webhook")]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Webhook()
     {
         var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();

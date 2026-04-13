@@ -15,7 +15,6 @@ namespace MusicShop.API.Controllers;
 public sealed class CuratedCollectionsController(IMediator mediator) : BaseApiController
 {
     [HttpGet]
-    [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<CuratedCollectionResponse>>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<IReadOnlyList<CuratedCollectionResponse>>>> GetCuratedCollections()
     {
         var result = await mediator.Send(new GetCuratedCollectionsQuery());
@@ -23,7 +22,7 @@ public sealed class CuratedCollectionsController(IMediator mediator) : BaseApiCo
     }
 
     [HttpGet("{id:guid}")]
-    [ProducesResponseType(typeof(ApiResponse<CuratedCollectionDetailResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<CuratedCollectionDetailResponse>>> GetCuratedCollectionById([FromRoute] Guid id)
     {
         var result = await mediator.Send(new GetCuratedCollectionByIdQuery(id));
@@ -33,6 +32,7 @@ public sealed class CuratedCollectionsController(IMediator mediator) : BaseApiCo
     [HttpPost]
     [Authorize(Roles = "admin")]
     [ProducesResponseType(typeof(ApiResponse<Guid>), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse<Guid>>> CreateCuratedCollection([FromBody] CreateCuratedCollectionCommand command)
     {
         var result = await mediator.Send(command);
@@ -43,7 +43,8 @@ public sealed class CuratedCollectionsController(IMediator mediator) : BaseApiCo
 
     [HttpPatch("{id:guid}")]
     [Authorize(Roles = "admin")]
-    [ProducesResponseType(typeof(ApiResponse<Guid>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<Guid>>> UpdateCuratedCollection([FromRoute] Guid id, [FromBody] UpdateCuratedCollectionRequest request)
     {
         var result = await mediator.Send(new UpdateCuratedCollectionCommand(id, request.Title, request.Description, request.IsPublished));
@@ -53,6 +54,8 @@ public sealed class CuratedCollectionsController(IMediator mediator) : BaseApiCo
     [HttpPost("{id:guid}/items")]
     [Authorize(Roles = "admin")]
     [ProducesResponseType(typeof(ApiResponse<Guid>), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<Guid>>> AddProductToCollection([FromRoute] Guid id, [FromBody] AddProductToCollectionRequest request)
     {
         var result = await mediator.Send(new AddProductToCollectionCommand(id, request.ProductId, request.SortOrder));
@@ -61,7 +64,8 @@ public sealed class CuratedCollectionsController(IMediator mediator) : BaseApiCo
 
     [HttpDelete("{id:guid}/items/{productId:guid}")]
     [Authorize(Roles = "admin")]
-    [ProducesResponseType(typeof(ApiResponse<Unit>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<Unit>>> RemoveProductFromCollection([FromRoute] Guid id, [FromRoute] Guid productId)
     {
         var result = await mediator.Send(new RemoveProductFromCollectionCommand(id, productId));

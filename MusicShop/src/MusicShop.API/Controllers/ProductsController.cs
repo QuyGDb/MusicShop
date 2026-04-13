@@ -23,7 +23,6 @@ public sealed class ProductsController(IMediator mediator) : BaseApiController
     // ── Products ────────────────────────────────────────────────────────────
 
     [HttpGet]
-    [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<ProductListItemDto>>), StatusCodes.Status200OK)]
     public async Task<ActionResult<ApiResponse<IReadOnlyList<ProductListItemDto>>>> GetProducts(
         [FromQuery] GetProductsQuery query,
         CancellationToken cancellationToken)
@@ -33,7 +32,6 @@ public sealed class ProductsController(IMediator mediator) : BaseApiController
     }
 
     [HttpGet("{slug}")]
-    [ProducesResponseType(typeof(ApiResponse<ProductDetailDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<ProductDetailDto>>> GetProductBySlug(
         string slug,
@@ -99,7 +97,6 @@ public sealed class ProductsController(IMediator mediator) : BaseApiController
     // Let's use Slug for the parent product in the route.
 
     [HttpGet("{slug}/variants")]
-    [ProducesResponseType(typeof(ApiResponse<IReadOnlyList<ProductVariantDto>>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<IReadOnlyList<ProductVariantDto>>>> GetVariants(
         string slug,
