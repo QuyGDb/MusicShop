@@ -1,3 +1,3 @@
 namespace MusicShop.Domain.Enums;
 
-public enum PaymentGateway { VnpayMock, COD }
+public enum PaymentGateway { Stripe }

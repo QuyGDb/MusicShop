@@ -7,6 +7,7 @@ using MusicShop.Infrastructure.Persistence.Repositories;
 using MusicShop.Infrastructure.Security;
 using MusicShop.Infrastructure.Services;
 using MusicShop.Infrastructure.Cache;
+using MusicShop.Infrastructure.Payments;
 using MusicShop.Application.Common.Interfaces;
 
 namespace MusicShop.Infrastructure;
@@ -49,6 +50,12 @@ public static class DependencyInjection
         services.AddOptions<GoogleSettings>()
             .Bind(configuration.GetSection(GoogleSettings.SectionName))
             .ValidateOnStart();
+
+        services.AddOptions<StripeSettings>()
+            .Bind(configuration.GetSection(StripeSettings.SectionName))
+            .ValidateOnStart();
+
+        services.AddScoped<IStripeService, StripeService>();
 
         services.AddScoped<ITokenService, JwtTokenService>();
         

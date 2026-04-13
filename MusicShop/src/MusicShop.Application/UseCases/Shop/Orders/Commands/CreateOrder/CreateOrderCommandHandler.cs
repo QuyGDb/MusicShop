@@ -16,7 +16,8 @@ public sealed class CreateOrderCommandHandler(
     IOrderRepository orderRepository,
     IProductRepository productRepository,
     IUnitOfWork unitOfWork,
-    ICurrentUserService currentUserService) : IRequestHandler<CreateOrderCommand, Result<CreateOrderResponse>>
+    ICurrentUserService currentUserService,
+    IStripeService stripeService) : IRequestHandler<CreateOrderCommand, Result<CreateOrderResponse>>
 {
     public async Task<Result<CreateOrderResponse>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
@@ -85,7 +86,7 @@ public sealed class CreateOrderCommandHandler(
 
         order.TotalAmount = totalAmount;
 
-        // 6. Initialize Payment
+        // 6. Initialize Payment & Create Session
         Payment payment = new()
         {
             Amount = totalAmount,
@@ -93,12 +94,18 @@ public sealed class CreateOrderCommandHandler(
             Status = PaymentStatus.Pending
         };
         
-        // Mock gateway response URL
-        string? vnpayUrl = null;
-        if (request.PaymentMethod == PaymentGateway.VnpayMock)
+        var stripeResult = await stripeService.CreateCheckoutSessionAsync(
+            order, 
+            request.SuccessUrl ?? "https://localhost:5001/checkout/success", 
+            request.CancelUrl ?? "https://localhost:5001/checkout/cancel", 
+            cancellationToken);
+
+        if (!stripeResult.IsSuccess)
         {
-            vnpayUrl = $"https://vnpay-mock.example.com/pay?orderId={order.Id}&amount={totalAmount}";
+            return Result<CreateOrderResponse>.Failure(stripeResult.Error);
         }
+
+        string checkoutUrl = stripeResult.Value.Url;
 
         order.Payment = payment;
 
@@ -110,7 +117,7 @@ public sealed class CreateOrderCommandHandler(
 
         return Result<CreateOrderResponse>.Success(new CreateOrderResponse(
             new OrderSummaryDto(order.Id, order.Status, order.TotalAmount, order.CreatedAt),
-            new PaymentSummaryDto(payment.Id, payment.Gateway, payment.Status, vnpayUrl)
+            new PaymentSummaryDto(payment.Id, payment.Gateway, payment.Status, checkoutUrl)
         ));
     }
 }
