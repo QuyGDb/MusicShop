@@ -46,12 +46,13 @@ public abstract class BaseApiController : ControllerBase
 
     protected ActionResult MapError(Error error)
     {
-        int statusCode = error.Code switch
+        int statusCode = error.Type switch
         {
-            string code when code.EndsWith(".NotFound") => StatusCodes.Status404NotFound,
-            string code when code.EndsWith(".Unauthorized") => StatusCodes.Status401Unauthorized,
-            string code when code.EndsWith(".Forbidden") => StatusCodes.Status403Forbidden,
-            string code when code.EndsWith(".Conflict") => StatusCodes.Status409Conflict,
+            ErrorType.NotFound => StatusCodes.Status404NotFound,
+            ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
+            ErrorType.Forbidden => StatusCodes.Status403Forbidden,
+            ErrorType.Conflict => StatusCodes.Status409Conflict,
+            ErrorType.Validation => StatusCodes.Status400BadRequest,
             _ => StatusCodes.Status400BadRequest
         };
 

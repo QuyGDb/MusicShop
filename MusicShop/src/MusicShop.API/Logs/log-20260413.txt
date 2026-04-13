@@ -1,0 +1,88 @@
+2026-04-13 11:40:40.010 +07:00 [INF] User profile is available. Using 'C:\Users\usopp\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-04-13 11:40:40.126 +07:00 [INF] Now listening on: http://localhost:5016
+2026-04-13 11:40:40.128 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-04-13 11:40:40.129 +07:00 [INF] Hosting environment: Development
+2026-04-13 11:40:40.129 +07:00 [INF] Content root path: D:\Pine tree\MusicShop\src\MusicShop.API
+2026-04-13 11:40:47.640 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5016/ - null null
+2026-04-13 11:40:47.687 +07:00 [WRN] Failed to determine the https port for redirect.
+2026-04-13 11:40:48.672 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5016/ - 404 0 null 1034.9588ms
+2026-04-13 11:40:48.677 +07:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET http://localhost:5016/, Response status code: 404
+2026-04-13 11:40:53.005 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5016/swagger - null null
+2026-04-13 11:40:53.010 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5016/swagger - 301 0 null 5.6137ms
+2026-04-13 11:40:53.013 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5016/swagger/index.html - null null
+2026-04-13 11:40:53.068 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5016/swagger/index.html - 200 null text/html;charset=utf-8 54.3159ms
+2026-04-13 11:40:53.074 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5016/swagger/swagger-ui-bundle.js - null null
+2026-04-13 11:40:53.075 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5016/swagger/swagger-ui.css - null null
+2026-04-13 11:40:53.075 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5016/swagger/swagger-ui-standalone-preset.js - null null
+2026-04-13 11:40:53.099 +07:00 [INF] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A'
+2026-04-13 11:40:53.100 +07:00 [INF] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A'
+2026-04-13 11:40:53.103 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5016/swagger/swagger-ui-standalone-preset.js - 200 312163 text/javascript 27.4589ms
+2026-04-13 11:40:53.103 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5016/swagger/swagger-ui.css - 200 144929 text/css 28.0541ms
+2026-04-13 11:40:53.106 +07:00 [INF] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A'
+2026-04-13 11:40:53.110 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5016/swagger/swagger-ui-bundle.js - 200 1061536 text/javascript 35.462ms
+2026-04-13 11:40:53.257 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5016/swagger/v1/swagger.json - null null
+2026-04-13 11:40:53.411 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5016/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 153.4128ms
+2026-04-13 13:32:58.209 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5016/swagger/index.html - null null
+2026-04-13 13:32:58.211 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5016/swagger/index.html - 200 null text/html;charset=utf-8 2.1771ms
+2026-04-13 13:32:58.389 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5016/swagger/v1/swagger.json - null null
+2026-04-13 13:32:58.415 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5016/swagger/favicon-32x32.png - null null
+2026-04-13 13:32:58.419 +07:00 [INF] Sending file. Request path: '/favicon-32x32.png'. Physical path: 'N/A'
+2026-04-13 13:32:58.420 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5016/swagger/favicon-32x32.png - 200 628 image/png 5.2124ms
+2026-04-13 13:32:58.444 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5016/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 54.9017ms
+2026-04-13 13:36:09.215 +07:00 [INF] User profile is available. Using 'C:\Users\usopp\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-04-13 13:36:09.313 +07:00 [INF] Now listening on: http://localhost:5016
+2026-04-13 13:36:09.316 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-04-13 13:36:09.317 +07:00 [INF] Hosting environment: Development
+2026-04-13 13:36:09.319 +07:00 [INF] Content root path: D:\Pine tree\MusicShop\src\MusicShop.API
+2026-04-13 13:36:38.588 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5016/ - null null
+2026-04-13 13:36:38.652 +07:00 [WRN] Failed to determine the https port for redirect.
+2026-04-13 13:36:38.683 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5016/ - 404 0 null 95.6676ms
+2026-04-13 13:36:38.690 +07:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET http://localhost:5016/, Response status code: 404
+2026-04-13 13:36:41.150 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5016/swagger/index.html - null null
+2026-04-13 13:36:41.203 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5016/swagger/index.html - 200 null text/html;charset=utf-8 52.7731ms
+2026-04-13 13:36:41.301 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5016/swagger/v1/swagger.json - null null
+2026-04-13 13:36:41.454 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5016/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 152.7043ms
+2026-04-13 13:40:30.813 +07:00 [INF] User profile is available. Using 'C:\Users\usopp\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-04-13 13:40:30.902 +07:00 [INF] Now listening on: http://localhost:5000
+2026-04-13 13:40:30.904 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-04-13 13:40:30.904 +07:00 [INF] Hosting environment: Development
+2026-04-13 13:40:30.905 +07:00 [INF] Content root path: D:\Pine tree\MusicShop\src\MusicShop.API
+2026-04-13 13:40:58.776 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/ - null null
+2026-04-13 13:40:58.820 +07:00 [WRN] Failed to determine the https port for redirect.
+2026-04-13 13:40:58.845 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/ - 404 0 null 70.4055ms
+2026-04-13 13:40:58.851 +07:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET http://localhost:5000/, Response status code: 404
+2026-04-13 13:41:01.752 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/s - null null
+2026-04-13 13:41:01.757 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/s - 404 0 null 5.7053ms
+2026-04-13 13:41:01.760 +07:00 [INF] Request reached the end of the middleware pipeline without being handled by application code. Request path: GET http://localhost:5000/s, Response status code: 404
+2026-04-13 13:41:07.807 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger - null null
+2026-04-13 13:41:07.810 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger - 301 0 null 3.0673ms
+2026-04-13 13:41:07.814 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/index.html - null null
+2026-04-13 13:41:07.875 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/index.html - 200 null text/html;charset=utf-8 61.7256ms
+2026-04-13 13:41:07.900 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui.css - null null
+2026-04-13 13:41:07.901 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui-bundle.js - null null
+2026-04-13 13:41:07.902 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui-standalone-preset.js - null null
+2026-04-13 13:41:07.924 +07:00 [INF] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A'
+2026-04-13 13:41:07.924 +07:00 [INF] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A'
+2026-04-13 13:41:07.928 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui.css - 200 144929 text/css 28.5567ms
+2026-04-13 13:41:07.928 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui-standalone-preset.js - 200 312163 text/javascript 25.9813ms
+2026-04-13 13:41:07.946 +07:00 [INF] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A'
+2026-04-13 13:41:07.947 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui-bundle.js - 200 1061536 text/javascript 46.4111ms
+2026-04-13 13:41:08.075 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - null null
+2026-04-13 13:41:08.092 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/favicon-32x32.png - null null
+2026-04-13 13:41:08.097 +07:00 [INF] Sending file. Request path: '/favicon-32x32.png'. Physical path: 'N/A'
+2026-04-13 13:41:08.099 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/favicon-32x32.png - 200 628 image/png 7.0932ms
+2026-04-13 13:41:08.283 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 208.653ms
+2026-04-13 13:45:26.453 +07:00 [INF] Request starting HTTP/1.1 DELETE http://localhost:5000/api/v1/Artists/1b07d0c4-1961-4087-bb72-1ccb5fe85fcb - null null
+2026-04-13 13:45:26.462 +07:00 [INF] CORS policy execution failed.
+2026-04-13 13:45:26.464 +07:00 [INF] Request origin http://localhost:5000 does not have permission to access the resource.
+2026-04-13 13:45:26.474 +07:00 [INF] Authorization failed. These requirements were not met:
+RolesAuthorizationRequirement:User.IsInRole must be true for one of the following roles: (admin)
+2026-04-13 13:45:26.478 +07:00 [INF] AuthenticationScheme: Bearer was challenged.
+2026-04-13 13:45:26.480 +07:00 [INF] Request finished HTTP/1.1 DELETE http://localhost:5000/api/v1/Artists/1b07d0c4-1961-4087-bb72-1ccb5fe85fcb - 401 0 null 26.9662ms
+2026-04-13 13:45:36.541 +07:00 [INF] Request starting HTTP/1.1 DELETE http://localhost:5000/api/v1/Artists/1b07d0c4-1961-4087-bb72-1ccb5fe85fcb - null null
+2026-04-13 13:45:36.544 +07:00 [INF] CORS policy execution failed.
+2026-04-13 13:45:36.545 +07:00 [INF] Request origin http://localhost:5000 does not have permission to access the resource.
+2026-04-13 13:45:36.546 +07:00 [INF] Authorization failed. These requirements were not met:
+RolesAuthorizationRequirement:User.IsInRole must be true for one of the following roles: (admin)
+2026-04-13 13:45:36.551 +07:00 [INF] AuthenticationScheme: Bearer was challenged.
+2026-04-13 13:45:36.553 +07:00 [INF] Request finished HTTP/1.1 DELETE http://localhost:5000/api/v1/Artists/1b07d0c4-1961-4087-bb72-1ccb5fe85fcb - 401 0 null 11.9719ms

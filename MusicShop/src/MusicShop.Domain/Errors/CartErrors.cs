@@ -9,13 +9,16 @@ public static class CartErrors
 {
     public static readonly Error NotFound = new(
         "Cart.NotFound", 
-        "Shopping cart not found for this user.");
+        "Shopping cart not found for this user.",
+        ErrorType.NotFound);
 
     public static readonly Error ItemNotFound = new(
         "Cart.ItemNotFound", 
-        "The specified item was not found in the cart.");
+        "The specified item was not found in the cart.",
+        ErrorType.NotFound);
 
     public static readonly Error InsufficientStock = new(
         "Cart.InsufficientStock", 
-        "The requested quantity exceeds available stock.");
+        "The requested quantity exceeds available stock.",
+        ErrorType.Validation);
 }
