@@ -28,8 +28,9 @@ public class UpdateArtistCommandHandlerTests
     public async Task Handle_Should_ReturnSuccess_When_ValidRequest()
     {
         // Arrange
+        Guid artistId = Guid.NewGuid();
         UpdateArtistCommand command = new UpdateArtistCommand(
-            "old-slug",
+            artistId,
             "Updated Artist",
             "updated-slug",
             "New Bio",
@@ -37,9 +38,9 @@ public class UpdateArtistCommandHandlerTests
             null,
             null);
 
-        Artist existingArtist = new Artist { Id = Guid.NewGuid(), Name = "Old Name", Slug = "old-slug" };
+        Artist existingArtist = new Artist { Id = artistId, Name = "Old Name", Slug = "old-slug" };
         
-        _artistRepository.GetWithGenresBySlugAsync("old-slug", Arg.Any<CancellationToken>())
+        _artistRepository.GetWithGenresAsync(artistId, Arg.Any<CancellationToken>())
             .Returns(existingArtist);
             
         _artistRepository.FirstOrDefaultAsync(Arg.Any<System.Linq.Expressions.Expression<System.Func<Artist, bool>>>(), Arg.Any<CancellationToken>())
@@ -60,9 +61,10 @@ public class UpdateArtistCommandHandlerTests
     public async Task Handle_Should_ReturnFailure_When_ArtistNotFound()
     {
         // Arrange
-        UpdateArtistCommand command = new UpdateArtistCommand("wrong-slug", "Name", "slug", null, null, null);
+        Guid artistId = Guid.NewGuid();
+        UpdateArtistCommand command = new UpdateArtistCommand(artistId, "Name", "slug", null, null, null);
         
-        _artistRepository.GetWithGenresBySlugAsync("wrong-slug", Arg.Any<CancellationToken>())
+        _artistRepository.GetWithGenresAsync(artistId, Arg.Any<CancellationToken>())
             .Returns((Artist?)null);
 
         // Act

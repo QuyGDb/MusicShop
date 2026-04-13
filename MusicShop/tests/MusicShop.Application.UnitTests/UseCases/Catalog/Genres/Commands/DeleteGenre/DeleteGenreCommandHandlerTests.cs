@@ -26,11 +26,11 @@ public class DeleteGenreCommandHandlerTests
     public async Task Handle_Should_ReturnSuccess_When_GenreExistsAndHasNoAssociations()
     {
         // Arrange
-        string slug = "rock";
-        DeleteGenreCommand command = new DeleteGenreCommand(slug);
-        Genre genre = new Genre { Id = Guid.NewGuid(), Slug = slug };
+        Guid genreId = Guid.NewGuid();
+        DeleteGenreCommand command = new DeleteGenreCommand(genreId);
+        Genre genre = new Genre { Id = genreId };
         
-        _genreRepository.GetWithAssociationsBySlugAsync(slug, Arg.Any<CancellationToken>())
+        _genreRepository.GetWithAssociationsAsync(genreId, Arg.Any<CancellationToken>())
             .Returns(genre);
 
         // Act
@@ -46,10 +46,10 @@ public class DeleteGenreCommandHandlerTests
     public async Task Handle_Should_ReturnFailure_When_GenreNotFound()
     {
         // Arrange
-        string slug = "non-existent";
-        DeleteGenreCommand command = new DeleteGenreCommand(slug);
+        Guid genreId = Guid.NewGuid();
+        DeleteGenreCommand command = new DeleteGenreCommand(genreId);
         
-        _genreRepository.GetWithAssociationsBySlugAsync(slug, Arg.Any<CancellationToken>())
+        _genreRepository.GetWithAssociationsAsync(genreId, Arg.Any<CancellationToken>())
             .Returns((Genre?)null);
 
         // Act
@@ -64,12 +64,12 @@ public class DeleteGenreCommandHandlerTests
     public async Task Handle_Should_ReturnFailure_When_GenreHasAssociations()
     {
         // Arrange
-        string slug = "pop";
-        DeleteGenreCommand command = new DeleteGenreCommand(slug);
-        Genre genre = new Genre { Id = Guid.NewGuid(), Slug = slug };
+        Guid genreId = Guid.NewGuid();
+        DeleteGenreCommand command = new DeleteGenreCommand(genreId);
+        Genre genre = new Genre { Id = genreId };
         genre.ArtistGenres.Add(new ArtistGenre { ArtistId = Guid.NewGuid() });
         
-        _genreRepository.GetWithAssociationsBySlugAsync(slug, Arg.Any<CancellationToken>())
+        _genreRepository.GetWithAssociationsAsync(genreId, Arg.Any<CancellationToken>())
             .Returns(genre);
 
         // Act

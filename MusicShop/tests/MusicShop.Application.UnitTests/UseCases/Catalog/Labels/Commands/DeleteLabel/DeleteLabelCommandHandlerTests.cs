@@ -26,11 +26,11 @@ public class DeleteLabelCommandHandlerTests
     public async Task Handle_Should_ReturnSuccess_When_LabelExistsAndHasNoVersions()
     {
         // Arrange
-        string slug = "test-label";
-        DeleteLabelCommand command = new DeleteLabelCommand(slug);
-        Label label = new Label { Id = Guid.NewGuid(), Slug = slug };
+        Guid labelId = Guid.NewGuid();
+        DeleteLabelCommand command = new DeleteLabelCommand(labelId);
+        Label label = new Label { Id = labelId };
         
-        _labelRepository.GetWithVersionsBySlugAsync(slug, Arg.Any<CancellationToken>())
+        _labelRepository.GetWithVersionsAsync(labelId, Arg.Any<CancellationToken>())
             .Returns(label);
 
         // Act
@@ -46,10 +46,10 @@ public class DeleteLabelCommandHandlerTests
     public async Task Handle_Should_ReturnFailure_When_LabelNotFound()
     {
         // Arrange
-        string slug = "non-existent";
-        DeleteLabelCommand command = new DeleteLabelCommand(slug);
+        Guid labelId = Guid.NewGuid();
+        DeleteLabelCommand command = new DeleteLabelCommand(labelId);
         
-        _labelRepository.GetWithVersionsBySlugAsync(slug, Arg.Any<CancellationToken>())
+        _labelRepository.GetWithVersionsAsync(labelId, Arg.Any<CancellationToken>())
             .Returns((Label?)null);
 
         // Act
@@ -64,12 +64,12 @@ public class DeleteLabelCommandHandlerTests
     public async Task Handle_Should_ReturnFailure_When_LabelHasVersions()
     {
         // Arrange
-        var slug = "active-label";
-        DeleteLabelCommand command = new DeleteLabelCommand(slug);
-        Label label = new Label { Id = Guid.NewGuid(), Slug = slug };
+        Guid labelId = Guid.NewGuid();
+        DeleteLabelCommand command = new DeleteLabelCommand(labelId);
+        Label label = new Label { Id = labelId };
         label.ReleaseVersions.Add(new ReleaseVersion { Id = Guid.NewGuid() });
         
-        _labelRepository.GetWithVersionsBySlugAsync(slug, Arg.Any<CancellationToken>())
+        _labelRepository.GetWithVersionsAsync(labelId, Arg.Any<CancellationToken>())
             .Returns(label);
 
         // Act

@@ -26,11 +26,11 @@ public class DeleteArtistCommandHandlerTests
     public async Task Handle_Should_ReturnSuccess_When_ArtistExistsAndHasNoReleases()
     {
         // Arrange
-        string slug = "test-artist";
-        DeleteArtistCommand command = new DeleteArtistCommand(slug);
-        Artist artist = new Artist { Id = Guid.NewGuid(), Slug = slug };
+        Guid artistId = Guid.NewGuid();
+        DeleteArtistCommand command = new DeleteArtistCommand(artistId);
+        Artist artist = new Artist { Id = artistId };
         
-        _artistRepository.GetWithReleasesBySlugAsync(slug, Arg.Any<CancellationToken>())
+        _artistRepository.GetWithReleasesAsync(artistId, Arg.Any<CancellationToken>())
             .Returns(artist);
 
         // Act
@@ -46,10 +46,10 @@ public class DeleteArtistCommandHandlerTests
     public async Task Handle_Should_ReturnFailure_When_ArtistNotFound()
     {
         // Arrange
-        string slug = "non-existent";
-        DeleteArtistCommand command = new DeleteArtistCommand(slug);
+        Guid artistId = Guid.NewGuid();
+        DeleteArtistCommand command = new DeleteArtistCommand(artistId);
         
-        _artistRepository.GetWithReleasesBySlugAsync(slug, Arg.Any<CancellationToken>())
+        _artistRepository.GetWithReleasesAsync(artistId, Arg.Any<CancellationToken>())
             .Returns((Artist?)null);
 
         // Act
@@ -64,12 +64,12 @@ public class DeleteArtistCommandHandlerTests
     public async Task Handle_Should_ReturnFailure_When_ArtistHasReleases()
     {
         // Arrange
-        string slug = "active-artist";
-        DeleteArtistCommand command = new DeleteArtistCommand(slug);
-        Artist artist = new Artist { Id = Guid.NewGuid(), Slug = slug };
+        Guid artistId = Guid.NewGuid();
+        DeleteArtistCommand command = new DeleteArtistCommand(artistId);
+        Artist artist = new Artist { Id = artistId };
         artist.Releases.Add(new Release { Id = Guid.NewGuid() });
         
-        _artistRepository.GetWithReleasesBySlugAsync(slug, Arg.Any<CancellationToken>())
+        _artistRepository.GetWithReleasesAsync(artistId, Arg.Any<CancellationToken>())
             .Returns(artist);
 
         // Act

@@ -35,6 +35,7 @@ public class UpdateReleaseCommandHandlerTests
         UpdateReleaseCommand command = new UpdateReleaseCommand(
             releaseId,
             "Updated Title",
+            "updated-slug",
             2024,
             "Album",
             artistId,
@@ -77,6 +78,7 @@ public class UpdateReleaseCommandHandlerTests
         UpdateReleaseCommand command = new UpdateReleaseCommand(
             releaseId,
             "Updated Title",
+            "updated-slug",
             2024,
             "Album",
             newArtistId,
@@ -114,7 +116,7 @@ public class UpdateReleaseCommandHandlerTests
         // Arrange
         Guid releaseId = Guid.NewGuid();
         UpdateReleaseCommand command = new UpdateReleaseCommand(
-            releaseId, "Title", 2024, null, Guid.NewGuid(), null, null, null, null);
+            releaseId, "Title", "slug", 2024, null, Guid.NewGuid(), null, null, null, null);
         
         _releaseRepository.GetWithDetailsAsync(releaseId, track: true, Arg.Any<CancellationToken>())
             .Returns((Release?)null);
@@ -135,7 +137,7 @@ public class UpdateReleaseCommandHandlerTests
         Guid oldArtistId = Guid.NewGuid();
         Guid newArtistId = Guid.NewGuid();
         UpdateReleaseCommand command = new UpdateReleaseCommand(
-            releaseId, "Title", 2024, null, newArtistId, null, null, null, null);
+            releaseId, "Title", "slug", 2024, null, newArtistId, null, null, null, null);
 
         Release release = new Release { Id = releaseId, ArtistId = oldArtistId };
         
