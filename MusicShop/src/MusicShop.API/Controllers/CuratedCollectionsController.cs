@@ -72,6 +72,3 @@ public sealed class CuratedCollectionsController(IMediator mediator) : BaseApiCo
         return HandleResult(result);
     }
 }
-
-public sealed record UpdateCuratedCollectionRequest(string? Title, string? Description, bool? IsPublished);
-public sealed record AddProductToCollectionRequest(Guid ProductId, int? SortOrder);

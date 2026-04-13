@@ -73,5 +73,5 @@ public sealed class CartController(
     }
 }
 
-public sealed record AddToCartRequest(Guid ProductVariantId, int Quantity);
-public sealed record UpdateCartItemRequest(int Quantity);
+
+

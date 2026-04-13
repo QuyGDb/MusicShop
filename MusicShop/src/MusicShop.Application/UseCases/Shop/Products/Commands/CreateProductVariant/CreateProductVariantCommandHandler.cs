@@ -13,7 +13,7 @@ public sealed class CreateProductVariantCommandHandler(
 {
     public async Task<Result<Guid>> Handle(CreateProductVariantCommand request, CancellationToken cancellationToken)
     {
-        Domain.Entities.Shop.Product? product = await productRepository.GetByIdAsync(request.ProductId, cancellationToken);
+        Product? product = await productRepository.GetByIdAsync(request.ProductId, cancellationToken);
 
         if (product is null)
         {

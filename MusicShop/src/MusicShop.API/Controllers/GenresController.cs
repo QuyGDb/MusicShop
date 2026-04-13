@@ -64,5 +64,3 @@ public class GenresController(IMediator mediator) : BaseApiController
         return HandleNoContentResult(result);
     }
 }
-
-public record UpdateGenreRequest(string Name);
