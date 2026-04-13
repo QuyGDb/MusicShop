@@ -6,10 +6,10 @@
 
 | Layer | Technology | Lý do chọn |
 |---|---|---|
-| Runtime | **.NET 8 LTS** | LTS, performance vượt trội, cross-platform |
-| Framework | **ASP.NET Core 8 Web API** | Industry standard, mature ecosystem |
+| Runtime | **.NET 10 LTS** | Modern, performance vượt trội, cross-platform |
+| Framework | **ASP.NET Core 10 Web API** | Modern standard, mature ecosystem |
 | Language | **C# 12** | Type safety, modern features, nullable reference types |
-| ORM | **Entity Framework Core 8** | Code-first migrations, LINQ, change tracking |
+| ORM | **Entity Framework Core 10** | Code-first migrations, LINQ, change tracking |
 | Database | **PostgreSQL 16** | JSONB, enum, full-text search, free |
 | DB Driver | **Npgsql** | PostgreSQL provider cho EF Core |
 | Cache | **Redis 7** + **StackExchange.Redis** | Session, cache, distributed lock |
@@ -19,7 +19,7 @@
 | Mapping | **Manual Mapping** | Transparency, performance, no magic |
 | Storage | **AWS S3 / Cloudflare R2** (AWSSDK.S3) | File upload |
 | Email | **MailKit** + **SMTP / SendGrid** | Transactional email |
-| Payment | **VNPAY SDK / tự implement** | HMAC-SHA512, tích hợp nội địa |
+| Payment | **Stripe (Official SDK)** | Payment Link/Checkout Session, Global support |
 | Search | **PostgreSQL FTS → Elasticsearch / Meilisearch** | Tìm kiếm sản phẩm |
 | Realtime | **Server-Sent Events (SSE)** | AI streaming response |
 | API Docs | **Swashbuckle (Swagger)** | Auto-generate OpenAPI từ controller |
@@ -66,7 +66,7 @@ src/
 │   │   └── Behaviours/        ← MediatR pipeline behaviours
 │   └── DependencyInjection.cs
 │
-├── VinylShop.Infrastructure/  ← EF Core, Redis, S3, Email, VNPAY
+├── MusicShop.Infrastructure/  ← EF Core, Redis, S3, Email, Stripe
 │   ├── Persistence/
 │   │   ├── AppDbContext.cs
 │   │   ├── Migrations/
@@ -74,7 +74,7 @@ src/
 │   ├── Cache/
 │   ├── Storage/
 │   ├── Email/
-│   ├── Payment/
+│   ├── Payments/
 │   └── DependencyInjection.cs
 │
 └── VinylShop.Api/             ← Controllers, Middleware, Program.cs
@@ -101,12 +101,12 @@ Request → Controller → MediatR → Handler → Repository → DB
 
 | # | Tính năng | Phase gốc |
 |---|---|---|
-| 1 | Project setup + Clean Architecture + Docker Compose | Phase 1 |
-| 2 | EF Core migrations (schema cốt lõi) | Phase 1 |
-| 3 | Auth — Register / Login / JWT / Refresh Token | Phase 1 |
-| 4 | Products — list, filter, detail, Redis cache | Phase 2 |
-| 5 | Cart + Orders — tạo đơn, pessimistic lock tồn kho | Phase 3 |
-| 6 | VNPAY — tạo URL + IPN + HMAC-SHA512 | Phase 4 |
+| 1 | Project setup + Clean Architecture + Docker Compose | ✅ |
+| 2 | EF Core migrations (schema cốt lõi) | ✅ |
+| 3 | Auth — Register / Login / JWT / Refresh Token | ✅ |
+| 4 | Products — list, filter, detail, Redis cache | ✅ |
+| 5 | Cart + Orders — tạo đơn, pessimistic lock tồn kho | ✅ |
+| 6 | Stripe — Checkout Session + Webhook notification | Phase 4 |
 | 7 | Hangfire — gửi email xác nhận đơn | Phase 5 |
 
 
@@ -138,11 +138,10 @@ Request → Controller → MediatR → Handler → Repository → DB
 ## Timeline 4 tuần
 
 ```
-Tuần 1    Tier 1 #1 → #4    Foundation + Auth + Products
-Tuần 2    Tier 1 #5 → #7    Orders + VNPAY + Email
-Tuần 3    Stabilization      Unit tests, Integration tests, Fix bugs
-Tuần 4    Tier 2 #9 → #14   Backend mở rộng
-                              Tier 3 nếu còn giờ
+Tuần 1    Foundation + Auth + Products                    (DONE)
+Tuần 2    Orders + Billing (Stripe)                       (IN PROGRESS)
+Tuần 3    Admin UI + Testing                              (PENDING)
+Tuần 4    AI Features + Cleanup                           (PENDING)
 ```
 
 ---

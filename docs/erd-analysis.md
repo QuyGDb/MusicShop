@@ -562,9 +562,9 @@ payments
 ─────────────────────────────────────────
 id               | uuid     PK
 order_id         | uuid     FK → orders.id    unique    -- 1 đơn chỉ có 1 payment
-method           | enum               -- vnpay | cod
+method           | enum               -- stripe
 amount           | decimal            -- số tiền thanh toán
-transaction_code | string  nullable   -- mã giao dịch từ VNPAY, null nếu COD
+transaction_code | string  nullable   -- mã giao dịch từ Stripe (Session ID / Payment Intent ID)
 status           | enum               -- pending | success | failed
 paid_at          | timestamp nullable -- thời điểm thanh toán thành công
 ```
@@ -579,8 +579,7 @@ paid_at          | timestamp nullable -- thời điểm thanh toán thành công
 **Flow thanh toán:**
 
 ```
-VNPAY:  Tạo payment (pending) → redirect VNPAY → callback → success/failed
-COD:    Tạo payment (pending) → giao hàng → thu tiền → success
+STRIPE:  Tạo payment (pending) → redirect Stripe → webhook → success/failed
 ```
 
 ---
@@ -947,7 +946,7 @@ erDiagram
   payments {
     uuid id PK
     uuid order_id FK
-    enum method "vnpay | cod"
+    enum method "stripe"
     decimal amount
     string transaction_code
     enum status "pending | success | failed"

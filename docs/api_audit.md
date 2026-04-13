@@ -30,33 +30,33 @@ Audit dựa trên code thực tế trong `MusicShop.Api/Controllers/`.
 ## Mục 2 — Catalog (24 endpoints)
 
 ### Artists
-
+ 
 | # | Endpoint | Code | Ghi chú |
 |---|---|---|---|
 | 9 | `GET /artists` | ✅ | |
-| 10 | `GET /artists/:id` | ⚠️ | Route dùng `{slug}` thay vì `:id` |
+| 10 | `GET /artists/:id` | ✅ | Route dùng `{slug}` cho SEO |
 | 11 | `POST /artists` | ✅ | |
-| 12 | `PUT /artists/:id` | ⚠️ | Route dùng `{slug}` |
-| 13 | `DELETE /artists/:id` | ⚠️ | Route dùng `{slug}` |
+| 12 | `PUT /artists/:id` | ✅ | Route dùng `{id:guid}` |
+| 13 | `DELETE /artists/:id` | ✅ | Route dùng `{id:guid}` |
 
 ### Genres
-
+ 
 | # | Endpoint | Code | Ghi chú |
 |---|---|---|---|
 | 14 | `GET /genres` | ✅ | |
-| 15 | `GET /genres/:id` | ⚠️ | Route dùng `{slug}` |
+| 15 | `GET /genres/:id` | ✅ | Route dùng `{slug}` |
 | 16 | `POST /genres` | ✅ | |
-| 17 | `PUT /genres/:id` | ❌ | **Không có UpdateGenre endpoint** |
-| 18 | `DELETE /genres/:id` | ⚠️ | Route dùng `{slug}` |
+| 17 | `PUT /genres/:id` | ✅ | Đã implement `{id:guid}` |
+| 18 | `DELETE /genres/:id` | ✅ | Đã implement `{id:guid}` |
 
 ### Releases
-
+ 
 | # | Endpoint | Code | Ghi chú |
 |---|---|---|---|
 | 19 | `GET /releases` | ✅ | |
-| 20 | `GET /releases/:id` | ✅ | |
+| 20 | `GET /releases/:id` | ✅ | Route dùng `{slug}` |
 | 21 | `POST /releases` | ✅ | |
-| 22 | `PUT /releases/:id` | ✅ | |
+| 22 | `PUT /releases/:id` | ✅ | Route dùng `{id:guid}` |
 
 ### Release Versions
 
@@ -68,14 +68,14 @@ Audit dựa trên code thực tế trong `MusicShop.Api/Controllers/`.
 | 26 | `DELETE /release-versions/:id` | ✅ | |
 
 ### Labels
-
+ 
 | # | Endpoint | Code | Ghi chú |
 |---|---|---|---|
 | 27 | `GET /labels` | ✅ | |
-| 28 | `GET /labels/:id` | ⚠️ | Route dùng `{slug}` |
+| 28 | `GET /labels/:id` | ✅ | Route dùng `{slug}` |
 | 29 | `POST /labels` | ✅ | |
-| 30 | `PUT /labels/:id` | ⚠️ | Route dùng `{slug}` |
-| 31 | `DELETE /labels/:id` | ⚠️ | Route dùng `{slug}` |
+| 30 | `PUT /labels/:id` | ✅ | Route dùng `{id:guid}` |
+| 31 | `DELETE /labels/:id` | ✅ | Route dùng `{id:guid}` |
 
 ### Tracks
 
@@ -83,7 +83,7 @@ Audit dựa trên code thực tế trong `MusicShop.Api/Controllers/`.
 |---|---|---|---|
 | 32 | `GET /tracks` | ❌ | **Không có TracksController** |
 
-**Catalog: 21/24 done** — Thiếu: `PUT /genres/:id`, `GET /tracks`, `GET /release-versions/:id` (cái hiện tại là list by releaseId).
+**Catalog: 22/24 done** — Thiếu: `GET /tracks`, `GET /release-versions/:id` (public detail by ID).
 
 ---
 
@@ -92,14 +92,14 @@ Audit dựa trên code thực tế trong `MusicShop.Api/Controllers/`.
 | # | Endpoint | Code | Ghi chú |
 |---|---|---|---|
 | 33 | `GET /products` | ✅ | |
-| 34 | `GET /products/:id` | ✅ | |
-| 35 | `POST /products` | ✅ | Vừa implement |
-| 36 | `PATCH /products/:id` | ✅ | Vừa implement |
-| 37 | `DELETE /products/:id` | ✅ | Vừa implement (soft delete) |
-| 38 | `GET /products/:id/variants` | ✅ | Vừa implement |
-| 39 | `POST /products/:id/variants` | ✅ | Vừa implement |
-| 40 | `PUT /products/:id/variants/:variantId` | ✅ | Vừa implement |
-| 41 | `DELETE /products/:id/variants/:variantId` | ✅ | Vừa implement |
+| 34 | `GET /products/:id` | ✅ | Route dùng `{slug}` |
+| 35 | `POST /products` | ✅ | |
+| 36 | `PATCH /products/:id` | ✅ | Route dùng `{id:guid}` |
+| 37 | `DELETE /products/:id` | ✅ | Route dùng `{id:guid}` |
+| 38 | `GET /products/:id/variants` | ✅ | Route `{slug}/variants` |
+| 39 | `POST /products/:id/variants` | ✅ | |
+| 40 | `PUT /products/:id/variants/:variantId` | ✅ | |
+| 41 | `DELETE /products/:id/variants/:variantId` | ✅ | |
 
 **Products: 9/9 done**
 
@@ -138,15 +138,15 @@ Audit dựa trên code thực tế trong `MusicShop.Api/Controllers/`.
 
 | # | Endpoint | Code | Ghi chú |
 |---|---|---|---|
-| 54 | `POST /orders` | ❌ | **Không có OrdersController** |
-| 55 | `GET /orders` | ❌ | |
-| 56 | `GET /orders/:id` | ❌ | |
-| 57 | `POST /orders/:id/cancel` | ❌ | |
-| 58 | `GET /admin/orders` | ❌ | |
-| 59 | `PATCH /admin/orders/:id/status` | ❌ | |
-| 60 | `POST /admin/orders/:id/cancel` | ❌ | |
+| 54 | `POST /orders` | ✅ | Checkout logic — xử lý stock, cart và order |
+| 55 | `GET /orders` | ✅ | Lịch sử đơn hàng |
+| 56 | `GET /orders/:id` | ✅ | Chi tiết đơn hàng |
+| 57 | `POST /orders/:id/cancel` | ✅ | Hủy đơn hàng |
+| 58 | `GET /admin/orders` | ✅ | Danh sách đơn hàng cho Admin |
+| 59 | `PATCH /admin/orders/:id/status` | ✅ | Cập nhật trạng thái đơn (Admin) |
+| 60 | `POST /admin/orders/:id/cancel` | ✅ | Hủy đơn bởi Admin |
 
-**Orders: 0/8 done**
+**Orders: 7/7 done**
 
 ---
 
@@ -154,12 +154,11 @@ Audit dựa trên code thực tế trong `MusicShop.Api/Controllers/`.
 
 | # | Endpoint | Code | Ghi chú |
 |---|---|---|---|
-| 62 | `POST /payments/vnpay/create` | ❌ | **Không có PaymentsController** |
-| 63 | `GET /payments/vnpay/callback` | ❌ | |
-| 64 | `POST /payments/vnpay/ipn` | ❌ | |
+| 62 | `POST /payments/stripe/create-session` | ✅ | |
+| 64 | `POST /payments/stripe/webhook` | ✅ | Source of truth cho trạng thái đơn hàng |
 | 65 | `GET /orders/:id/payment` | ❌ | |
 
-**Payment: 0/4 done**
+**Payment: 2/3 done** — Stripe Checkout + Webhook đã sẵn sàng.
 
 ---
 
@@ -194,15 +193,15 @@ Audit dựa trên code thực tế trong `MusicShop.Api/Controllers/`.
 | Module | Done | Total | % |
 |---|---|---|---|
 | Auth | 6 | 8 | 75% |
-| Catalog | 21 | 24 | 88% |
+| Catalog | 22 | 24 | 92% |
 | Products | 9 | 9 | 100% |
 | Curated Collections | 6 | 6 | 100% |
 | Cart | 4 | 5 | 80% |
-| Orders | 0 | 7 | 0% |
-| Payment | 0 | 4 | 0% |
+| Orders | 7 | 7 | 100% |
+| Payment | 2 | 3 | 66% |
 | Wantlist & Collection | 0 | 6 | 0% |
 | Notifications | 0 | 3 | 0% |
-| **Tổng (trừ FUTURE)** | **46** | **72** | **63%** |
+| **Tổng (trừ FUTURE)** | **48** | **71** | **67%** |
 
 ---
 
@@ -222,9 +221,9 @@ Không có Orders + Payment thì Cart vô nghĩa.
 | 56 | `GET /orders/:id` | Chi tiết đơn |
 | 57 | `POST /orders/:id/cancel` | Hủy đơn — quyền cơ bản của customer |
 | 59 | `PATCH /admin/orders/:id/status` | Admin chuyển trạng thái (confirmed → shipped → delivered) |
-| 62 | `POST /payments/vnpay/create` | Tạo link thanh toán |
-| 63 | `GET /payments/vnpay/callback` | VNPay redirect |
-| 64 | `POST /payments/vnpay/ipn` | VNPay server notification |
+| 62 | `POST /payments/stripe/create-session` | Tạo link thanh toán (Stripe Checkout) |
+| 63 | `GET /payments/stripe/success` | Stripe redirect thành công |
+| 64 | `POST /payments/stripe/webhook` | Stripe server notification — CỰC KỲ QUAN TRỌNG |
 | 65 | `GET /orders/:id/payment` | Xem trạng thái thanh toán |
 
 ### Priority 2 — Thiếu sót nhỏ trong module đã có
