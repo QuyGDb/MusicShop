@@ -66,8 +66,11 @@ public abstract class BaseApiController : ControllerBase
 
     private static string GetErrorType(int statusCode) => statusCode switch
     {
+        StatusCodes.Status400BadRequest => "https://tools.ietf.org/html/rfc7231#section-6.5.1",
+        StatusCodes.Status401Unauthorized => "https://tools.ietf.org/html/rfc7235#section-3.1",
+        StatusCodes.Status403Forbidden => "https://tools.ietf.org/html/rfc7231#section-6.5.3",
         StatusCodes.Status404NotFound => "https://tools.ietf.org/html/rfc7231#section-6.5.4",
         StatusCodes.Status409Conflict => "https://tools.ietf.org/html/rfc7231#section-6.5.11",
-        _ => "https://tools.ietf.org/html/rfc7231#section-6.5.1"
+        _ => "https://tools.ietf.org/html/rfc7231#section-6.6.1"
     };
 }
