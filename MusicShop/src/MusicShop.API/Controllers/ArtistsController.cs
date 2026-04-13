@@ -49,9 +49,10 @@ public class ArtistsController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpDelete("{id:guid}")]
-    public async Task<ActionResult<ApiResponse<object>>> DeleteArtist(Guid id)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> DeleteArtist(Guid id)
     {
         Result result = await mediator.Send(new DeleteArtistCommand(id));
-        return HandleNonGenericResult(result);
+        return HandleNoContentResult(result);
     }
 }

@@ -16,11 +16,11 @@ public abstract class BaseApiController : ControllerBase
         return Ok(ApiResponse<T>.SuccessResult(result.Value));
     }
 
-    protected ActionResult<ApiResponse<object>> HandleNonGenericResult(Result result)
+    protected IActionResult HandleNoContentResult(Result result)
     {
         if (result.IsFailure) return MapError(result.Error);
 
-        return Ok(ApiResponse<object>.SuccessResult(null!));
+        return NoContent();
     }
 
     protected ActionResult<ApiResponse<IReadOnlyList<T>>> HandlePaginatedResult<T>(Result<PaginatedResult<T>> result)

@@ -9,6 +9,7 @@ using MusicShop.Application.UseCases.Catalog.Genres.Commands.CreateGenre;
 using MusicShop.Application.UseCases.Catalog.Genres.Commands.DeleteGenre;
 using MusicShop.Application.UseCases.Catalog.Genres.Commands.UpdateGenre;
 using MusicShop.API.Infrastructure;
+using MusicShop.Domain.Common;
 
 namespace MusicShop.API.Controllers;
 
@@ -48,10 +49,11 @@ public class GenresController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpDelete("{id:guid}")]
-    public async Task<ActionResult<ApiResponse<object>>> DeleteGenre(Guid id)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> DeleteGenre(Guid id)
     {
-        var result = await mediator.Send(new DeleteGenreCommand(id));
-        return HandleNonGenericResult(result);
+        Result result = await mediator.Send(new DeleteGenreCommand(id));
+        return HandleNoContentResult(result);
     }
 }
 

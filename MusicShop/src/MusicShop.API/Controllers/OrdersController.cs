@@ -43,10 +43,10 @@ public sealed class OrdersController(IMediator mediator) : BaseApiController
 
     [HttpPost("{id:guid}/cancel")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<ActionResult<ApiResponse<object>>> CancelOrder([FromRoute] Guid id)
+    public async Task<IActionResult> CancelOrder([FromRoute] Guid id)
     {
         Result result = await mediator.Send(new CancelOrderCommand(id));
-        return HandleNonGenericResult(result);
+        return HandleNoContentResult(result);
     }
 
     [Authorize(Roles = "admin")]
@@ -61,16 +61,14 @@ public sealed class OrdersController(IMediator mediator) : BaseApiController
     [Authorize(Roles = "admin")]
     [HttpPatch("/api/v1/admin/orders/{id:guid}/status")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<ActionResult<ApiResponse<object>>> UpdateOrderStatus(
-        [FromRoute] Guid id, 
+    public async Task<IActionResult> UpdateOrderStatus(
+        [FromRoute] Guid id,
         [FromBody] UpdateOrderStatusCommand command)
     {
         if (id != command.OrderId)
-        {
             return MapError(new MusicShop.Domain.Common.Error("Order.IdMismatch", "Order ID mismatch."));
-        }
 
         Result result = await mediator.Send(command);
-        return HandleNonGenericResult(result);
+        return HandleNoContentResult(result);
     }
 }

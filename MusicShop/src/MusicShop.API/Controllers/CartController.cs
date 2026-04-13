@@ -10,6 +10,7 @@ using MusicShop.Application.UseCases.Shop.Cart.Commands.ClearCart;
 using MusicShop.Application.UseCases.Shop.Cart.Commands.RemoveFromCart;
 using MusicShop.Application.UseCases.Shop.Cart.Commands.UpdateCartItem;
 using MusicShop.Application.UseCases.Shop.Cart.Queries.GetCart;
+using MusicShop.Domain.Common;
 
 namespace MusicShop.API.Controllers;
 
@@ -41,31 +42,31 @@ public sealed class CartController(
     }
 
     [HttpPut("items/{id:guid}")]
-    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<ApiResponse<object>>> UpdateCartItem(Guid id, [FromBody] UpdateCartItemRequest request)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> UpdateCartItem(Guid id, [FromBody] UpdateCartItemRequest request)
     {
-        var result = await mediator.Send(new UpdateCartItemCommand(
+        Result result = await mediator.Send(new UpdateCartItemCommand(
             GetUserId(),
             id,
             request.Quantity));
-            
-        return HandleNonGenericResult(result);
+
+        return HandleNoContentResult(result);
     }
 
     [HttpDelete("items/{id:guid}")]
-    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status204NoContent)]
-    public async Task<ActionResult<ApiResponse<object>>> RemoveFromCart(Guid id)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> RemoveFromCart(Guid id)
     {
-        var result = await mediator.Send(new RemoveFromCartCommand(GetUserId(), id));
-        return HandleNonGenericResult(result);
+        Result result = await mediator.Send(new RemoveFromCartCommand(GetUserId(), id));
+        return HandleNoContentResult(result);
     }
 
     [HttpDelete]
-    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status204NoContent)]
-    public async Task<ActionResult<ApiResponse<object>>> ClearCart()
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> ClearCart()
     {
-        var result = await mediator.Send(new ClearCartCommand());
-        return HandleNonGenericResult(result);
+        Result result = await mediator.Send(new ClearCartCommand());
+        return HandleNoContentResult(result);
     }
 }
 

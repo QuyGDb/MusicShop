@@ -7,6 +7,7 @@ using MusicShop.Application.UseCases.Catalog.ReleaseVersions.Commands.DeleteRele
 using MusicShop.Application.UseCases.Catalog.ReleaseVersions.Queries.GetReleaseVersionsByRelease;
 using MusicShop.Application.DTOs.Catalog;
 using MusicShop.API.Infrastructure;
+using MusicShop.Domain.Common;
 
 namespace MusicShop.API.Controllers;
 
@@ -38,9 +39,10 @@ public class ReleaseVersionsController(IMediator mediator) : BaseApiController
 
     [HttpDelete("{id:guid}")]
     [Authorize(Roles = "admin")]
-    public async Task<ActionResult<ApiResponse<object>>> DeleteReleaseVersion(Guid id)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> DeleteReleaseVersion(Guid id)
     {
-        var result = await mediator.Send(new DeleteReleaseVersionCommand(id));
-        return HandleNonGenericResult(result);
+        Result result = await mediator.Send(new DeleteReleaseVersionCommand(id));
+        return HandleNoContentResult(result);
     }
 }

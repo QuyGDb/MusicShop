@@ -9,6 +9,7 @@ using MusicShop.Application.UseCases.Catalog.Labels.Commands.CreateLabel;
 using MusicShop.Application.UseCases.Catalog.Labels.Commands.UpdateLabel;
 using MusicShop.Application.UseCases.Catalog.Labels.Commands.DeleteLabel;
 using MusicShop.API.Infrastructure;
+using MusicShop.Domain.Common;
 
 namespace MusicShop.API.Controllers;
 
@@ -48,9 +49,10 @@ public class LabelsController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpDelete("{id:guid}")]
-    public async Task<ActionResult<ApiResponse<object>>> DeleteLabel(Guid id)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> DeleteLabel(Guid id)
     {
-        var result = await mediator.Send(new DeleteLabelCommand(id));
-        return HandleNonGenericResult(result);
+        Result result = await mediator.Send(new DeleteLabelCommand(id));
+        return HandleNoContentResult(result);
     }
 }

@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Authorization;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MusicShop.API.Infrastructure;
 using MusicShop.Application.DTOs.Catalog;
@@ -9,6 +9,7 @@ using MusicShop.Application.UseCases.Catalog.Releases.Commands.UpdateRelease;
 using MusicShop.Application.UseCases.Catalog.Releases.Queries.GetReleaseById;
 using MusicShop.Application.UseCases.Catalog.Releases.Queries.GetReleaseBySlug;
 using MusicShop.Application.UseCases.Catalog.Releases.Queries.GetReleases;
+using MusicShop.Domain.Common;
 
 namespace MusicShop.API.Controllers;
 
@@ -48,9 +49,10 @@ public class ReleasesController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpDelete("{id:guid}")]
-    public async Task<ActionResult<ApiResponse<object>>> DeleteRelease(Guid id)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public async Task<IActionResult> DeleteRelease(Guid id)
     {
-        var result = await mediator.Send(new DeleteReleaseCommand(id));
-        return HandleNonGenericResult(result);
+        Result result = await mediator.Send(new DeleteReleaseCommand(id));
+        return HandleNoContentResult(result);
     }
 }

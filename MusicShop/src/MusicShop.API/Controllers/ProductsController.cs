@@ -14,6 +14,7 @@ using MusicShop.Application.UseCases.Shop.Products.Queries.GetProductById;
 using MusicShop.Application.UseCases.Shop.Products.Queries.GetProductBySlug;
 using MusicShop.Application.UseCases.Shop.Products.Queries.GetProductVariants;
 using MusicShop.Application.UseCases.Shop.Products.Queries.GetProducts;
+using MusicShop.Domain.Common;
 
 namespace MusicShop.API.Controllers;
 
@@ -56,31 +57,30 @@ public sealed class ProductsController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpPatch("{id:guid}")]
-    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<ApiResponse<object>>> UpdateProduct(
+    public async Task<IActionResult> UpdateProduct(
         Guid id,
         [FromBody] UpdateProductCommand command,
         CancellationToken cancellationToken)
     {
         if (id != command.Id) return BadRequest();
 
-        var result = await mediator.Send(command, cancellationToken);
-        return HandleNonGenericResult(result);
+        Result result = await mediator.Send(command, cancellationToken);
+        return HandleNoContentResult(result);
     }
 
     [Authorize(Roles = "admin")]
     [HttpDelete("{id:guid}")]
-    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<ApiResponse<object>>> DeactivateProduct(
+    public async Task<IActionResult> DeactivateProduct(
         Guid id,
         CancellationToken cancellationToken)
     {
-        var result = await mediator.Send(new DeactivateProductCommand(id), cancellationToken);
-        return HandleNonGenericResult(result);
+        Result result = await mediator.Send(new DeactivateProductCommand(id), cancellationToken);
+        return HandleNoContentResult(result);
     }
 
 
@@ -124,10 +124,10 @@ public sealed class ProductsController(IMediator mediator) : BaseApiController
 
     [Authorize(Roles = "admin")]
     [HttpPut("{id:guid}/variants/{variantId:guid}")]
-    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<ApiResponse<object>>> UpdateVariant(
+    public async Task<IActionResult> UpdateVariant(
         Guid id,
         Guid variantId,
         [FromBody] UpdateProductVariantCommand command,
@@ -135,20 +135,20 @@ public sealed class ProductsController(IMediator mediator) : BaseApiController
     {
         if (id != command.ProductId || variantId != command.VariantId) return BadRequest();
 
-        var result = await mediator.Send(command, cancellationToken);
-        return HandleNonGenericResult(result);
+        Result result = await mediator.Send(command, cancellationToken);
+        return HandleNoContentResult(result);
     }
 
     [Authorize(Roles = "admin")]
     [HttpDelete("{id:guid}/variants/{variantId:guid}")]
-    [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ApiResponse<object>>> DeleteVariant(
+    public async Task<IActionResult> DeleteVariant(
         Guid id,
         Guid variantId,
         CancellationToken cancellationToken)
     {
-        var result = await mediator.Send(new DeleteProductVariantCommand(id, variantId), cancellationToken);
-        return HandleNonGenericResult(result);
+        Result result = await mediator.Send(new DeleteProductVariantCommand(id, variantId), cancellationToken);
+        return HandleNoContentResult(result);
     }
 }
