@@ -18,37 +18,37 @@ public sealed class ReleaseRepository : GenericRepository<Release>, IReleaseRepo
         CancellationToken ct = default)
     {
         IQueryable<Release> query = _context.Set<Release>()
-            .Include(x => x.Artist)
-            .Include(x => x.ReleaseGenres)
-                .ThenInclude(x => x.Genre)
+            .Include(release => release.Artist)
+            .Include(release => release.ReleaseGenres)
+                .ThenInclude(releaseGenre => releaseGenre.Genre)
             .AsNoTracking();
 
         // 1. Filtering
         if (!string.IsNullOrWhiteSpace(request.Q))
         {
-            query = query.Where(r => r.Title.Contains(request.Q));
+            query = query.Where(release => release.Title.Contains(request.Q));
         }
 
         if (request.ArtistId.HasValue)
         {
-            query = query.Where(r => r.ArtistId == request.ArtistId.Value);
+            query = query.Where(release => release.ArtistId == request.ArtistId.Value);
         }
 
         if (request.GenreId.HasValue)
         {
-            query = query.Where(r => r.ReleaseGenres.Any(rg => rg.GenreId == request.GenreId.Value));
+            query = query.Where(release => release.ReleaseGenres.Any(releaseGenre => releaseGenre.GenreId == request.GenreId.Value));
         }
 
         if (!string.IsNullOrWhiteSpace(request.Type))
         {
-            query = query.Where(r => r.Type == request.Type);
+            query = query.Where(release => release.Type == request.Type);
         }
 
         if (!string.IsNullOrWhiteSpace(request.Format))
         {
             if (Enum.TryParse<ReleaseFormat>(request.Format, true, out ReleaseFormat formatEnum))
             {
-                query = query.Where(r => r.Versions.Any(v => v.Format == formatEnum));
+                query = query.Where(release => release.Versions.Any(variant => variant.Format == formatEnum));
             }
         }
 
@@ -57,8 +57,8 @@ public sealed class ReleaseRepository : GenericRepository<Release>, IReleaseRepo
 
         // 3. Paging and Sorting
         List<Release> items = await query
-            .OrderByDescending(r => r.Year)
-            .ThenBy(r => r.Title)
+            .OrderByDescending(release => release.Year)
+            .ThenBy(release => release.Title)
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync(ct);
@@ -68,16 +68,16 @@ public sealed class ReleaseRepository : GenericRepository<Release>, IReleaseRepo
 
     public async Task<Release?> GetWithDetailsAsync(Guid id, bool track = false, CancellationToken ct = default)
     {
-        var query = _context.Set<Release>()
-            .Include(x => x.Artist)
-            .Include(x => x.ReleaseGenres)
-                .ThenInclude(x => x.Genre)
-            .Include(x => x.Tracks.OrderBy(t => t.Position))
-            .Include(x => x.Versions)
-                .ThenInclude(x => x.Label)
-            .Include(x => x.Versions)
-                .ThenInclude(v => v.Products)
-                    .ThenInclude(p => p.Variants)
+        IQueryable<Release> query = _context.Set<Release>()
+            .Include(release => release.Artist)
+            .Include(release => release.ReleaseGenres)
+                .ThenInclude(releaseGenre => releaseGenre.Genre)
+            .Include(release => release.Tracks.OrderBy(t => t.Position))
+            .Include(release => release.Versions)
+                .ThenInclude(releaseVersion => releaseVersion.Label)
+            .Include(release => release.Versions)
+                .ThenInclude(releaseVersion => releaseVersion.Products)
+                    .ThenInclude(product => product.Variants)
             .AsQueryable();
 
         if (!track)
@@ -85,21 +85,21 @@ public sealed class ReleaseRepository : GenericRepository<Release>, IReleaseRepo
             query = query.AsNoTracking();
         }
 
-        return await query.FirstOrDefaultAsync(x => x.Id == id, ct);
+        return await query.FirstOrDefaultAsync(release => release.Id == id, ct);
     }
 
     public async Task<Release?> GetBySlugWithDetailsAsync(string slug, bool track = false, CancellationToken ct = default)
     {
-        var query = _context.Set<Release>()
-            .Include(x => x.Artist)
-            .Include(x => x.ReleaseGenres)
-                .ThenInclude(x => x.Genre)
-            .Include(x => x.Tracks.OrderBy(t => t.Position))
-            .Include(x => x.Versions)
-                .ThenInclude(x => x.Label)
-            .Include(x => x.Versions)
-                .ThenInclude(v => v.Products)
-                    .ThenInclude(p => p.Variants)
+        IQueryable<Release> query = _context.Set<Release>()
+            .Include(release => release.Artist)
+            .Include(release => release.ReleaseGenres)
+                .ThenInclude(releaseGenre => releaseGenre.Genre)
+            .Include(release => release.Tracks.OrderBy(releaseTrack => releaseTrack.Position))
+            .Include(release => release.Versions)
+                .ThenInclude(releaseVersion => releaseVersion.Label)
+            .Include(release => release.Versions)
+                .ThenInclude(releaseVersion => releaseVersion.Products)
+                    .ThenInclude(product => product.Variants)
             .AsQueryable();
 
         if (!track)
@@ -107,7 +107,7 @@ public sealed class ReleaseRepository : GenericRepository<Release>, IReleaseRepo
             query = query.AsNoTracking();
         }
 
-        return await query.FirstOrDefaultAsync(x => x.Slug == slug, ct);
+        return await query.FirstOrDefaultAsync(release => release.Slug == slug, ct);
     }
 
     public async Task<List<Release>> SearchByTitleAsync(string searchTerm, int limit, CancellationToken ct = default)

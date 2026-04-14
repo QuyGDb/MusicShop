@@ -20,13 +20,13 @@ public sealed class GenreRepository : GenericRepository<Genre>, IGenreRepository
 
         if (!string.IsNullOrWhiteSpace(request.Q))
         {
-            query = query.Where(x => x.Name.Contains(request.Q));
+            query = query.Where(genre => genre.Name.Contains(request.Q));
         }
 
         int totalCount = await query.CountAsync(ct);
 
         List<Genre> items = await query
-            .OrderBy(x => x.Name)
+            .OrderBy(genre => genre.Name)
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync(ct);
@@ -38,22 +38,22 @@ public sealed class GenreRepository : GenericRepository<Genre>, IGenreRepository
     {
         return await _context.Set<Genre>()
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Slug == slug, ct);
+            .FirstOrDefaultAsync(genre => genre.Slug == slug, ct);
     }
 
     public async Task<Genre?> GetWithAssociationsAsync(Guid id, CancellationToken ct = default)
     {
         return await _context.Set<Genre>()
-            .Include(x => x.ArtistGenres)
-            .Include(x => x.ReleaseGenres)
-            .FirstOrDefaultAsync(x => x.Id == id, ct);
+            .Include(genre => genre.ArtistGenres)
+            .Include(genre => genre.ReleaseGenres)
+            .FirstOrDefaultAsync(genre => genre.Id == id, ct);
     }
 
     public async Task<Genre?> GetWithAssociationsBySlugAsync(string slug, CancellationToken ct = default)
     {
         return await _context.Set<Genre>()
-            .Include(x => x.ArtistGenres)
-            .Include(x => x.ReleaseGenres)
-            .FirstOrDefaultAsync(x => x.Slug == slug, ct);
+            .Include(genre => genre.ArtistGenres)
+            .Include(genre => genre.ReleaseGenres)
+            .FirstOrDefaultAsync(genre => genre.Slug == slug, ct);
     }
 }

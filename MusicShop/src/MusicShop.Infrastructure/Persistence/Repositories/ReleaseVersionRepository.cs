@@ -14,8 +14,8 @@ public sealed class ReleaseVersionRepository : GenericRepository<ReleaseVersion>
     public async Task<List<ReleaseVersion>> GetByReleaseIdWithLabelAsync(Guid releaseId, CancellationToken ct = default)
     {
         return await _context.Set<ReleaseVersion>()
-            .Include(v => v.Label)
-            .Where(v => v.ReleaseId == releaseId)
+            .Include(releaseVersion => releaseVersion.Label)
+            .Where(releaseVersion => releaseVersion.ReleaseId == releaseId)
             .AsNoTracking()
             .ToListAsync(ct);
     }

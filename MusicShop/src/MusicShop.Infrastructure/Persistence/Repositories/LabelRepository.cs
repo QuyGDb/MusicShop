@@ -20,18 +20,18 @@ public sealed class LabelRepository : GenericRepository<Label>, ILabelRepository
 
         if (!string.IsNullOrWhiteSpace(request.Q))
         {
-            query = query.Where(x => x.Name.Contains(request.Q));
+            query = query.Where(label => label.Name.Contains(request.Q));
         }
 
         if (!string.IsNullOrWhiteSpace(request.Country))
         {
-            query = query.Where(x => x.Country == request.Country);
+            query = query.Where(label => label.Country == request.Country);
         }
 
         int totalCount = await query.CountAsync(ct);
 
         List<Label> items = await query
-            .OrderBy(x => x.Name)
+            .OrderBy(label => label.Name)
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync(ct);
@@ -43,20 +43,20 @@ public sealed class LabelRepository : GenericRepository<Label>, ILabelRepository
     {
         return await _context.Set<Label>()
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Slug == slug, ct);
+            .FirstOrDefaultAsync(label => label.Slug == slug, ct);
     }
 
     public async Task<Label?> GetWithVersionsAsync(Guid id, CancellationToken ct = default)
     {
         return await _context.Set<Label>()
-            .Include(x => x.ReleaseVersions)
-            .FirstOrDefaultAsync(x => x.Id == id, ct);
+            .Include(label => label.ReleaseVersions)
+            .FirstOrDefaultAsync(label => label.Id == id, ct);
     }
 
     public async Task<Label?> GetWithVersionsBySlugAsync(string slug, CancellationToken ct = default)
     {
         return await _context.Set<Label>()
-            .Include(x => x.ReleaseVersions)
-            .FirstOrDefaultAsync(x => x.Slug == slug, ct);
+            .Include(label => label.ReleaseVersions)
+            .FirstOrDefaultAsync(label => label.Slug == slug, ct);
     }
 }

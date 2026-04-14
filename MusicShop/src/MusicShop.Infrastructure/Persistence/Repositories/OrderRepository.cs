@@ -15,18 +15,18 @@ public sealed class OrderRepository : GenericRepository<Order>, IOrderRepository
     public async Task<Order?> GetByIdWithDetailsAsync(Guid orderId, CancellationToken ct = default)
     {
         return await _dbSet
-            .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Variant)
-                    .ThenInclude(v => v.Product)
-            .Include(o => o.Payment)
-            .FirstOrDefaultAsync(o => o.Id == orderId, ct);
+            .Include(order => order.OrderItems)
+                .ThenInclude(orderItem => orderItem.Variant)
+                    .ThenInclude(variant => variant.Product)
+            .Include(order => order.Payment)
+            .FirstOrDefaultAsync(order => order.Id == orderId, ct);
     }
 
     public async Task<IEnumerable<Order>> GetByUserIdAsync(Guid userId, CancellationToken ct = default)
     {
         return await _dbSet
-            .Where(o => o.CustomerId == userId)
-            .OrderByDescending(o => o.CreatedAt)
+            .Where(order => order.CustomerId == userId)
+            .OrderByDescending(order => order.CreatedAt)
             .ToListAsync(ct);
     }
 
@@ -37,20 +37,20 @@ public sealed class OrderRepository : GenericRepository<Order>, IOrderRepository
         int limit, 
         CancellationToken ct = default)
     {
-        var query = _dbSet.AsNoTracking()
-            .Where(o => o.CustomerId == userId)
+        IQueryable<Order> query = _dbSet.AsNoTracking()
+            .Where(order => order.CustomerId == userId)
             .AsQueryable();
 
         if (status.HasValue)
         {
-            query = query.Where(o => o.Status == status.Value);
+            query = query.Where(order => order.Status == status.Value);
         }
 
         int totalCount = await query.CountAsync(ct);
 
-        var items = await query
-            .Include(o => o.OrderItems)
-            .OrderByDescending(o => o.CreatedAt)
+        List<Order> items = await query
+            .Include(order => order.OrderItems)
+            .OrderByDescending(order => order.CreatedAt)
             .Skip((page - 1) * limit)
             .Take(limit)
             .ToListAsync(ct);
@@ -64,18 +64,18 @@ public sealed class OrderRepository : GenericRepository<Order>, IOrderRepository
         int limit, 
         CancellationToken ct = default)
     {
-        var query = _dbSet.AsNoTracking().AsQueryable();
+        IQueryable<Order> query = _dbSet.AsNoTracking().AsQueryable();
 
         if (status.HasValue)
         {
-            query = query.Where(o => o.Status == status.Value);
+            query = query.Where(order => order.Status == status.Value);
         }
 
         int totalCount = await query.CountAsync(ct);
 
-        var items = await query
-            .Include(o => o.OrderItems)
-            .OrderByDescending(o => o.CreatedAt)
+        List<Order> items = await query
+            .Include(order => order.OrderItems)
+            .OrderByDescending(order => order.CreatedAt)
             .Skip((page - 1) * limit)
             .Take(limit)
             .ToListAsync(ct);

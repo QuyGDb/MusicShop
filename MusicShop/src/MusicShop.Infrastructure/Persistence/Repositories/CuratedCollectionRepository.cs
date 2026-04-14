@@ -11,24 +11,24 @@ public sealed class CuratedCollectionRepository(AppDbContext context) : ICurated
     {
         return await context.CuratedCollections
             .AsNoTracking()
-            .Where(c => c.IsPublished)
-            .OrderBy(c => c.CreatedAt)
+            .Where(collection => collection.IsPublished)
+            .OrderBy(collection => collection.CreatedAt)
             .ToListAsync(ct);
     }
 
     public async Task<CuratedCollection?> GetByIdWithItemsAsync(Guid id, CancellationToken ct = default)
     {
         return await context.CuratedCollections
-            .Include(c => c.Items.OrderBy(i => i.SortOrder))
-                .ThenInclude(i => i.Product)
-                    .ThenInclude(p => p.ReleaseVersion)
-                        .ThenInclude(rv => rv.Release)
-                            .ThenInclude(r => r.Artist)
-            .Include(c => c.Items)
-                .ThenInclude(i => i.Product)
-                    .ThenInclude(p => p.Variants)
+            .Include(collection => collection.Items.OrderBy(item => item.SortOrder))
+                .ThenInclude(item => item.Product)
+                    .ThenInclude(product => product.Variants)
+            .Include(collection => collection.Items)
+                .ThenInclude(item => item.Product)
+                    .ThenInclude(product => product.ReleaseVersion)
+                        .ThenInclude(releaseVersion => releaseVersion.Release)
+                            .ThenInclude(release => release.Artist)
             .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.Id == id, ct);
+            .FirstOrDefaultAsync(collection => collection.Id == id, ct);
     }
 
     public async Task<CuratedCollection?> GetByIdAsync(Guid id, CancellationToken ct = default)
@@ -56,7 +56,7 @@ public sealed class CuratedCollectionRepository(AppDbContext context) : ICurated
 
     public async Task<bool> ExistsAsync(Guid id, CancellationToken ct = default)
     {
-        return await context.CuratedCollections.AnyAsync(c => c.Id == id, ct);
+        return await context.CuratedCollections.AnyAsync(collection => collection.Id == id, ct);
     }
 
     public async Task AddItemAsync(CuratedCollectionItem item, CancellationToken ct = default)
@@ -67,8 +67,8 @@ public sealed class CuratedCollectionRepository(AppDbContext context) : ICurated
 
     public async Task RemoveItemAsync(Guid collectionId, Guid productId, CancellationToken ct = default)
     {
-        var item = await context.Set<CuratedCollectionItem>()
-            .FirstOrDefaultAsync(i => i.CollectionId == collectionId && i.ProductId == productId, ct);
+        CuratedCollectionItem? item = await context.Set<CuratedCollectionItem>()
+            .FirstOrDefaultAsync(item => item.CollectionId == collectionId && item.ProductId == productId, ct);
 
         if (item != null)
         {
@@ -80,14 +80,14 @@ public sealed class CuratedCollectionRepository(AppDbContext context) : ICurated
     public async Task<bool> ItemExistsAsync(Guid collectionId, Guid productId, CancellationToken ct = default)
     {
         return await context.Set<CuratedCollectionItem>()
-            .AnyAsync(i => i.CollectionId == collectionId && i.ProductId == productId, ct);
+            .AnyAsync(item => item.CollectionId == collectionId && item.ProductId == productId, ct);
     }
 
     public async Task<int> GetNextSortOrderAsync(Guid collectionId, CancellationToken ct = default)
     {
-        var maxOrder = await context.Set<CuratedCollectionItem>()
-            .Where(i => i.CollectionId == collectionId)
-            .MaxAsync(i => (int?)i.SortOrder, ct) ?? 0;
+        int maxOrder = await context.Set<CuratedCollectionItem>()
+            .Where(item => item.CollectionId == collectionId)
+            .MaxAsync(item => (int?)item.SortOrder, ct) ?? 0;
 
         return maxOrder + 1;
     }

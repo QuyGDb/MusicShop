@@ -17,64 +17,64 @@ public sealed class ProductRepository : GenericRepository<Product>, IProductRepo
         GetProductsQuery request,
         CancellationToken ct = default)
     {
-        var query = _dbSet.AsNoTracking()
-            .Include(p => p.Variants)
-            .Include(p => p.ReleaseVersion)
-                .ThenInclude(rv => rv!.Release)
-                    .ThenInclude(r => r!.Artist)
-            .Where(p => p.IsActive)
+        IQueryable<Product> query = _dbSet.AsNoTracking()
+            .Include(product => product.Variants)
+            .Include(product => product.ReleaseVersion)
+                .ThenInclude(releaseVersion => releaseVersion!.Release)
+                    .ThenInclude(release => release!.Artist)
+            .Where(product => product.IsActive)
             .AsQueryable();
 
         // 1. Filtering
         if (request.Format.HasValue)
         {
-            query = query.Where(p => p.Format == request.Format.Value);
+            query = query.Where(product => product.Format == request.Format.Value);
         }
 
         if (!string.IsNullOrEmpty(request.Genre))
         {
-            query = query.Where(p => p.ReleaseVersion != null && 
-                                     p.ReleaseVersion.Release != null && 
-                                     p.ReleaseVersion.Release.ReleaseGenres.Any(rg => rg.Genre != null && rg.Genre.Slug == request.Genre));
+            query = query.Where(product => product.ReleaseVersion != null && 
+                                     product.ReleaseVersion.Release != null && 
+                                     product.ReleaseVersion.Release.ReleaseGenres.Any(releaseGenre => releaseGenre.Genre != null && releaseGenre.Genre.Slug == request.Genre));
         }
 
         if (request.ArtistId.HasValue)
         {
-            query = query.Where(p => p.ReleaseVersion != null && 
-                                     p.ReleaseVersion.Release != null && 
-                                     p.ReleaseVersion.Release.ArtistId == request.ArtistId.Value);
+            query = query.Where(product => product.ReleaseVersion != null && 
+                                     product.ReleaseVersion.Release != null && 
+                                     product.ReleaseVersion.Release.ArtistId == request.ArtistId.Value);
         }
 
         if (request.IsLimited.HasValue)
         {
-            query = query.Where(p => p.IsLimited == request.IsLimited.Value);
+            query = query.Where(product => product.IsLimited == request.IsLimited.Value);
         }
 
         if (request.IsPreorder.HasValue)
         {
-            query = query.Where(p => p.IsPreorder == request.IsPreorder.Value);
+            query = query.Where(product => product.IsPreorder == request.IsPreorder.Value);
         }
 
         if (!string.IsNullOrEmpty(request.SearchQuery))
         {
-            query = query.Where(p => EF.Functions.ILike(p.Name, $"%{request.SearchQuery}%"));
+            query = query.Where(product => EF.Functions.ILike(product.Name, $"%{request.SearchQuery}%"));
         }
 
         if (request.MinPrice.HasValue)
         {
-            query = query.Where(p => p.Variants.Any(v => v.Price >= request.MinPrice.Value));
+            query = query.Where(product => product.Variants.Any(variant => variant.Price >= request.MinPrice.Value));
         }
 
         if (request.MaxPrice.HasValue)
         {
-            query = query.Where(p => p.Variants.Any(v => v.Price <= request.MaxPrice.Value));
+            query = query.Where(product => product.Variants.Any(variant => variant.Price <= request.MaxPrice.Value));
         }
 
         // 2. Execution
-        var totalCount = await query.CountAsync(ct);
+        int totalCount = await query.CountAsync(ct);
 
-        var items = await query
-            .OrderByDescending(p => p.CreatedAt)
+        List<Product> items = await query
+            .OrderByDescending(product => product.CreatedAt)
             .Skip((request.Page - 1) * request.Limit)
             .Take(request.Limit)
             .ToListAsync(ct);
@@ -85,29 +85,29 @@ public sealed class ProductRepository : GenericRepository<Product>, IProductRepo
     public async Task<Product?> GetByIdWithDetailsAsync(Guid id, CancellationToken ct = default)
     {
         return await _dbSet.AsNoTracking()
-            .Include(p => p.Variants)
-            .Include(p => p.ReleaseVersion)
-                .ThenInclude(rv => rv!.Release)
-                    .ThenInclude(r => r!.Artist)
-            .FirstOrDefaultAsync(p => p.Id == id && p.IsActive, ct);
+            .Include(product => product.Variants)
+            .Include(product => product.ReleaseVersion)
+                .ThenInclude(releaseVersion => releaseVersion!.Release)
+                    .ThenInclude(release => release!.Artist)
+            .FirstOrDefaultAsync(product => product.Id == id && product.IsActive, ct);
     }
 
     public async Task<Product?> GetBySlugWithDetailsAsync(string slug, CancellationToken ct = default)
     {
         return await _dbSet.AsNoTracking()
-            .Include(p => p.Variants)
-            .Include(p => p.ReleaseVersion)
-                .ThenInclude(rv => rv!.Release)
-                    .ThenInclude(r => r!.Artist)
-            .FirstOrDefaultAsync(p => p.Slug == slug && p.IsActive, ct);
+            .Include(product => product.Variants)
+            .Include(product => product.ReleaseVersion)
+                .ThenInclude(releaseVersion => releaseVersion!.Release)
+                    .ThenInclude(release => release!.Artist)
+            .FirstOrDefaultAsync(product => product.Slug == slug && product.IsActive, ct);
     }
 
     public async Task<bool> HasOrdersAsync(Guid productId, CancellationToken ct = default)
     {
         return await _context.Set<Domain.Entities.Orders.OrderItem>()
-            .AnyAsync(oi =>
-                oi.Variant.ProductId == productId &&
-                (oi.Order.Status == OrderStatus.Pending || oi.Order.Status == OrderStatus.Confirmed),
+            .AnyAsync(orderItem =>
+                orderItem.Variant.ProductId == productId &&
+                (orderItem.Order.Status == OrderStatus.Pending || orderItem.Order.Status == OrderStatus.Confirmed),
                 ct);
     }
 
@@ -115,20 +115,21 @@ public sealed class ProductRepository : GenericRepository<Product>, IProductRepo
     {
         return await _context.Set<ProductVariant>()
             .AsNoTracking()
-            .Include(v => v.VinylAttributes)
-            .Include(v => v.CdAttributes)
-            .Include(v => v.CassetteAttributes)
-            .Where(v => v.ProductId == productId)
+            .Include(variant => variant.VinylAttributes)
+            .Include(variant => variant.CdAttributes)
+            .Include(variant => variant.CassetteAttributes)
+            .Where(variant => variant.ProductId == productId)
             .ToListAsync(ct);
     }
 
     public async Task<ProductVariant?> GetVariantByIdAsync(Guid productId, Guid variantId, CancellationToken ct = default)
     {
         return await _context.Set<ProductVariant>()
-            .Include(v => v.VinylAttributes)
-            .Include(v => v.CdAttributes)
-            .Include(v => v.CassetteAttributes)
-            .FirstOrDefaultAsync(v => v.Id == variantId && v.ProductId == productId, ct);
+            .Include(variant => variant.Product)
+            .Include(variant => variant.VinylAttributes)
+            .Include(variant => variant.CdAttributes)
+            .Include(variant => variant.CassetteAttributes)
+            .FirstOrDefaultAsync(variant => variant.Id == variantId && variant.ProductId == productId, ct);
     }
 
     public void DeleteVariant(ProductVariant variant)
@@ -136,4 +137,3 @@ public sealed class ProductRepository : GenericRepository<Product>, IProductRepo
         _context.Set<ProductVariant>().Remove(variant);
     }
 }
-

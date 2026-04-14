@@ -15,33 +15,33 @@ public sealed class ArtistRepository : GenericRepository<Artist>, IArtistReposit
     public async Task<Artist?> GetWithGenresAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.Set<Artist>()
-            .Include(x => x.ArtistGenres)
-                .ThenInclude(x => x.Genre)
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+            .Include(artist => artist.ArtistGenres)
+                .ThenInclude(artistGenre => artistGenre.Genre)
+            .FirstOrDefaultAsync(artist => artist.Id == id, cancellationToken);
     }
 
     public async Task<Artist?> GetWithGenresBySlugAsync(string slug, CancellationToken cancellationToken = default)
     {
         return await _context.Set<Artist>()
-            .Include(x => x.ArtistGenres)
-                .ThenInclude(x => x.Genre)
-            .FirstOrDefaultAsync(x => x.Slug == slug, cancellationToken);
+            .Include(artist => artist.ArtistGenres)
+                .ThenInclude(artistGenre => artistGenre.Genre)
+            .FirstOrDefaultAsync(artist => artist.Slug == slug, cancellationToken);
     }
 
     public async Task<Artist?> GetWithReleasesAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.Set<Artist>()
-            .Include(x => x.Releases)
+            .Include(artist => artist.Releases)
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+            .FirstOrDefaultAsync(artist => artist.Id == id, cancellationToken);
     }
 
     public async Task<Artist?> GetWithReleasesBySlugAsync(string slug, CancellationToken cancellationToken = default)
     {
         return await _context.Set<Artist>()
-            .Include(x => x.Releases)
+            .Include(artist => artist.Releases)
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Slug == slug, cancellationToken);
+            .FirstOrDefaultAsync(artist => artist.Slug == slug, cancellationToken);
     }
 
     public async Task<(IReadOnlyList<Artist> Items, int TotalCount)> GetPagedAsync(
@@ -49,26 +49,26 @@ public sealed class ArtistRepository : GenericRepository<Artist>, IArtistReposit
         CancellationToken cancellationToken = default)
     {
         IQueryable<Artist> query = _context.Set<Artist>()
-            .Include(x => x.ArtistGenres)
-                .ThenInclude(x => x.Genre)
+            .Include(artist => artist.ArtistGenres)
+                .ThenInclude(artistGenre => artistGenre.Genre)
             .AsNoTracking();
 
         // 1. Apply Filtering
         if (!string.IsNullOrWhiteSpace(request.Q))
         {
-            query = query.Where(a => a.Name.Contains(request.Q));
+            query = query.Where(artist => artist.Name.Contains(request.Q));
         }
 
         if (request.GenreId.HasValue)
         {
-            query = query.Where(a => a.ArtistGenres.Any(ag => ag.GenreId == request.GenreId.Value));
+            query = query.Where(artist => artist.ArtistGenres.Any(artistGenre => artistGenre.GenreId == request.GenreId.Value));
         }
 
         // 2. Wrap into TotalCount and Paging
         int totalCount = await query.CountAsync(cancellationToken);
 
         List<Artist> items = await query
-            .OrderBy(a => a.Name)
+            .OrderBy(artist => artist.Name)
             .Skip((request.PageNumber - 1) * request.PageSize)
             .Take(request.PageSize)
             .ToListAsync(cancellationToken);
@@ -81,9 +81,9 @@ public sealed class ArtistRepository : GenericRepository<Artist>, IArtistReposit
         searchTerm = searchTerm.ToLower();
 
         return await _context.Set<Artist>()
-            .Include(x => x.ArtistGenres)
-                .ThenInclude(x => x.Genre)
-            .Where(a => a.Name.ToLower().Contains(searchTerm))
+            .Include(artist => artist.ArtistGenres)
+                .ThenInclude(artistGenre => artistGenre.Genre)
+            .Where(artist => artist.Name.ToLower().Contains(searchTerm))
             .Take(limit)
             .ToListAsync(ct);
     }
