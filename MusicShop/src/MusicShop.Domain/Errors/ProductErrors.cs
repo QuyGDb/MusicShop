@@ -41,4 +41,9 @@ public static class ProductErrors
         "Product.DuplicateSlug",
         "The specified slug is already in use by another product.",
         ErrorType.Conflict);
+
+    public static readonly Error InvalidAttributes = new(
+        "Product.InvalidAttributes",
+        "The provided attributes do not match the product format.",
+        ErrorType.Validation);
 }

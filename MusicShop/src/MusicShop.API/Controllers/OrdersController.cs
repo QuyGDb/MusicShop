@@ -25,6 +25,7 @@ public sealed class OrdersController(IMediator mediator) : BaseApiController
     }
 
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(typeof(ApiResponse<OrderDetailDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<OrderDetailDto>>> GetOrderDetail([FromRoute] Guid id)
     {
