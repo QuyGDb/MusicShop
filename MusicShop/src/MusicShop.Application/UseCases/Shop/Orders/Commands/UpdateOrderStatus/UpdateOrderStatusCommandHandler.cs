@@ -1,6 +1,7 @@
 using MediatR;
 using MusicShop.Application.Common.Interfaces;
 using MusicShop.Domain.Common;
+using MusicShop.Domain.Entities.Orders;
 using MusicShop.Domain.Enums;
 using MusicShop.Domain.Errors;
 using MusicShop.Domain.Interfaces;
@@ -13,7 +14,7 @@ public sealed class UpdateOrderStatusCommandHandler(
 {
     public async Task<Result> Handle(UpdateOrderStatusCommand request, CancellationToken cancellationToken)
     {
-        var order = await orderRepository.GetByIdWithDetailsAsync(request.OrderId, cancellationToken);
+        Order? order = await orderRepository.GetByIdWithDetailsAsync(request.OrderId, cancellationToken);
 
         if (order == null)
         {
@@ -23,11 +24,11 @@ public sealed class UpdateOrderStatusCommandHandler(
         // Logic: If transitioning TO Cancelled from something else, restore stock
         if (request.Status == OrderStatus.Cancelled && order.Status != OrderStatus.Cancelled)
         {
-            foreach (var item in order.OrderItems)
+            foreach (OrderItem orderItem in order.OrderItems)
             {
-                if (!item.Variant.Product.IsPreorder)
+                if (!orderItem.Variant.Product.IsPreorder)
                 {
-                    item.Variant.StockQty += item.Quantity;
+                    orderItem.Variant.StockQty += orderItem.Quantity;
                 }
             }
         }
@@ -35,11 +36,11 @@ public sealed class UpdateOrderStatusCommandHandler(
         // (Usually not recommended without re-validating stock, but let's keep it simple as Admin bypass)
         else if (order.Status == OrderStatus.Cancelled && request.Status != OrderStatus.Cancelled)
         {
-            foreach (var item in order.OrderItems)
+            foreach (OrderItem orderItem in order.OrderItems)
             {
-                if (!item.Variant.Product.IsPreorder)
+                if (!orderItem.Variant.Product.IsPreorder)
                 {
-                    item.Variant.StockQty -= item.Quantity;
+                    orderItem.Variant.StockQty -= orderItem.Quantity;
                 }
             }
         }

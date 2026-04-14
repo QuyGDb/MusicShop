@@ -14,7 +14,7 @@ public sealed class GetProductVariantsQueryHandler(
         GetProductVariantsQuery request,
         CancellationToken cancellationToken)
     {
-        bool exists = await productRepository.AnyAsync(p => p.Id == request.ProductId, cancellationToken);
+        bool exists = await productRepository.AnyAsync(product => product.Id == request.ProductId, cancellationToken);
         if (!exists)
         {
             return Result<IReadOnlyList<ProductVariantDto>>.Failure(ProductErrors.NotFound);
@@ -22,16 +22,16 @@ public sealed class GetProductVariantsQueryHandler(
 
         IReadOnlyList<ProductVariant> variants = await productRepository.GetVariantsAsync(request.ProductId, cancellationToken);
 
-        IReadOnlyList<ProductVariantDto> dtos = variants.Select(v => new ProductVariantDto
+        IReadOnlyList<ProductVariantDto> productVariantDtos = variants.Select(variant => new ProductVariantDto
         {
-            Id = v.Id,
-            VariantName = v.VariantName,
-            Price = v.Price,
-            StockQty = v.StockQty,
-            IsAvailable = v.IsAvailable,
-            IsSigned = v.IsSigned
+            Id = variant.Id,
+            VariantName = variant.VariantName,
+            Price = variant.Price,
+            StockQty = variant.StockQty,
+            IsAvailable = variant.IsAvailable,
+            IsSigned = variant.IsSigned
         }).ToList();
 
-        return Result<IReadOnlyList<ProductVariantDto>>.Success(dtos);
+        return Result<IReadOnlyList<ProductVariantDto>>.Success(productVariantDtos);
     }
 }

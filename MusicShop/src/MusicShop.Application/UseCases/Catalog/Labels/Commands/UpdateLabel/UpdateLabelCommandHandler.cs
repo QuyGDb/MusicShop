@@ -24,7 +24,7 @@ public sealed class UpdateLabelCommandHandler(
 
         // 2. Check duplicate name
         Label? existingName = await labelRepository.FirstOrDefaultAsync(
-            x => x.Name == request.Name && x.Id != label.Id, cancellationToken);
+            labelItem => labelItem.Name == request.Name && labelItem.Id != label.Id, cancellationToken);
         if (existingName != null)
         {
             return Result<string>.Failure(LabelErrors.DuplicateName);
@@ -32,7 +32,7 @@ public sealed class UpdateLabelCommandHandler(
 
         // 3. Check duplicate slug
         Label? existingSlug = await labelRepository.FirstOrDefaultAsync(
-            x => x.Slug == request.Slug && x.Id != label.Id, cancellationToken);
+            labelItem => labelItem.Slug == request.Slug && labelItem.Id != label.Id, cancellationToken);
         if (existingSlug != null)
         {
             return Result<string>.Failure(LabelErrors.DuplicateSlug);

@@ -16,4 +16,4 @@ public sealed record PaymentSummaryDto(
     Guid Id,
     PaymentGateway Method,
     PaymentStatus Status,
-    string? VnpayUrl = null);
+    string? CheckoutUrl = null);

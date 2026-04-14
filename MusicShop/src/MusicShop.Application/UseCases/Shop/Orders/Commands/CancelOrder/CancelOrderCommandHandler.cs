@@ -1,6 +1,7 @@
 using MediatR;
 using MusicShop.Application.Common.Interfaces;
 using MusicShop.Domain.Common;
+using MusicShop.Domain.Entities.Orders;
 using MusicShop.Domain.Enums;
 using MusicShop.Domain.Errors;
 using MusicShop.Domain.Interfaces;
@@ -14,7 +15,7 @@ public sealed class CancelOrderCommandHandler(
 {
     public async Task<Result> Handle(CancelOrderCommand request, CancellationToken cancellationToken)
     {
-        var order = await orderRepository.GetByIdWithDetailsAsync(request.OrderId, cancellationToken);
+        Order? order = await orderRepository.GetByIdWithDetailsAsync(request.OrderId, cancellationToken);
         
         if (order == null)
         {
@@ -22,7 +23,7 @@ public sealed class CancelOrderCommandHandler(
         }
 
         // Authorization: Only Owner can cancel (Admin usually uses update status endpoint)
-        var userId = Guid.Parse(currentUserService.UserId!);
+        Guid userId = Guid.Parse(currentUserService.UserId!);
         if (order.CustomerId != userId)
         {
             return Result.Failure(OrderErrors.NotFound);
@@ -35,12 +36,12 @@ public sealed class CancelOrderCommandHandler(
         }
 
         // Logic: Restore stock
-        foreach (var item in order.OrderItems)
+        foreach (OrderItem orderItem in order.OrderItems)
         {
             // Only restore stock for non-preorder products
-            if (!item.Variant.Product.IsPreorder)
+            if (!orderItem.Variant.Product.IsPreorder)
             {
-                item.Variant.StockQty += item.Quantity;
+                orderItem.Variant.StockQty += orderItem.Quantity;
             }
         }
 

@@ -15,12 +15,12 @@ public sealed class GetGenresQueryHandler(IGenreRepository genreRepository)
         GetGenresQuery request, 
         CancellationToken cancellationToken)
     {
-        var (items, totalCount) = await genreRepository.GetPagedAsync(request, cancellationToken);
+        (IReadOnlyList<Genre> genres, int totalCount) = await genreRepository.GetPagedAsync(request, cancellationToken);
 
-        List<GenreResponse> dtos = items.Select(x => x.ToResponse()).ToList();
+        List<GenreResponse> genreResponses = genres.Select(genre => genre.ToResponse()).ToList();
 
         PaginatedResult<GenreResponse> result = new PaginatedResult<GenreResponse>(
-            dtos,
+            genreResponses,
             totalCount,
             request.PageNumber,
             request.PageSize);

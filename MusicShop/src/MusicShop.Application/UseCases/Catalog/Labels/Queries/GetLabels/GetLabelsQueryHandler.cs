@@ -15,9 +15,9 @@ public sealed class GetLabelsQueryHandler(ILabelRepository labelRepository)
         GetLabelsQuery request, 
         CancellationToken cancellationToken)
     {
-        var (items, totalCount) = await labelRepository.GetPagedAsync(request, cancellationToken);
+        (IReadOnlyList<Label> labels, int totalCount) = await labelRepository.GetPagedAsync(request, cancellationToken);
 
-        List<LabelResponse> labelResponses = items.Select(label => label.ToResponse()).ToList();
+        List<LabelResponse> labelResponses = labels.Select(label => label.ToResponse()).ToList();
 
         PaginatedResult<LabelResponse> result = new PaginatedResult<LabelResponse>(
             labelResponses, 

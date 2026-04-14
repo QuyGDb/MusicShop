@@ -15,7 +15,7 @@ public sealed class CreateGenreCommandHandler(
         CreateGenreCommand request,
         CancellationToken cancellationToken)
     {
-        Genre? existing = await genreRepository.FirstOrDefaultAsync(x => x.Slug == request.Slug, cancellationToken);
+        Genre? existing = await genreRepository.FirstOrDefaultAsync(genre => genre.Slug == request.Slug, cancellationToken);
         if (existing != null)
         {
             return Result<string>.Failure(GenreErrors.DuplicateSlug);

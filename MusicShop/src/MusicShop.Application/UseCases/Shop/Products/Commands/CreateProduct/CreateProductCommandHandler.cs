@@ -14,7 +14,7 @@ public sealed class CreateProductCommandHandler(
     public async Task<Result<Guid>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
     {
         // 1. Check for duplicate slug
-        bool slugExists = await productRepository.AnyAsync(x => x.Slug == request.Slug, cancellationToken);
+        bool slugExists = await productRepository.AnyAsync(product => product.Slug == request.Slug, cancellationToken);
         if (slugExists)
         {
             return Result<Guid>.Failure(ProductErrors.DuplicateSlug);

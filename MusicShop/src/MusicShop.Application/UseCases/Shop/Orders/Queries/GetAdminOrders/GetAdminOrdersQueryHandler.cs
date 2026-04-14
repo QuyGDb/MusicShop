@@ -3,6 +3,7 @@ using MusicShop.Application.Common;
 using MusicShop.Application.Common.Interfaces;
 using MusicShop.Application.DTOs.Shop;
 using MusicShop.Domain.Common;
+using MusicShop.Domain.Entities.Orders;
 
 namespace MusicShop.Application.UseCases.Shop.Orders.Queries.GetAdminOrders;
 
@@ -11,21 +12,21 @@ public sealed class GetAdminOrdersQueryHandler(
 {
     public async Task<Result<PaginatedResult<OrderListItemDto>>> Handle(GetAdminOrdersQuery request, CancellationToken cancellationToken)
     {
-        var (items, totalCount) = await orderRepository.GetPagedAllAsync(
+        (IReadOnlyList<Order> orders, int totalCount) = await orderRepository.GetPagedAllAsync(
             request.Status,
             request.PageNumber,
             request.PageSize,
             cancellationToken);
 
-        var dtos = items.Select(o => new OrderListItemDto(
-            o.Id,
-            o.Status,
-            o.TotalAmount,
-            o.CreatedAt,
-            o.OrderItems.Count
+        List<OrderListItemDto> orderListItemDtos = orders.Select(order => new OrderListItemDto(
+            order.Id,
+            order.Status,
+            order.TotalAmount,
+            order.CreatedAt,
+            order.OrderItems.Count
         )).ToList();
 
         return Result<PaginatedResult<OrderListItemDto>>.Success(
-            new PaginatedResult<OrderListItemDto>(dtos, totalCount, request.PageNumber, request.PageSize));
+            new PaginatedResult<OrderListItemDto>(orderListItemDtos, totalCount, request.PageNumber, request.PageSize));
     }
 }

@@ -25,7 +25,7 @@ public sealed class CreateReleaseCommandHandler(
         }
 
         // 2. Check for duplicate slug
-        bool slugExists = await releaseRepository.AnyAsync(x => x.Slug == request.Slug, cancellationToken);
+        bool slugExists = await releaseRepository.AnyAsync(release => release.Slug == request.Slug, cancellationToken);
         if (slugExists)
         {
             return Result<Guid>.Failure(ReleaseErrors.DuplicateSlug);

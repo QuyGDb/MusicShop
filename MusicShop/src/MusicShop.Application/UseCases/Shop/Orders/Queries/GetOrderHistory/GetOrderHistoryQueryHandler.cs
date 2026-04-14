@@ -3,6 +3,7 @@ using MusicShop.Application.Common;
 using MusicShop.Application.Common.Interfaces;
 using MusicShop.Application.DTOs.Shop;
 using MusicShop.Domain.Common;
+using MusicShop.Domain.Entities.Orders;
 
 namespace MusicShop.Application.UseCases.Shop.Orders.Queries.GetOrderHistory;
 
@@ -14,22 +15,22 @@ public sealed class GetOrderHistoryQueryHandler(
     {
         Guid userId = Guid.Parse(currentUserService.UserId!);
 
-        var (orders, totalCount) = await orderRepository.GetPagedByUserIdAsync(
+        (IReadOnlyList<Order> orders, int totalCount) = await orderRepository.GetPagedByUserIdAsync(
             userId, 
             request.Status, 
             request.Page, 
             request.Limit, 
             cancellationToken);
 
-        var dtos = orders.Select(o => new OrderListItemDto(
-            o.Id,
-            o.Status,
-            o.TotalAmount,
-            o.CreatedAt,
-            o.OrderItems.Count
+        List<OrderListItemDto> orderListItemDtos = orders.Select(order => new OrderListItemDto(
+            order.Id,
+            order.Status,
+            order.TotalAmount,
+            order.CreatedAt,
+            order.OrderItems.Count
         )).ToList();
 
         return Result<PaginatedResult<OrderListItemDto>>.Success(
-            new PaginatedResult<OrderListItemDto>(dtos, totalCount, request.Page, request.Limit));
+            new PaginatedResult<OrderListItemDto>(orderListItemDtos, totalCount, request.Page, request.Limit));
     }
 }

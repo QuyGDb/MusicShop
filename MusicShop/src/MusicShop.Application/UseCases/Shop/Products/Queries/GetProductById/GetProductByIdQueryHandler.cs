@@ -21,7 +21,7 @@ public sealed class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQ
 
     public async Task<Result<ProductDetailDto>> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
     {
-        var product = await _productRepository.GetByIdWithDetailsAsync(request.Id, cancellationToken);
+        Domain.Entities.Shop.Product? product = await _productRepository.GetByIdWithDetailsAsync(request.Id, cancellationToken);
 
         if (product == null)
         {
@@ -29,8 +29,8 @@ public sealed class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQ
         }
 
         // Manual mapping from Entity to DTO
-        var detailDto = new[] { product }.AsQueryable().ProjectToDetailDto().First();
+        ProductDetailDto productDetailDto = new[] { product }.AsQueryable().ProjectToDetailDto().First();
 
-        return Result<ProductDetailDto>.Success(detailDto);
+        return Result<ProductDetailDto>.Success(productDetailDto);
     }
 }

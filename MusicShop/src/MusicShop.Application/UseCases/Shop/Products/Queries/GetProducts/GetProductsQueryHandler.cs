@@ -22,12 +22,12 @@ public sealed class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, 
 
     public async Task<Result<PaginatedResult<ProductListItemDto>>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
     {
-        var (items, totalCount) = await _productRepository.GetPagedAsync(request, cancellationToken);
+        (IReadOnlyList<Product> products, int totalCount) = await _productRepository.GetPagedAsync(request, cancellationToken);
 
-        var dtos = items.AsQueryable().ProjectToListItemDto().ToList();
+        List<ProductListItemDto> productListItemDtos = products.AsQueryable().ProjectToListItemDto().ToList();
 
-        var paginatedResult = new PaginatedResult<ProductListItemDto>(
-            dtos,
+        PaginatedResult<ProductListItemDto> paginatedResult = new PaginatedResult<ProductListItemDto>(
+            productListItemDtos,
             totalCount,
             request.Page,
             request.Limit);

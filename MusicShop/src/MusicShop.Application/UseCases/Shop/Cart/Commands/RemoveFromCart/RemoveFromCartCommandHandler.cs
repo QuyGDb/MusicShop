@@ -23,20 +23,20 @@ public sealed class RemoveFromCartCommandHandler : IRequestHandler<RemoveFromCar
     public async Task<Result> Handle(RemoveFromCartCommand request, CancellationToken cancellationToken)
     {
         // 1. Get tracked cart
-        var cart = await _cartRepository.GetByUserIdForUpdateAsync(request.UserId, cancellationToken);
+        Domain.Entities.Orders.Cart? cart = await _cartRepository.GetByUserIdForUpdateAsync(request.UserId, cancellationToken);
         if (cart == null)
         {
             return Result.Failure(CartErrors.NotFound);
         }
 
         // 2. Find and remove item
-        var item = cart.Items.FirstOrDefault(i => i.Id == request.CartItemId);
-        if (item == null)
+        Domain.Entities.Orders.CartItem? cartItem = cart.Items.FirstOrDefault(item => item.Id == request.CartItemId);
+        if (cartItem == null)
         {
             return Result.Failure(CartErrors.ItemNotFound);
         }
 
-        cart.Items.Remove(item);
+        cart.Items.Remove(cartItem);
         cart.UpdatedAt = DateTime.UtcNow;
 
         // 3. Save Changes

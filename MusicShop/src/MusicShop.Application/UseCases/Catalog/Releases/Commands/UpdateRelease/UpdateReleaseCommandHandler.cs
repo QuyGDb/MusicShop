@@ -40,7 +40,7 @@ public sealed class UpdateReleaseCommandHandler(
         // 3. Update Basic Info
         if (release.Slug != request.Slug)
         {
-            bool slugExists = await releaseRepository.AnyAsync(x => x.Slug == request.Slug && x.Id != request.Id, cancellationToken);
+            bool slugExists = await releaseRepository.AnyAsync(releaseItem => releaseItem.Slug == request.Slug && releaseItem.Id != request.Id, cancellationToken);
             if (slugExists)
             {
                 return Result<Guid>.Failure(ReleaseErrors.DuplicateSlug);

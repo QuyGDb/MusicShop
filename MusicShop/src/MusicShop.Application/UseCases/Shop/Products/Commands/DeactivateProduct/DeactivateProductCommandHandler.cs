@@ -3,7 +3,7 @@ using MusicShop.Application.Common.Interfaces;
 using MusicShop.Domain.Common;
 using MusicShop.Domain.Errors;
 using MusicShop.Domain.Interfaces;
-
+using MusicShop.Domain.Entities.Shop;
 namespace MusicShop.Application.UseCases.Shop.Products.Commands.DeactivateProduct;
 
 public sealed class DeactivateProductCommandHandler(
@@ -12,7 +12,7 @@ public sealed class DeactivateProductCommandHandler(
 {
     public async Task<Result> Handle(DeactivateProductCommand request, CancellationToken cancellationToken)
     {
-        Domain.Entities.Shop.Product? product = await productRepository.GetByIdAsync(request.Id, cancellationToken);
+       Product? product = await productRepository.GetByIdAsync(request.Id, cancellationToken);
 
         if (product is null)
         {

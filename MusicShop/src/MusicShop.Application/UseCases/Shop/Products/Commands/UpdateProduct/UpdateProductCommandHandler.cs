@@ -33,7 +33,7 @@ public sealed class UpdateProductCommandHandler(
         
         if (request.Slug is not null && request.Slug != product.Slug)
         {
-            bool slugExists = await productRepository.AnyAsync(x => x.Slug == request.Slug && x.Id != request.Id, cancellationToken);
+            bool slugExists = await productRepository.AnyAsync(productItem => productItem.Slug == request.Slug && productItem.Id != request.Id, cancellationToken);
             if (slugExists)
             {
                 return Result.Failure(ProductErrors.DuplicateSlug);

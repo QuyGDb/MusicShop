@@ -15,13 +15,13 @@ public sealed class GetArtistsQueryHandler(IArtistRepository artistRepository)
         GetArtistsQuery request,
         CancellationToken cancellationToken)
     {
-        var (items, totalCount) = await artistRepository.GetPagedAsync(request, cancellationToken);
+        (IReadOnlyList<Artist> artists, int totalCount) = await artistRepository.GetPagedAsync(request, cancellationToken);
 
-        List<ArtistResponse> dtos = items.Select(a => a.ToResponse()).ToList();
+        IReadOnlyList<ArtistResponse> artistResponses = artists.Select(artist => artist.ToResponse()).ToList();
 
         // 3. Wrap result
         PaginatedResult<ArtistResponse> result = new PaginatedResult<ArtistResponse>(
-            dtos,
+            artistResponses,
             totalCount,
             request.PageNumber,
             request.PageSize);

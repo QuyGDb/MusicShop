@@ -7,7 +7,6 @@ using MusicShop.Domain.Enums;
 using MusicShop.Domain.Errors;
 using MusicShop.Domain.Interfaces;
 using MusicShop.Domain.Entities.Shop;
-using CartEntity = MusicShop.Domain.Entities.Orders.Cart;
 
 namespace MusicShop.Application.UseCases.Shop.Orders.Commands.CreateOrder;
 
@@ -29,7 +28,7 @@ public sealed class CreateOrderCommandHandler(
         Guid userId = Guid.Parse(currentUserService.UserId);
 
         // 1. Fetch cart with items
-        CartEntity? cart = await cartRepository.GetByUserIdAsync(userId, cancellationToken);
+        Domain.Entities.Orders.Cart? cart = await cartRepository.GetByUserIdAsync(userId, cancellationToken);
 
         if (cart == null || cart.Items.Count == 0)
         {
@@ -54,7 +53,7 @@ public sealed class CreateOrderCommandHandler(
             // 3. Fetch tracked variant and its product
             // We re-fetch to ensure variants are tracked for stock reduction
             ProductVariant? variant = await productRepository.GetVariantByIdAsync(cartItem.Variant.ProductId, cartItem.VariantId, cancellationToken);
-            
+
             if (variant == null)
             {
                 return Result<CreateOrderResponse>.Failure(ProductErrors.VariantNotFound);
@@ -93,11 +92,11 @@ public sealed class CreateOrderCommandHandler(
             Gateway = request.PaymentMethod,
             Status = PaymentStatus.Pending
         };
-        
-        var stripeResult = await stripeService.CreateCheckoutSessionAsync(
-            order, 
-            request.SuccessUrl ?? "https://localhost:5001/checkout/success", 
-            request.CancelUrl ?? "https://localhost:5001/checkout/cancel", 
+
+        Result<StripeCheckoutDto> stripeResult = await stripeService.CreateCheckoutSessionAsync(
+            order,
+            request.SuccessUrl ?? "https://localhost:5000/checkout/success",
+            request.CancelUrl ?? "https://localhost:5000/checkout/cancel",
             cancellationToken);
 
         if (!stripeResult.IsSuccess)

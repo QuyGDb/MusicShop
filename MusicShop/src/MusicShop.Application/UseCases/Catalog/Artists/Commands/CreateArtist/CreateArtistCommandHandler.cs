@@ -17,14 +17,14 @@ public sealed class CreateArtistCommandHandler(
         CancellationToken cancellationToken)
     {
         // 1. Check for duplicate name
-        Artist? existingName = await artistRepository.FirstOrDefaultAsync(x => x.Name == request.Name, cancellationToken);
+        Artist? existingName = await artistRepository.FirstOrDefaultAsync(artist => artist.Name == request.Name, cancellationToken);
         if (existingName != null)
         {
             return Result<string>.Failure(ArtistErrors.DuplicateName);
         }
 
         // 2. Check for duplicate slug
-         Artist? existingSlug = await artistRepository.FirstOrDefaultAsync(x => x.Slug == request.Slug, cancellationToken);
+        Artist? existingSlug = await artistRepository.FirstOrDefaultAsync(artist => artist.Slug == request.Slug, cancellationToken);
         if (existingSlug != null)
         {
             return Result<string>.Failure(ArtistErrors.DuplicateSlug);
@@ -37,7 +37,7 @@ public sealed class CreateArtistCommandHandler(
             List<Guid> distinctGenreIds = request.GenreIds.Distinct().ToList();
             
             int existingGenresCount = await genreRepository.CountAsync(
-                g => distinctGenreIds.Contains(g.Id), cancellationToken);
+                genre => distinctGenreIds.Contains(genre.Id), cancellationToken);
 
             if (existingGenresCount != distinctGenreIds.Count)
             {

@@ -12,7 +12,7 @@ public sealed class GetProductBySlugQueryHandler(IProductRepository productRepos
 {
     public async Task<Result<ProductDetailDto>> Handle(GetProductBySlugQuery request, CancellationToken cancellationToken)
     {
-        var product = await productRepository.GetBySlugWithDetailsAsync(request.Slug, cancellationToken);
+        Domain.Entities.Shop.Product? product = await productRepository.GetBySlugWithDetailsAsync(request.Slug, cancellationToken);
 
         if (product == null)
         {
@@ -20,8 +20,8 @@ public sealed class GetProductBySlugQueryHandler(IProductRepository productRepos
         }
 
         // Manual mapping from Entity to DTO using ProjectToDetailDto extensions
-        var detailDto = new[] { product }.AsQueryable().ProjectToDetailDto().First();
+        ProductDetailDto productDetailDto = new[] { product }.AsQueryable().ProjectToDetailDto().First();
 
-        return Result<ProductDetailDto>.Success(detailDto);
+        return Result<ProductDetailDto>.Success(productDetailDto);
     }
 }

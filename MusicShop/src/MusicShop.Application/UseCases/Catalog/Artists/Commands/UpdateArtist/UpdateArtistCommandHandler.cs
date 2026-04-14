@@ -27,7 +27,7 @@ public sealed class UpdateArtistCommandHandler(
 
         // 2. Check for duplicate name
         Artist? existingWithSameName = await artistRepository.FirstOrDefaultAsync(
-            x => x.Name == request.Name && x.Id != artist.Id, cancellationToken);
+            artistItem => artistItem.Name == request.Name && artistItem.Id != artist.Id, cancellationToken);
 
         if (existingWithSameName != null)
         {
@@ -36,7 +36,7 @@ public sealed class UpdateArtistCommandHandler(
 
         // 3. Check for duplicate slug
         Artist? existingWithSameSlug = await artistRepository.FirstOrDefaultAsync(
-            x => x.Slug == request.Slug && x.Id != artist.Id, cancellationToken);
+            artistItem => artistItem.Slug == request.Slug && artistItem.Id != artist.Id, cancellationToken);
 
         if (existingWithSameSlug != null)
         {
@@ -49,7 +49,7 @@ public sealed class UpdateArtistCommandHandler(
             List<Guid> distinctGenreIds = request.GenreIds.Distinct().ToList();
 
             int existingGenresCount = await genreRepository.CountAsync(
-                g => distinctGenreIds.Contains(g.Id), cancellationToken);
+                genre => distinctGenreIds.Contains(genre.Id), cancellationToken);
 
             if (existingGenresCount != distinctGenreIds.Count)
             {

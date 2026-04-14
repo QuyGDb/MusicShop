@@ -10,22 +10,22 @@ public sealed class UpdateCuratedCollectionCommandHandler(ICuratedCollectionRepo
 {
     public async Task<Result<Guid>> Handle(UpdateCuratedCollectionCommand request, CancellationToken cancellationToken)
     {
-        var collection = await repository.GetByIdAsync(request.Id, cancellationToken);
+        Domain.Entities.Shop.CuratedCollection? curatedCollection = await repository.GetByIdAsync(request.Id, cancellationToken);
 
-        if (collection == null)
+        if (curatedCollection == null)
             return Result<Guid>.Failure(CuratedCollectionErrors.NotFound);
 
         if (request.Title != null)
-            collection.Title = request.Title;
+            curatedCollection.Title = request.Title;
 
         if (request.Description != null)
-            collection.Description = request.Description;
+            curatedCollection.Description = request.Description;
 
         if (request.IsPublished.HasValue)
-            collection.IsPublished = request.IsPublished.Value;
+            curatedCollection.IsPublished = request.IsPublished.Value;
 
-        await repository.UpdateAsync(collection, cancellationToken);
+        await repository.UpdateAsync(curatedCollection, cancellationToken);
 
-        return Result<Guid>.Success(collection.Id);
+        return Result<Guid>.Success(curatedCollection.Id);
     }
 }

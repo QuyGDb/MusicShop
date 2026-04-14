@@ -2,6 +2,7 @@ using MediatR;
 using MusicShop.Application.Common.Interfaces;
 using MusicShop.Domain.Common;
 using MusicShop.Domain.Entities.Shop;
+using MusicShop.Domain.Enums;
 using MusicShop.Domain.Errors;
 using MusicShop.Domain.Interfaces;
 
@@ -30,34 +31,38 @@ public sealed class CreateProductVariantCommandHandler(
             IsAvailable = true
         };
 
-        if (request.VinylAttributes is not null)
+        // 2. Validate and map attributes based on product format
+        switch (product.Format)
         {
-            variant.VinylAttributes = new VinylAttributes
-            {
-                DiscColor = request.VinylAttributes.DiscColor,
-                WeightGrams = request.VinylAttributes.WeightGrams,
-                SpeedRpm = request.VinylAttributes.SpeedRpm,
-                DiscCount = request.VinylAttributes.DiscCount,
-                SleeveType = request.VinylAttributes.SleeveType
-            };
-        }
+            case ReleaseFormat.Vinyl when request.VinylAttributes is not null:
+                variant.VinylAttributes = new VinylAttributes
+                {
+                    DiscColor = request.VinylAttributes.DiscColor,
+                    WeightGrams = request.VinylAttributes.WeightGrams,
+                    SpeedRpm = request.VinylAttributes.SpeedRpm,
+                    DiscCount = request.VinylAttributes.DiscCount,
+                    SleeveType = request.VinylAttributes.SleeveType
+                };
+                break;
 
-        if (request.CdAttributes is not null)
-        {
-            variant.CdAttributes = new CdAttributes
-            {
-                Edition = request.CdAttributes.Edition,
-                IsJapanEdition = request.CdAttributes.IsJapanEdition
-            };
-        }
+            case ReleaseFormat.CD when request.CdAttributes is not null:
+                variant.CdAttributes = new CdAttributes
+                {
+                    Edition = request.CdAttributes.Edition,
+                    IsJapanEdition = request.CdAttributes.IsJapanEdition
+                };
+                break;
 
-        if (request.CassetteAttributes is not null)
-        {
-            variant.CassetteAttributes = new CassetteAttributes
-            {
-                TapeColor = request.CassetteAttributes.TapeColor,
-                Edition = request.CassetteAttributes.Edition
-            };
+            case ReleaseFormat.Cassette when request.CassetteAttributes is not null:
+                variant.CassetteAttributes = new CassetteAttributes
+                {
+                    TapeColor = request.CassetteAttributes.TapeColor,
+                    Edition = request.CassetteAttributes.Edition
+                };
+                break;
+
+            default:
+                return Result<Guid>.Failure(ProductErrors.InvalidAttributes);
         }
 
         product.Variants.Add(variant);

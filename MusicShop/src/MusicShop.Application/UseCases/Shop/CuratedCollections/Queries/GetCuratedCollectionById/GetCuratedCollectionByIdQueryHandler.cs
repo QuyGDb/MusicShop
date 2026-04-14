@@ -11,32 +11,32 @@ public sealed class GetCuratedCollectionByIdQueryHandler(
 {
     public async Task<Result<CuratedCollectionDetailResponse>> Handle(GetCuratedCollectionByIdQuery request, CancellationToken cancellationToken)
     {
-        var collection = await repository.GetByIdWithItemsAsync(request.Id, cancellationToken);
+        Domain.Entities.Shop.CuratedCollection? curatedCollection = await repository.GetByIdWithItemsAsync(request.Id, cancellationToken);
 
-        if (collection == null)
+        if (curatedCollection == null)
             return Result<CuratedCollectionDetailResponse>.Failure(CuratedCollectionErrors.NotFound);
 
-        var products = collection.Items
-            .Select(i => i.Product)
-            .Select(p => new ProductListItemDto
+        List<ProductListItemDto> productListItemDtos = curatedCollection.Items
+            .Select(item => item.Product)
+            .Select(product => new ProductListItemDto
             {
-                Id = p.Id,
-                Name = p.Name,
-                ArtistName = p.ReleaseVersion.Release.Artist.Name,
-                Format = p.Format,
-                IsLimited = p.IsLimited,
-                IsPreorder = p.IsPreorder,
-                CoverUrl = p.ReleaseVersion.Release.CoverUrl,
-                MinPrice = p.Variants.Count > 0 ? p.Variants.Min(v => v.Price) : 0,
-                MaxPrice = p.Variants.Count > 0 ? p.Variants.Max(v => v.Price) : 0,
-                InStock = p.Variants.Any(v => v.StockQty > 0 && v.IsAvailable)
+                Id = product.Id,
+                Name = product.Name,
+                ArtistName = product.ReleaseVersion.Release.Artist.Name,
+                Format = product.Format,
+                IsLimited = product.IsLimited,
+                IsPreorder = product.IsPreorder,
+                CoverUrl = product.ReleaseVersion.Release.CoverUrl,
+                MinPrice = product.Variants.Count > 0 ? product.Variants.Min(variant => variant.Price) : 0,
+                MaxPrice = product.Variants.Count > 0 ? product.Variants.Max(variant => variant.Price) : 0,
+                InStock = product.Variants.Any(variant => variant.StockQty > 0 && variant.IsAvailable)
             })
             .ToList();
 
         return Result<CuratedCollectionDetailResponse>.Success(new CuratedCollectionDetailResponse(
-            collection.Id,
-            collection.Title,
-            collection.Description,
-            products));
+            curatedCollection.Id,
+            curatedCollection.Title,
+            curatedCollection.Description,
+            productListItemDtos));
     }
 }

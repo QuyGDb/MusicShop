@@ -31,19 +31,19 @@ public sealed class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, 
     public async Task<Result<Guid>> Handle(AddToCartCommand request, CancellationToken cancellationToken)
     {
         // 1. Validate Product Variant & Stock
-        var variant = await _variantRepository.FirstOrDefaultAsync(v => v.Id == request.ProductVariantId, cancellationToken);
-        if (variant == null)
+        ProductVariant? productVariant = await _variantRepository.FirstOrDefaultAsync(variant => variant.Id == request.ProductVariantId, cancellationToken);
+        if (productVariant == null)
         {
             return Result<Guid>.Failure(ProductErrors.VariantNotFound);
         }
 
-        if (!variant.IsAvailable || variant.StockQty < request.Quantity)
+        if (!productVariant.IsAvailable || productVariant.StockQty < request.Quantity)
         {
             return Result<Guid>.Failure(CartErrors.InsufficientStock);
         }
 
         // 2. Get or Create Cart (Tracked)
-        var cart = await _cartRepository.GetByUserIdForUpdateAsync(request.UserId, cancellationToken);
+        Domain.Entities.Orders.Cart? cart = await _cartRepository.GetByUserIdForUpdateAsync(request.UserId, cancellationToken);
         if (cart == null)
         {
             cart = new Domain.Entities.Orders.Cart
@@ -57,15 +57,15 @@ public sealed class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, 
         }
 
         // 3. Add or Update Item
-        var existingItem = cart.Items.FirstOrDefault(i => i.VariantId == request.ProductVariantId);
-        if (existingItem != null)
+        CartItem? existingCartItem = cart.Items.FirstOrDefault(item => item.VariantId == request.ProductVariantId);
+        if (existingCartItem != null)
         {
-            int newQuantity = existingItem.Quantity + request.Quantity;
-            if (variant.StockQty < newQuantity)
+            int newQuantity = existingCartItem.Quantity + request.Quantity;
+            if (productVariant.StockQty < newQuantity)
             {
                 return Result<Guid>.Failure(CartErrors.InsufficientStock);
             }
-            existingItem.Quantity = newQuantity;
+            existingCartItem.Quantity = newQuantity;
         }
         else
         {

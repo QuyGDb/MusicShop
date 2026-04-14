@@ -15,12 +15,12 @@ public sealed class GetReleasesQueryHandler(IReleaseRepository releaseRepository
         GetReleasesQuery request,
         CancellationToken cancellationToken)
     {
-        var (items, totalCount) = await releaseRepository.GetPagedAsync(request, cancellationToken);
+        (IReadOnlyList<Release> releases, int totalCount) = await releaseRepository.GetPagedAsync(request, cancellationToken);
 
-        List<ReleaseResponse> dtos = items.Select(r => r.ToResponse()).ToList();
+        List<ReleaseResponse> releaseResponses = releases.Select(release => release.ToResponse()).ToList();
 
         PaginatedResult<ReleaseResponse> result = new PaginatedResult<ReleaseResponse>(
-            dtos,
+            releaseResponses,
             totalCount,
             request.PageNumber,
             request.PageSize);

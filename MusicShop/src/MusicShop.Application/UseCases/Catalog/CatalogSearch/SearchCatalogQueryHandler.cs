@@ -23,16 +23,16 @@ public sealed class SearchCatalogQueryHandler(
 
         // 1. Search Artists
         List<Artist> artists = await artistRepository.SearchByNameAsync(request.Q, 5, cancellationToken);
-        List<ArtistResponse> artistDtos = artists.Select(a => a.ToResponse()).ToList();
+        List<ArtistResponse> artistResponses = artists.Select(artist => artist.ToResponse()).ToList();
 
         // 2. Search Releases
         List<Release> releases = await releaseRepository.SearchByTitleAsync(request.Q, 10, cancellationToken);
-        List<ReleaseResponse> releaseDtos = releases.Select(r => r.ToResponse()).ToList();
+        List<ReleaseResponse> releaseResponses = releases.Select(release => release.ToResponse()).ToList();
 
         CatalogSearchResult result = new()
         {
-            Artists = artistDtos,
-            Releases = releaseDtos
+            Artists = artistResponses,
+            Releases = releaseResponses
         };
 
         return Result<CatalogSearchResult>.Success(result);

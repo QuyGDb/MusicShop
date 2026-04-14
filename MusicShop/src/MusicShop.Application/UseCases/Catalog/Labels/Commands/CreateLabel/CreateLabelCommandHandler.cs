@@ -16,14 +16,14 @@ public sealed class CreateLabelCommandHandler(
         CancellationToken cancellationToken)
     {
         // 1. Check duplicate name
-        Label? existingName = await labelRepository.FirstOrDefaultAsync(x => x.Name == request.Name, cancellationToken);
+        Label? existingName = await labelRepository.FirstOrDefaultAsync(labelItem => labelItem.Name == request.Name, cancellationToken);
         if (existingName != null)
         {
             return Result<string>.Failure(LabelErrors.DuplicateName);
         }
 
         // 2. Check duplicate slug
-        Label? existingSlug = await labelRepository.FirstOrDefaultAsync(x => x.Slug == request.Slug, cancellationToken);
+        Label? existingSlug = await labelRepository.FirstOrDefaultAsync(labelItem => labelItem.Slug == request.Slug, cancellationToken);
         if (existingSlug != null)
         {
             return Result<string>.Failure(LabelErrors.DuplicateSlug);

@@ -25,12 +25,12 @@ public sealed class GetCartQueryHandler : IRequestHandler<GetCartQuery, Result<C
 
     public async Task<Result<CartDto>> Handle(GetCartQuery request, CancellationToken cancellationToken)
     {
-        var cart = await _cartRepository.GetByUserIdAsync(request.UserId, cancellationToken);
+        Domain.Entities.Orders.Cart? cart = await _cartRepository.GetByUserIdAsync(request.UserId, cancellationToken);
 
         if (cart == null)
         {
             // If cart doesn't exist, create an empty one for the user
-            var newCart = new Domain.Entities.Orders.Cart
+            Domain.Entities.Orders.Cart newCart = new Domain.Entities.Orders.Cart
             {
                 Id = Guid.NewGuid(),
                 UserId = request.UserId,

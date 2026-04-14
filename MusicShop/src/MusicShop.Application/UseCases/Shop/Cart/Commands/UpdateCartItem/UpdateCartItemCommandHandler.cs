@@ -30,15 +30,15 @@ public sealed class UpdateCartItemCommandHandler : IRequestHandler<UpdateCartIte
     public async Task<Result> Handle(UpdateCartItemCommand request, CancellationToken cancellationToken)
     {
         // 1. Get tracked cart
-        var cart = await _cartRepository.GetByUserIdForUpdateAsync(request.UserId, cancellationToken);
+        Domain.Entities.Orders.Cart? cart = await _cartRepository.GetByUserIdForUpdateAsync(request.UserId, cancellationToken);
         if (cart == null)
         {
             return Result.Failure(CartErrors.NotFound);
         }
 
         // 2. Find item
-        var item = cart.Items.FirstOrDefault(i => i.Id == request.CartItemId);
-        if (item == null)
+        Domain.Entities.Orders.CartItem? cartItem = cart.Items.FirstOrDefault(item => item.Id == request.CartItemId);
+        if (cartItem == null)
         {
             return Result.Failure(CartErrors.ItemNotFound);
         }
@@ -46,23 +46,23 @@ public sealed class UpdateCartItemCommandHandler : IRequestHandler<UpdateCartIte
         // 3. Handle deletion if quantity is 0 or less
         if (request.NewQuantity <= 0)
         {
-            cart.Items.Remove(item);
+            cart.Items.Remove(cartItem);
         }
         else
         {
             // 4. Validate Stock
-            var variant = await _variantRepository.FirstOrDefaultAsync(v => v.Id == item.VariantId, cancellationToken);
-            if (variant == null)
+            ProductVariant? productVariant = await _variantRepository.FirstOrDefaultAsync(variant => variant.Id == cartItem.VariantId, cancellationToken);
+            if (productVariant == null)
             {
                 return Result.Failure(ProductErrors.VariantNotFound);
             }
 
-            if (!variant.IsAvailable || variant.StockQty < request.NewQuantity)
+            if (!productVariant.IsAvailable || productVariant.StockQty < request.NewQuantity)
             {
                 return Result.Failure(CartErrors.InsufficientStock);
             }
 
-            item.Quantity = request.NewQuantity;
+            cartItem.Quantity = request.NewQuantity;
         }
 
         cart.UpdatedAt = DateTime.UtcNow;

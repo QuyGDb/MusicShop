@@ -10,7 +10,7 @@ public sealed class ClearCartCommandHandler(
 {
     public async Task<Result> Handle(ClearCartCommand request, CancellationToken cancellationToken)
     {
-        var userId = Guid.Parse(currentUserService.UserId!);
+        Guid userId = Guid.Parse(currentUserService.UserId!);
         await cartRepository.ClearCartAsync(userId, cancellationToken);
         
         return Result.Success();

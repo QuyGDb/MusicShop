@@ -17,8 +17,8 @@ public sealed class GetReleaseVersionsByReleaseQueryHandler(IReleaseVersionRepos
         List<ReleaseVersion> versions = await releaseVersionRepository.GetByReleaseIdWithLabelAsync(
             request.ReleaseId, cancellationToken);
 
-        List<ReleaseVersionDto> dtos = versions.Select(v => v.ToDto()).ToList();
+        List<ReleaseVersionDto> releaseVersionDtos = versions.Select(releaseVersion => releaseVersion.ToDto()).ToList();
 
-        return Result<IReadOnlyList<ReleaseVersionDto>>.Success(dtos.AsReadOnly());
+        return Result<IReadOnlyList<ReleaseVersionDto>>.Success(releaseVersionDtos.AsReadOnly());
     }
 }

@@ -10,15 +10,15 @@ public sealed class CreateCuratedCollectionCommandHandler(ICuratedCollectionRepo
 {
     public async Task<Result<Guid>> Handle(CreateCuratedCollectionCommand request, CancellationToken cancellationToken)
     {
-        var collection = new CuratedCollection
+        CuratedCollection curatedCollection = new CuratedCollection
         {
             Title = request.Title,
             Description = request.Description,
             IsPublished = false
         };
 
-        await repository.AddAsync(collection, cancellationToken);
+        await repository.AddAsync(curatedCollection, cancellationToken);
 
-        return Result<Guid>.Success(collection.Id);
+        return Result<Guid>.Success(curatedCollection.Id);
     }
 }
