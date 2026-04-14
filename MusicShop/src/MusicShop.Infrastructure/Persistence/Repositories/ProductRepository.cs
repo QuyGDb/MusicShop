@@ -7,12 +7,8 @@ using MusicShop.Infrastructure.Persistence;
 
 namespace MusicShop.Infrastructure.Persistence.Repositories;
 
-public sealed class ProductRepository : GenericRepository<Product>, IProductRepository
+public sealed class ProductRepository(AppDbContext context) : GenericRepository<Product>(context), IProductRepository
 {
-    public ProductRepository(AppDbContext context) : base(context)
-    {
-    }
-
     public async Task<(IReadOnlyList<Product> Items, int TotalCount)> GetPagedAsync(
         GetProductsQuery request,
         CancellationToken ct = default)
@@ -33,15 +29,15 @@ public sealed class ProductRepository : GenericRepository<Product>, IProductRepo
 
         if (!string.IsNullOrEmpty(request.Genre))
         {
-            query = query.Where(product => product.ReleaseVersion != null && 
-                                     product.ReleaseVersion.Release != null && 
+            query = query.Where(product => product.ReleaseVersion != null &&
+                                     product.ReleaseVersion.Release != null &&
                                      product.ReleaseVersion.Release.ReleaseGenres.Any(releaseGenre => releaseGenre.Genre != null && releaseGenre.Genre.Slug == request.Genre));
         }
 
         if (request.ArtistId.HasValue)
         {
-            query = query.Where(product => product.ReleaseVersion != null && 
-                                     product.ReleaseVersion.Release != null && 
+            query = query.Where(product => product.ReleaseVersion != null &&
+                                     product.ReleaseVersion.Release != null &&
                                      product.ReleaseVersion.Release.ArtistId == request.ArtistId.Value);
         }
 

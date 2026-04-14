@@ -7,7 +7,7 @@ trigger: always_on
 ## Stack
 - .NET 10+, C# 12, Nullable enable, ImplicitUsings enable
 - Clean Architecture: `Domain → Application → Infrastructure → Api`
-- Minimal APIs ưu tiên; Controllers khi cần
+- Minimal APIs preferred; Controllers when necessary
 
 ## Project Structure
 ```
@@ -18,18 +18,18 @@ Api/           # Endpoints, Middleware, DI wiring
 ```
 
 ## API
-- REST đúng chuẩn: POST → 201 + Location, DELETE → 204, lỗi → 404/400
-- Versioning qua URL: `/api/v1/`
-- Dùng `TypedResults` với Minimal APIs
-- Không đặt business logic trong Controller
+- Standard REST: POST → 201 + Location, DELETE → 204, Errors → 404/400
+- Versioning via URL: `/api/v1/`
+- Use `TypedResults` with Minimal APIs
+- No business logic in Controllers
 
 ## CQRS
-- Mỗi use case = 1 handler (`IRequest<Result<T>>`)
-- Dùng `ValidationBehavior` pipeline để validate trước handler
+- Each use case = 1 handler (`IRequest<Result<T>>`)
+- Use `ValidationBehavior` pipeline for pre-handler validation
 
 ## Result Pattern
 ```csharp
-// Không throw exception cho lỗi nghiệp vụ
+// Do not throw exceptions for business logic errors
 Result<T>.Match(onSuccess, onFailure)
 
 public static class ProductErrors
@@ -39,29 +39,29 @@ public static class ProductErrors
 ```
 
 ## Validation
-- FluentValidation, đăng ký `AddValidatorsFromAssembly`
-- Validate ở Application layer, không ở Controller
+- FluentValidation, registered via `AddValidatorsFromAssembly`
+- Validate at the Application layer, not in the Controller
 
 ## EF Core
-- Mỗi entity có `IEntityTypeConfiguration<T>` riêng
-- Read-only query: `AsNoTracking()`
-- Luôn truyền `CancellationToken`
-- `SaveChangesAsync` ở handler, không ở repository
+- Each entity has its own `IEntityTypeConfiguration<T>`
+- Read-only queries: `AsNoTracking()`
+- Always pass `CancellationToken`
+- `SaveChangesAsync` in the handler, not in the repository
 
-## DI
+## DI (Dependency Injection)
 - `Scoped`: DbContext, Repository, UnitOfWork
-- `Transient`: stateless service nhỏ
-- `Singleton`: cache, HttpClientFactory
-- Dùng primary constructor cho injection
+- `Transient`: Small stateless services
+- `Singleton`: Cache, HttpClientFactory
+- Use primary constructors for injection
 
 ## Error Handling
-- Global handler với `UseExceptionHandler` → trả về `ProblemDetails` (RFC 7807)
-- Không để stack trace lộ ra client
+- Global handler with `UseExceptionHandler` → returns `ProblemDetails` (RFC 7807)
+- Do not expose stack traces to the client
 
-## Config
+## Configuration
 - Strongly typed options: `IOptions<T>` + `ValidateOnStart()`
-- Không inject `IConfiguration` vào Application/Domain layer
-- Không commit secret vào source control
+- Do not inject `IConfiguration` into the Application/Domain layers
+- Do not commit secrets to source control
 
 ## Logging
 ```csharp
@@ -72,24 +72,29 @@ logger.LogInformation($"Order {order.Id} placed");
 ```
 
 ## Security
-- HTTPS + HSTS bật trong production
-- Rate limiting trên auth endpoint
-- Parameterized query / EF Core — không raw SQL với input người dùng
-- JWT: expiry ngắn + refresh token
+- HTTPS + HSTS enabled in production
+- Rate limiting on authentication endpoints
+- Parameterized queries / EF Core — no raw SQL with user input
+- JWT: Short expiry + refresh tokens
 
 ## Testing
 - Unit: xUnit + NSubstitute + FluentAssertions
 - Integration: `WebApplicationFactory<Program>`
 
 ## Conventions
-- `sealed` cho concrete class mặc định
+- `sealed` for concrete classes by default
 - Async method suffix `Async`
-- Private field: `_camelCase`
-- File-scoped namespace
-- 1 class / 1 file, tối đa ~200 LOC
+- Private fields: `_camelCase`
+- File-scoped namespaces
+- 1 class per file, maximum ~200 LOC
+- **Explicit Typing**: Always use explicit types; never use `var`.
+- **Descriptive Naming**: No abbreviated variable names or lambda parameters (e.g., use `artist`, `order` instead of `x`, `o`).
+- **Collections**: Prefer `IReadOnlyList<T>` for lists returned from Handlers/Repositories.
 
-## Không làm
+## Prohibited (Don'ts)
 - `async void`, `.Result`, `.Wait()`
-- `HttpClient` trực tiếp → dùng `IHttpClientFactory`
-- `dynamic`, catch `Exception` không log/rethrow
-- Mix sync/async code
+- Direct `HttpClient` usage → use `IHttpClientFactory`
+- `dynamic`, catching `Exception` without logging/rethrowing
+- Mixing sync/async code
+- Using `var` for any variable declarations
+- Abbreviating variable names (e.g., `x`, `o`, `i`, `dto`)

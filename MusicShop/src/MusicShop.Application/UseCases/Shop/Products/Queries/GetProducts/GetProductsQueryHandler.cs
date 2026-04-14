@@ -11,18 +11,11 @@ namespace MusicShop.Application.UseCases.Shop.Products.Queries.GetProducts;
 /// <summary>
 /// Handler for GetProductsQuery. Uses IProductRepository.
 /// </summary>
-public sealed class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, Result<PaginatedResult<ProductListItemDto>>>
+public sealed class GetProductsQueryHandler(IProductRepository productRepository) : IRequestHandler<GetProductsQuery, Result<PaginatedResult<ProductListItemDto>>>
 {
-    private readonly IProductRepository _productRepository;
-
-    public GetProductsQueryHandler(IProductRepository productRepository)
-    {
-        _productRepository = productRepository;
-    }
-
     public async Task<Result<PaginatedResult<ProductListItemDto>>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
     {
-        (IReadOnlyList<Product> products, int totalCount) = await _productRepository.GetPagedAsync(request, cancellationToken);
+        (IReadOnlyList<Product> products, int totalCount) = await productRepository.GetPagedAsync(request, cancellationToken);
 
         List<ProductListItemDto> productListItemDtos = products.AsQueryable().ProjectToListItemDto().ToList();
 

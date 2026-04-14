@@ -6,12 +6,8 @@ using MusicShop.Infrastructure.Persistence;
 
 namespace MusicShop.Infrastructure.Persistence.Repositories;
 
-public sealed class OrderRepository : GenericRepository<Order>, IOrderRepository
+public sealed class OrderRepository(AppDbContext context) : GenericRepository<Order>(context), IOrderRepository
 {
-    public OrderRepository(AppDbContext context) : base(context)
-    {
-    }
-
     public async Task<Order?> GetByIdWithDetailsAsync(Guid orderId, CancellationToken ct = default)
     {
         return await _dbSet
@@ -31,10 +27,10 @@ public sealed class OrderRepository : GenericRepository<Order>, IOrderRepository
     }
 
     public async Task<(IReadOnlyList<Order> Items, int TotalCount)> GetPagedByUserIdAsync(
-        Guid userId, 
-        OrderStatus? status, 
-        int page, 
-        int limit, 
+        Guid userId,
+        OrderStatus? status,
+        int page,
+        int limit,
         CancellationToken ct = default)
     {
         IQueryable<Order> query = _dbSet.AsNoTracking()
@@ -59,9 +55,9 @@ public sealed class OrderRepository : GenericRepository<Order>, IOrderRepository
     }
 
     public async Task<(IReadOnlyList<Order> Items, int TotalCount)> GetPagedAllAsync(
-        OrderStatus? status, 
-        int page, 
-        int limit, 
+        OrderStatus? status,
+        int page,
+        int limit,
         CancellationToken ct = default)
     {
         IQueryable<Order> query = _dbSet.AsNoTracking().AsQueryable();

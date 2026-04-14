@@ -6,14 +6,10 @@ using MusicShop.Domain.Interfaces;
 
 namespace MusicShop.Infrastructure.Persistence.Repositories;
 
-public sealed class GenreRepository : GenericRepository<Genre>, IGenreRepository
+public sealed class GenreRepository(AppDbContext context) : GenericRepository<Genre>(context), IGenreRepository
 {
-    public GenreRepository(AppDbContext context) : base(context)
-    {
-    }
-
     public async Task<(IReadOnlyList<Genre> Items, int TotalCount)> GetPagedAsync(
-        GetGenresQuery request, 
+        GetGenresQuery request,
         CancellationToken ct = default)
     {
         IQueryable<Genre> query = _context.Set<Genre>().AsNoTracking();

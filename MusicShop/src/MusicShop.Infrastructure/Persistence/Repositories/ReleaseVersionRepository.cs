@@ -5,12 +5,8 @@ using MusicShop.Domain.Interfaces;
 
 namespace MusicShop.Infrastructure.Persistence.Repositories;
 
-public sealed class ReleaseVersionRepository : GenericRepository<ReleaseVersion>, IReleaseVersionRepository
+public sealed class ReleaseVersionRepository(AppDbContext context) : GenericRepository<ReleaseVersion>(context), IReleaseVersionRepository
 {
-    public ReleaseVersionRepository(AppDbContext context) : base(context)
-    {
-    }
-
     public async Task<List<ReleaseVersion>> GetByReleaseIdWithLabelAsync(Guid releaseId, CancellationToken ct = default)
     {
         return await _context.Set<ReleaseVersion>()
