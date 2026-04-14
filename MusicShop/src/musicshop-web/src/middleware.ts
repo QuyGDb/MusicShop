@@ -28,7 +28,7 @@ export function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Chỉ chạy middleware cho các đường dẫn cụ thể để tối ưu hiệu năng
+// Run middleware only for specific paths to optimize performance
 export const config = {
   matcher: ['/profile/:path*', '/dashboard/:path*', '/login', '/register'],
 };

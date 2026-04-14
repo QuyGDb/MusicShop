@@ -37,7 +37,7 @@ export const useAuthStore = create<AuthState>()(
         set({ user }),
     }),
     {
-      name: 'auth-storage', // Tên key lưu trong LocalStorage
+      name: 'auth-storage', // Key name stored in LocalStorage
       storage: createJSONStorage(() => localStorage),
     }
   )
