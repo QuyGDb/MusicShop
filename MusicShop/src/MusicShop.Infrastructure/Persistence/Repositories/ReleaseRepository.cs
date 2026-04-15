@@ -7,12 +7,8 @@ using MusicShop.Domain.Interfaces;
 
 namespace MusicShop.Infrastructure.Persistence.Repositories;
 
-public sealed class ReleaseRepository : GenericRepository<Release>, IReleaseRepository
+public sealed class ReleaseRepository(AppDbContext context) : GenericRepository<Release>(context), IReleaseRepository
 {
-    public ReleaseRepository(AppDbContext context) : base(context)
-    {
-    }
-
     public async Task<(IReadOnlyList<Release> Items, int TotalCount)> GetPagedAsync(
         GetReleasesQuery request,
         CancellationToken ct = default)

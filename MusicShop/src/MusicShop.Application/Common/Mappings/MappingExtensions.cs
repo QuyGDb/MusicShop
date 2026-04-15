@@ -116,7 +116,7 @@ public static class MappingExtensions
     {
         return new UserResponse
         {
-            UserId = user.Id,
+            Id = user.Id,
             Email = user.Email,
             FullName = user.FullName,
             Role = user.Role.ToString(),
@@ -135,10 +135,7 @@ public static class MappingExtensions
             AccessToken = accessToken,
             RefreshToken = refreshToken,
             AccessTokenExpiresAt = accessTokenExpiresAtUtc,
-            UserId = user.Id,
-            Email = user.Email,
-            FullName = user.FullName,
-            Role = user.Role.ToString()
+            User = user.ToResponse()
         };
     }
 }

@@ -62,7 +62,8 @@ export default function LoginForm() {
       setAuth(result.data.user, result.data.accessToken);
       router.push('/');
     } else {
-      setApiError(result.error?.message || 'Google login failed on server side');
+      const errorMessage = result.error?.message || 'Google login failed on server side';
+      setApiError(errorMessage);
     }
   };
 

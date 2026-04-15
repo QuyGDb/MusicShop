@@ -15,14 +15,24 @@ export const authService = {
       return response.data;
     } catch (error: any) {
       if (error.response?.data) {
-        return error.response.data;
+        // Handle ASP.NET Core ProblemDetails (title/detail)
+        const data = error.response.data;
+        return {
+          success: false,
+          data: null,
+          error: {
+            code: data.title || 'Error.Unknown',
+            message: data.detail || 'An unexpected error occurred.'
+          },
+          meta: null
+        };
       }
       return {
         success: false,
         data: null,
         error: {
-          code: 'Error.Unknown',
-          message: 'An error occurred. Please try again later.'
+          code: 'Error.Network',
+          message: 'Unable to connect to the server. Please check if the API is running.'
         },
         meta: null
       };
@@ -41,14 +51,24 @@ export const authService = {
       return response.data;
     } catch (error: any) {
       if (error.response?.data) {
-        return error.response.data;
+        // Handle ASP.NET Core ProblemDetails (title/detail)
+        const data = error.response.data;
+        return {
+          success: false,
+          data: null,
+          error: {
+            code: data.title || 'Error.GoogleLogin',
+            message: data.detail || 'Google login failed on the server.'
+          },
+          meta: null
+        };
       }
       return {
         success: false,
         data: null,
         error: {
-          code: 'Error.GoogleLogin',
-          message: 'Google login failed. Please try again.'
+          code: 'Error.Network',
+          message: 'Unable to connect to the server for Google login. Please check your connection.'
         },
         meta: null
       };

@@ -6,12 +6,8 @@ using MusicShop.Domain.Interfaces;
 
 namespace MusicShop.Infrastructure.Persistence.Repositories;
 
-public sealed class LabelRepository : GenericRepository<Label>, ILabelRepository
+public sealed class LabelRepository(AppDbContext context) : GenericRepository<Label>(context), ILabelRepository
 {
-    public LabelRepository(AppDbContext context) : base(context)
-    {
-    }
-
     public async Task<(IReadOnlyList<Label> Items, int TotalCount)> GetPagedAsync(
         GetLabelsQuery request, 
         CancellationToken ct = default)

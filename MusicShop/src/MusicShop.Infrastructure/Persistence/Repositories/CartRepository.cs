@@ -5,12 +5,8 @@ using MusicShop.Infrastructure.Persistence;
 
 namespace MusicShop.Infrastructure.Persistence.Repositories;
 
-public sealed class CartRepository : GenericRepository<Cart>, ICartRepository
+public sealed class CartRepository(AppDbContext context) : GenericRepository<Cart>(context), ICartRepository
 {
-    public CartRepository(AppDbContext context) : base(context)
-    {
-    }
-
     public async Task<Cart?> GetByUserIdAsync(Guid userId, CancellationToken ct = default)
     {
         return await _dbSet.AsNoTracking()

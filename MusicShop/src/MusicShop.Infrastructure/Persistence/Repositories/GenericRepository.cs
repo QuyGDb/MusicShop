@@ -5,16 +5,10 @@ using System.Linq.Expressions;
 
 namespace MusicShop.Infrastructure.Persistence.Repositories;
 
-public class GenericRepository<T> : IRepository<T> where T : BaseEntity
+public class GenericRepository<T>(AppDbContext context) : IRepository<T> where T : BaseEntity
 {
-    protected readonly AppDbContext _context;
-    protected readonly DbSet<T> _dbSet;
-
-    public GenericRepository(AppDbContext context)
-    {
-        _context = context;
-        _dbSet = context.Set<T>();
-    }
+    protected readonly AppDbContext _context = context;
+    protected readonly DbSet<T> _dbSet = context.Set<T>();
 
     public async Task<T?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
