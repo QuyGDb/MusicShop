@@ -17,16 +17,23 @@ interface ProductsPageProps {
   };
 }
 
-export default async function ProductsPage({ searchParams }: ProductsPageProps) {
-  // Parse filters from searchParams
+export default async function ProductsPage({ 
+  searchParams 
+}: { 
+  searchParams: Promise<{ [key: string]: string | string[] | undefined }> 
+}) {
+  // In Next.js 15+, searchParams is a Promise that must be awaited
+  const params = await searchParams;
+
+  // Parse filters from awaited params
   const filters: ProductFilters = {
-    format: searchParams.format ? parseInt(searchParams.format) as ReleaseFormat : undefined,
-    genre: searchParams.genre,
-    minPrice: searchParams.minPrice ? parseFloat(searchParams.minPrice) : undefined,
-    maxPrice: searchParams.maxPrice ? parseFloat(searchParams.maxPrice) : undefined,
-    page: searchParams.page ? parseInt(searchParams.page) : 1,
+    format: typeof params.format === 'string' ? parseInt(params.format) as ReleaseFormat : undefined,
+    genre: typeof params.genre === 'string' ? params.genre : undefined,
+    minPrice: typeof params.minPrice === 'string' ? parseFloat(params.minPrice) : undefined,
+    maxPrice: typeof params.maxPrice === 'string' ? parseFloat(params.maxPrice) : undefined,
+    page: typeof params.page === 'string' ? parseInt(params.page) : 1,
     limit: 12, // Items per page
-    searchQuery: searchParams.q
+    searchQuery: typeof params.q === 'string' ? params.q : undefined
   };
 
   // Fetch data in Server Component
@@ -88,7 +95,7 @@ export default async function ProductsPage({ searchParams }: ProductsPageProps) 
                         key={i}
                         href={{
                           pathname: '/products',
-                          query: { ...searchParams, page: i + 1 }
+                          query: { ...params, page: i + 1 }
                         }}
                         className={`px-4 py-2 rounded-lg border transition-all ${
                           (filters.page || 1) === i + 1 

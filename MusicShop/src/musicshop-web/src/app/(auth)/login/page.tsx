@@ -2,8 +2,8 @@ import React from 'react';
 import LoginForm from '@/features/auth/components/LoginForm';
 
 export const metadata = {
-  title: 'Đăng nhập | MusicShop',
-  description: 'Đăng nhập vào tài khoản MusicShop của bạn',
+  title: 'Login | MusicShop',
+  description: 'Log in to your MusicShop account',
 };
 
 export default function LoginPage() {
@@ -13,7 +13,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm">
         <div className="mb-10 text-center">
           <h1 className="text-4xl font-extrabold tracking-tight text-white mb-2">MusicShop</h1>
-          <p className="text-neutral-500">Nơi tìm thấy tâm hồn âm nhạc của bạn</p>
+          <p className="text-neutral-500">Where you find your musical soul</p>
         </div>
         <LoginForm />
       </div>

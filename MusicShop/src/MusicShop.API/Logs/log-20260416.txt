@@ -1,0 +1,31 @@
+2026-04-16 00:01:24.659 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=8&limit=12&maxPrice=500 - application/json null
+2026-04-16 00:01:24.664 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-16 00:01:24.665 +07:00 [INF] Route matched with {action = "GetProducts", controller = "Products"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[System.Collections.Generic.IReadOnlyList`1[MusicShop.Application.DTOs.Shop.ProductListItemDto]]]] GetProducts(MusicShop.Application.UseCases.Shop.Products.Queries.GetProducts.GetProductsQuery, System.Threading.CancellationToken) on controller MusicShop.API.Controllers.ProductsController (MusicShop.API).
+2026-04-16 00:01:24.730 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@request_MaxPrice_Value='?' (DbType = Decimal)], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Products" AS p
+WHERE p."IsActive" AND EXISTS (
+    SELECT 1
+    FROM "ProductVariants" AS p0
+    WHERE p."Id" = p0."ProductId" AND p0."Price" <= @request_MaxPrice_Value)
+2026-04-16 00:01:24.735 +07:00 [INF] Executed DbCommand (3ms) [Parameters=[@request_MaxPrice_Value='?' (DbType = Decimal), @p2='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT p1."Id", p1."CoverUrl", p1."CreatedAt", p1."Description", p1."Format", p1."IsActive", p1."IsLimited", p1."IsPreorder", p1."LimitedQty", p1."Name", p1."PreorderReleaseDate", p1."ReleaseVersionId", p1."Slug", p1."UpdatedAt", r."Id", r0."Id", a."Id", p2."Id", p2."CreatedAt", p2."IsAvailable", p2."IsSigned", p2."Price", p2."ProductId", p2."StockQty", p2."UpdatedAt", p2."VariantName", r."CatalogNumber", r."CreatedAt", r."Format", r."LabelId", r."Notes", r."PressingCountry", r."PressingYear", r."ReleaseId", r."UpdatedAt", r0."ArtistId", r0."CoverUrl", r0."CreatedAt", r0."Description", r0."Slug", r0."Title", r0."Type", r0."UpdatedAt", r0."Year", a."Bio", a."Country", a."CreatedAt", a."ImageUrl", a."Name", a."Slug", a."UpdatedAt"
+FROM (
+    SELECT p."Id", p."CoverUrl", p."CreatedAt", p."Description", p."Format", p."IsActive", p."IsLimited", p."IsPreorder", p."LimitedQty", p."Name", p."PreorderReleaseDate", p."ReleaseVersionId", p."Slug", p."UpdatedAt"
+    FROM "Products" AS p
+    WHERE p."IsActive" AND EXISTS (
+        SELECT 1
+        FROM "ProductVariants" AS p0
+        WHERE p."Id" = p0."ProductId" AND p0."Price" <= @request_MaxPrice_Value)
+    ORDER BY p."CreatedAt" DESC
+    LIMIT @p2 OFFSET @p
+) AS p1
+LEFT JOIN "ReleaseVersions" AS r ON p1."ReleaseVersionId" = r."Id"
+LEFT JOIN "Releases" AS r0 ON r."ReleaseId" = r0."Id"
+LEFT JOIN "Artists" AS a ON r0."ArtistId" = a."Id"
+LEFT JOIN "ProductVariants" AS p2 ON p1."Id" = p2."ProductId"
+ORDER BY p1."CreatedAt" DESC, p1."Id", r."Id", r0."Id", a."Id"
+2026-04-16 00:01:24.738 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[System.Collections.Generic.IReadOnlyList`1[[MusicShop.Application.DTOs.Shop.ProductListItemDto, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-04-16 00:01:24.739 +07:00 [INF] Executed action MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API) in 72.7054ms
+2026-04-16 00:01:24.740 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-16 00:01:24.741 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=8&limit=12&maxPrice=500 - 200 null application/json; charset=utf-8 81.7045ms

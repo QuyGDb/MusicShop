@@ -2,6 +2,7 @@ import api from '@/services/apiClient';
 import { AuthResponse } from '@/types/auth';
 import { ApiResponse } from '@/types/api';
 import { LoginSchema } from '../schemas/loginSchema';
+import { RegisterSchema } from '../schemas/registerSchema';
 
 export const authService = {
   /**
@@ -69,6 +70,45 @@ export const authService = {
         error: {
           code: 'Error.Network',
           message: 'Unable to connect to the server for Google login. Please check your connection.'
+        },
+        meta: null
+      };
+    }
+  },
+
+  /**
+   * Performs user registration
+   * @param data The registration details (FullName, Email, Password)
+   * @returns ApiResponse containing AuthResponse (tokens and user info)
+   */
+  register: async (data: RegisterSchema): Promise<ApiResponse<AuthResponse>> => {
+    try {
+      // Backend expects Email, Password, FullName
+      const response = await api.post<ApiResponse<AuthResponse>>('/auth/register', {
+        email: data.email,
+        password: data.password,
+        fullName: data.fullName
+      });
+      return response.data;
+    } catch (error: any) {
+      if (error.response?.data) {
+        const problem = error.response.data;
+        return {
+          success: false,
+          data: null,
+          error: {
+            code: problem.title || 'Error.Registration',
+            message: problem.detail || 'Registration failed.'
+          },
+          meta: null
+        };
+      }
+      return {
+        success: false,
+        data: null,
+        error: {
+          code: 'Error.Network',
+          message: 'Unable to connect to the server. Please check if the API is running.'
         },
         meta: null
       };

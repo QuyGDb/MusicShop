@@ -54,7 +54,7 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 // 4. Configure JWT Authentication
-JwtSettings jwtSettings = new JwtSettings();
+JwtSettings jwtSettings = new();
 builder.Configuration.GetSection(JwtSettings.SectionName).Bind(jwtSettings);
 
 builder.Services.AddAuthentication(options =>
@@ -108,7 +108,7 @@ using (IServiceScope scope = app.Services.CreateScope())
     {
         AppDbContext context = services.GetRequiredService<AppDbContext>();
         ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
-        
+
         logger.LogInformation("Checking database for seeding...");
         await DbInitializer.SeedAsync(context);
         logger.LogInformation("Database initialization complete.");

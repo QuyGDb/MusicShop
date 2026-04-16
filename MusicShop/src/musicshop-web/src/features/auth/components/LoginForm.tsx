@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { authService } from '../services/authService';
 import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { GoogleLogin } from '@react-oauth/google';
 
 /**
@@ -50,7 +51,7 @@ export default function LoginForm() {
    */
   const handleGoogleSuccess = async (credentialResponse: any) => {
     setApiError(null);
-    
+
     // The 'credential' field contains the ID Token required by our backend
     const idToken = credentialResponse.credential;
     if (!idToken) return;
@@ -140,10 +141,12 @@ export default function LoginForm() {
         </div>
       </CardContent>
       <CardFooter className="flex flex-wrap items-center justify-center gap-1 text-sm text-neutral-400">
-        Don&apos;t have an account?{' '}
-        <Button variant="link" className="p-0 h-auto text-blue-400 hover:text-blue-300">
-          Sign up now
-        </Button>
+        <p className="text-center text-sm text-neutral-500">
+          Don't have an account?{' '}
+          <Link href="/register" className="text-blue-500 font-semibold hover:text-blue-400 transition-colors">
+            Sign Up
+          </Link>
+        </p>
       </CardFooter>
     </Card>
   );
