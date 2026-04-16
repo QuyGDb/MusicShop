@@ -92,7 +92,7 @@ public class RegisterCommandHandlerTests
         // Assert
         result.IsSuccess.Should().BeTrue();
         result.Value.Should().NotBeNull();
-        result.Value.Email.Should().Be(command.Email);
+        result.Value.User.Email.Should().Be(command.Email);
         result.Value.AccessToken.Should().Be(accessToken);
         result.Value.RefreshToken.Should().Be(refreshToken);
 
