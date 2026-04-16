@@ -5,19 +5,11 @@
 ## 1. Project Overview
 
 > AI-powered Music Shop · ASP.NET Core 10 · Claude API · pgvector  
-> Inspired by **Rough Trade** (layout) · **Bandcamp Daily** (editorial) · **Bleep** (dark aesthetic)
 
 ### 1.1 Overview
 MusicShop is an online platform for selling physical media (vinyl, CD, cassette). The Admin is the sole manager of the catalog.
 
 The key differentiator from standard shops is the integration of an **AI Agent** that helps customers find products, answers music-related questions, and provides personalized recommendations based on interests.
-
-### 1.2 Design References
-| Ref | Elements Borrowed |
-|-----|--------|
-| **[Rough Trade](https://www.roughtrade.com/)** | Main Layout — album card grid, "Album of the Week" section, weekly new arrivals |
-| **[Bandcamp Daily](https://daily.bandcamp.com/)** | Editorial tone — integrated player + buy button, storytelling per release |
-| **[Bleep](https://bleep.com/)** | Dark mode aesthetic — minimalist dark UI, clear genre tagging, clean typography |
 
 
 ---
