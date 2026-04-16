@@ -1,8 +1,7 @@
 import api from '@/services/apiClient';
 import { AuthResponse } from '@/types/auth';
 import { ApiResponse } from '@/types/api';
-import { LoginSchema } from '../schemas/loginSchema';
-import { RegisterSchema } from '../schemas/registerSchema';
+// No Zod schemas imported
 
 export const authService = {
   /**
@@ -10,7 +9,7 @@ export const authService = {
    * @param credentials The email and password from the login form
    * @returns ApiResponse containing AuthResponse (tokens and user info)
    */
-  login: async (credentials: LoginSchema): Promise<ApiResponse<AuthResponse>> => {
+  login: async (credentials: { email: string; password: string }): Promise<ApiResponse<AuthResponse>> => {
     try {
       const response = await api.post<ApiResponse<AuthResponse>>('/auth/login', credentials);
       return response.data;
@@ -81,7 +80,7 @@ export const authService = {
    * @param data The registration details (FullName, Email, Password)
    * @returns ApiResponse containing AuthResponse (tokens and user info)
    */
-  register: async (data: RegisterSchema): Promise<ApiResponse<AuthResponse>> => {
+  register: async (data: { email: string; password: string; fullName: string; confirmPassword?: string }): Promise<ApiResponse<AuthResponse>> => {
     try {
       // Backend expects Email, Password, FullName
       const response = await api.post<ApiResponse<AuthResponse>>('/auth/register', {
