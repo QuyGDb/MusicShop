@@ -1,43 +1,62 @@
-'use client';
-
 import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { registerSchema, RegisterSchema } from '../schemas/registerSchema';
 import { authService } from '../services/authService';
-import { useAuthStore } from '@/store/authStore';
-import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, Loader2, Music, UserPlus } from 'lucide-react';
+import { AlertCircle, Loader2, UserPlus } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import Link from 'next/link';
 
 export const RegisterForm: React.FC = () => {
   const [serverError, setServerError] = useState<string | null>(null);
-  const { setAuth } = useAuthStore();
-  const router = useRouter();
+  const { setAuth } = useAuth();
+  const navigate = useNavigate();
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<RegisterSchema>({
-    resolver: zodResolver(registerSchema),
-  });
+  // Controlled component states
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  
+  // UI states
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<{ fullName?: string; email?: string; password?: string; confirmPassword?: string }>({});
 
-  const onSubmit = async (data: RegisterSchema) => {
+  const validate = () => {
+    const newErrors: typeof errors = {};
+    if (!fullName || fullName.length < 2) {
+      newErrors.fullName = 'Full Name must be at least 2 characters';
+    }
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'Valid email is required';
+    }
+    if (!password || password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+    if (password !== confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setServerError(null);
-    const result = await authService.register(data);
+    
+    if (!validate()) return;
+    
+    setIsSubmitting(true);
+    const result = await authService.register({ email, password, fullName });
 
     if (result.success && result.data) {
       setAuth(result.data.user, result.data.accessToken);
-      router.push('/');
-      router.refresh();
+      navigate('/');
     } else {
       setServerError(result.error?.message || 'An unexpected error occurred during registration.');
     }
+    setIsSubmitting(false);
   };
 
   return (
@@ -53,10 +72,9 @@ export const RegisterForm: React.FC = () => {
       </div>
 
       <div className="bg-neutral-900/40 backdrop-blur-md border border-neutral-800 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
-        {/* Decorative background glow */}
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl group-hover:bg-blue-600/20 transition-colors duration-500" />
         
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5 relative z-10">
+        <form onSubmit={onSubmit} className="space-y-5 relative z-10">
           {serverError && (
             <Alert variant="destructive" className="bg-red-900/20 border-red-900/50">
               <AlertCircle className="h-4 w-4" />
@@ -70,10 +88,11 @@ export const RegisterForm: React.FC = () => {
             <Input
               id="fullName"
               placeholder="John Doe"
-              {...register('fullName')}
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
               className={`bg-neutral-950/50 border-neutral-800 focus:border-blue-500 h-11 transition-all ${errors.fullName ? 'border-red-500/50' : ''}`}
             />
-            {errors.fullName && <p className="text-xs text-red-400 mt-1">{errors.fullName.message}</p>}
+            {errors.fullName && <p className="text-xs text-red-400 mt-1">{errors.fullName}</p>}
           </div>
 
           <div className="space-y-2">
@@ -82,10 +101,11 @@ export const RegisterForm: React.FC = () => {
               id="email"
               type="email"
               placeholder="name@example.com"
-              {...register('email')}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className={`bg-neutral-950/50 border-neutral-800 focus:border-blue-500 h-11 transition-all ${errors.email ? 'border-red-500/50' : ''}`}
             />
-            {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email.message}</p>}
+            {errors.email && <p className="text-xs text-red-400 mt-1">{errors.email}</p>}
           </div>
 
           <div className="space-y-2">
@@ -94,10 +114,11 @@ export const RegisterForm: React.FC = () => {
               id="password"
               type="password"
               placeholder="••••••••"
-              {...register('password')}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className={`bg-neutral-950/50 border-neutral-800 focus:border-blue-500 h-11 transition-all ${errors.password ? 'border-red-500/50' : ''}`}
             />
-            {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password.message}</p>}
+            {errors.password && <p className="text-xs text-red-400 mt-1">{errors.password}</p>}
           </div>
 
           <div className="space-y-2">
@@ -106,10 +127,11 @@ export const RegisterForm: React.FC = () => {
               id="confirmPassword"
               type="password"
               placeholder="••••••••"
-              {...register('confirmPassword')}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               className={`bg-neutral-950/50 border-neutral-800 focus:border-blue-500 h-11 transition-all ${errors.confirmPassword ? 'border-red-500/50' : ''}`}
             />
-            {errors.confirmPassword && <p className="text-xs text-red-400 mt-1">{errors.confirmPassword.message}</p>}
+            {errors.confirmPassword && <p className="text-xs text-red-400 mt-1">{errors.confirmPassword}</p>}
           </div>
 
           <Button 
@@ -131,7 +153,7 @@ export const RegisterForm: React.FC = () => {
 
       <p className="text-center text-sm text-neutral-500">
         Already have an account?{' '}
-        <Link href="/login" className="text-blue-500 font-semibold hover:text-blue-400 transition-colors">
+        <Link to="/login" className="text-blue-500 font-semibold hover:text-blue-400 transition-colors">
           Sign In
         </Link>
       </p>

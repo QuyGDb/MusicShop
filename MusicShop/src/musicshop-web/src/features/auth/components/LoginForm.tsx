@@ -1,67 +1,70 @@
-'use client';
-
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, LoginSchema } from '../schemas/loginSchema';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { authService } from '../services/authService';
-import { useAuthStore } from '@/store/authStore';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
+import { useNavigate, Link } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
 
-/**
- * LoginForm component for handling standard and Google authentication.
- */
 export default function LoginForm() {
-  const router = useRouter();
-  const setAuth = useAuthStore((state) => state.setAuth);
-  const [apiError, setApiError] = React.useState<string | null>(null);
+  const navigate = useNavigate();
+  const { setAuth } = useAuth();
+  
+  // Controlled components state
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  
+  // UI State
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginSchema>({
-    resolver: zodResolver(loginSchema),
-  });
+  const validate = () => {
+    const newErrors: { email?: string; password?: string } = {};
+    if (!email) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'Email is invalid';
+    }
+    if (!password) {
+      newErrors.password = 'Password is required';
+    } else if (password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-  /**
-   * Handles the standard email/password login submission.
-   */
-  const onSubmit = async (data: LoginSchema) => {
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setApiError(null);
-    const result = await authService.login(data);
+    
+    if (!validate()) return;
+    
+    setIsSubmitting(true);
+    const result = await authService.login({ email, password });
 
     if (result.success && result.data) {
       setAuth(result.data.user, result.data.accessToken);
-      router.push('/');
+      navigate('/');
     } else {
       setApiError(result.error?.message || 'Login failed');
     }
+    setIsSubmitting(false);
   };
 
-  /**
-   * Handles successful Google Login response.
-   * @param credentialResponse Contains the Google ID Token (credential)
-   */
   const handleGoogleSuccess = async (credentialResponse: any) => {
     setApiError(null);
-
-    // The 'credential' field contains the ID Token required by our backend
     const idToken = credentialResponse.credential;
     if (!idToken) return;
 
     const result = await authService.googleLogin(idToken);
 
     if (result.success && result.data) {
-      // Store user info and token in the global store
       setAuth(result.data.user, result.data.accessToken);
-      router.push('/');
+      navigate('/');
     } else {
       const errorMessage = result.error?.message || 'Google login failed on server side';
       setApiError(errorMessage);
@@ -77,35 +80,37 @@ export default function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
               id="email"
               type="email"
               placeholder="name@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="bg-neutral-800 border-neutral-700"
-              {...register('email')}
             />
             {errors.email && (
-              <p className="text-sm text-red-500">{errors.email.message}</p>
+              <p className="text-sm text-red-500">{errors.email}</p>
             )}
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Button variant="link" className="p-0 h-auto text-xs text-neutral-400">
+              <Button type="button" variant="link" className="p-0 h-auto text-xs text-neutral-400">
                 Forgot password?
               </Button>
             </div>
             <Input
               id="password"
               type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="bg-neutral-800 border-neutral-700"
-              {...register('password')}
             />
             {errors.password && (
-              <p className="text-sm text-red-500">{errors.password.message}</p>
+              <p className="text-sm text-red-500">{errors.password}</p>
             )}
           </div>
           {apiError && (
@@ -127,23 +132,22 @@ export default function LoginForm() {
           </div>
         </div>
 
-        {/* Standard Google Login Button - Handles Token Flow Automatically */}
         <div className="flex justify-center w-full">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={() => {
-              setApiError('Google login was unsuccessful');
+               setApiError('Google login was unsuccessful');
             }}
             theme="filled_black"
             shape="pill"
-            width="384" // Max width of the card
+            width="384"
           />
         </div>
       </CardContent>
       <CardFooter className="flex flex-wrap items-center justify-center gap-1 text-sm text-neutral-400">
         <p className="text-center text-sm text-neutral-500">
           Don't have an account?{' '}
-          <Link href="/register" className="text-blue-500 font-semibold hover:text-blue-400 transition-colors">
+          <Link to="/register" className="text-blue-500 font-semibold hover:text-blue-400 transition-colors">
             Sign Up
           </Link>
         </p>
