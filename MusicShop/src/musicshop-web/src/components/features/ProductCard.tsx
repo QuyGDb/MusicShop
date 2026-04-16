@@ -6,7 +6,7 @@ import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Disc, Music } from 'lucide-react';
-import Image from 'next/image';
+// React Vanilla implementation
 
 interface ProductCardProps {
   product: ProductListItem;
@@ -30,12 +30,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
       {/* Image Container */}
       <div className="relative aspect-square overflow-hidden bg-neutral-800">
-        <Image
+        <img
           src={product.coverUrl || '/images/placeholder-album.png'}
           alt={`${product.artistName} - ${product.name}`}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-110"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
            {/* Quick Action Button */}

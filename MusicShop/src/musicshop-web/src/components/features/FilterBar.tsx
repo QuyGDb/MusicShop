@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ReleaseFormat } from '@/types/product';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -10,8 +10,8 @@ import { Button } from '@/components/ui/button';
 import { Disc, Music, CassetteTape, Filter, RotateCcw } from 'lucide-react';
 
 export const FilterBar: React.FC = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Current filter states from URL
   const selectedFormat = searchParams.get('format');
@@ -28,11 +28,11 @@ export const FilterBar: React.FC = () => {
     }
     // Always reset to page 1 on filter change
     params.set('page', '1');
-    router.push(`/products?${params.toString()}`);
+    navigate(`/products?${params.toString()}`);
   };
 
   const clearFilters = () => {
-    router.push('/products');
+    navigate('/products');
   };
 
   return (
