@@ -21,6 +21,12 @@ public class AuthController(IMediator mediator) : BaseApiController
     public async Task<ActionResult<ApiResponse<AuthResponse>>> Register([FromBody] RegisterCommand command)
     {
         Result<AuthResponse> result = await mediator.Send(command);
+        
+        if (result.IsSuccess)
+        {
+            SetRefreshTokenCookie(result.Value.RefreshToken);
+        }
+
         return HandleResult(result);
     }
 
@@ -30,6 +36,12 @@ public class AuthController(IMediator mediator) : BaseApiController
     public async Task<ActionResult<ApiResponse<AuthResponse>>> Login([FromBody] LoginQuery query)
     {
         Result<AuthResponse> result = await mediator.Send(query);
+        
+        if (result.IsSuccess)
+        {
+            SetRefreshTokenCookie(result.Value.RefreshToken);
+        }
+
         return HandleResult(result);
     }
 
@@ -38,6 +50,12 @@ public class AuthController(IMediator mediator) : BaseApiController
     public async Task<ActionResult<ApiResponse<AuthResponse>>> GoogleLogin([FromBody] GoogleLoginCommand command)
     {
         Result<AuthResponse> result = await mediator.Send(command);
+        
+        if (result.IsSuccess)
+        {
+            SetRefreshTokenCookie(result.Value.RefreshToken);
+        }
+
         return HandleResult(result);
     }
 
@@ -47,6 +65,12 @@ public class AuthController(IMediator mediator) : BaseApiController
     public async Task<ActionResult<ApiResponse<AuthResponse>>> RefreshToken([FromBody] RefreshTokenCommand command)
     {
         Result<AuthResponse> result = await mediator.Send(command);
+        
+        if (result.IsSuccess)
+        {
+            SetRefreshTokenCookie(result.Value.RefreshToken);
+        }
+
         return HandleResult(result);
     }
 
@@ -72,5 +96,18 @@ public class AuthController(IMediator mediator) : BaseApiController
     {
         Result<Unit> result = await mediator.Send(command);
         return HandleResult(result);
+    }
+
+    private void SetRefreshTokenCookie(string refreshToken)
+    {
+        CookieOptions cookieOptions = new()
+        {
+            HttpOnly = true,
+            Secure = true, // Set to true for production (requires HTTPS)
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddDays(7)
+        };
+
+        Response.Cookies.Append("refreshToken", refreshToken, cookieOptions);
     }
 }
