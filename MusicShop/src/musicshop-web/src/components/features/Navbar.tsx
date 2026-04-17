@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/hooks/useAuth';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { Music, LogOut, User as UserIcon, ShoppingBag, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
