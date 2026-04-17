@@ -1,45 +1,50 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { User } from '@/types/auth';
 
+/**
+ * Defines the shape of the authentication context.
+ * includes user data, access tokens, and methods to manipulate auth state.
+ */
 interface AuthContextType {
-  user: any | null;
+  user: User | null;
   accessToken: string | null;
-  setAuth: (user: any, token: string) => void;
+  setAuth: (user: User, token: string) => void;
   clearAuth: () => void;
 }
 
-// 1. Create Context
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+// 1. Create the Context object. Default is undefined to enforce Provider usage.
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// 2. Setup Provider
+/**
+ * Provider component that wraps the application and supplies auth state.
+ */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(() => {
+    return localStorage.getItem('accessToken');
+  });
 
-  // Component Mount: Lấy thông tin phiên từ Local Storage
-  useEffect(() => {
-    const storedToken = localStorage.getItem('accessToken');
+  const [user, setUser] = useState<User | null>(() => {
     const storedUser = localStorage.getItem('user');
-    
-    if (storedToken && storedUser) {
-      setAccessToken(storedToken);
+    if (storedUser) {
       try {
-        setUser(JSON.parse(storedUser));
+        return JSON.parse(storedUser);
       } catch (error) {
         console.error('Failed to parse user from local storage:', error);
         localStorage.removeItem('user');
       }
     }
-  }, []);
+    return null;
+  });
 
-  // Hàm cập nhật trạng thái đăng nhập
-  const setAuth = (newUser: any, newToken: string) => {
+  // Update authentication state and persist to local storage
+  const setAuth = (newUser: User, newToken: string) => {
     setUser(newUser);
     setAccessToken(newToken);
     localStorage.setItem('accessToken', newToken);
     localStorage.setItem('user', JSON.stringify(newUser));
   };
 
-  // Hàm đăng xuất
+  // Clear authentication state and local storage
   const clearAuth = () => {
     setUser(null);
     setAccessToken(null);
@@ -48,18 +53,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
+    // Provide the combined state and actions to the rest of the app
     <AuthContext.Provider value={{ user, accessToken, setAuth, clearAuth }}>
       {children}
     </AuthContext.Provider>
   );
-}
-
-// 3. Custom Hook (Vanilla React) để chui vào các Component con lấy data
-export function useAuth() {
-  const context = useContext(AuthContext);
-  // Nếu gọi useAuth ở bên ngoài thẻ <AuthProvider>, React sẽ chửi thẳng mặt
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider root Component');
-  }
-  return context;
 }

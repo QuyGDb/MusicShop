@@ -1,39 +1,56 @@
-import axios from 'axios';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1';
 
-const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1',
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
-
-// Request interceptor for API calls
-api.interceptors.request.use(
-  (config) => {
-    // We store the token separately for easy access by the interceptor
-    const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
+/**
+ * A lightweight wrapper around the native fetch API to mimic Axios-like behavior
+ * such as baseURL, header injection, and default JSON handling.
+ */
+async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<{ data: T }> {
+  const url = `${BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
+  
+  // Get token from localStorage (Vite/Client-side only)
+  const token = typeof window !== 'undefined' ? localStorage.getItem('accessToken') : null;
+  
+  const headers = new Headers(options.headers || {});
+  headers.set('Content-Type', 'application/json');
+  
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
   }
-);
 
-// Response interceptor for API calls
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
-    // Handle unauthorized errors, e.g., token expiration
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-      // Implement refresh token logic here if needed
+  const config: RequestInit = {
+    ...options,
+    headers,
+    credentials: 'include',
+  };
+
+  try {
+    const response = await fetch(url, config);
+    
+    // Parse JSON safely
+    const data = await response.json().catch(() => null);
+
+    if (!response.ok) {
+        // Mocking Axios error behavior for consistent handle in services
+        const error: any = new Error(data?.message || 'API Request failed');
+        error.response = { data, status: response.status };
+        throw error;
     }
-    return Promise.reject(error);
+
+    return { data };
+  } catch (error) {
+    throw error;
   }
-);
+}
+
+const api = {
+  get: <T>(url: string, options?: RequestInit) => apiRequest<T>(url, { ...options, method: 'GET' }),
+  post: <T>(url: string, body: any, options?: RequestInit) => 
+    apiRequest<T>(url, { ...options, method: 'POST', body: JSON.stringify(body) }),
+  put: <T>(url: string, body: any, options?: RequestInit) => 
+    apiRequest<T>(url, { ...options, method: 'PUT', body: JSON.stringify(body) }),
+  patch: <T>(url: string, body: any, options?: RequestInit) => 
+    apiRequest<T>(url, { ...options, method: 'PATCH', body: JSON.stringify(body) }),
+  delete: <T>(url: string, options?: RequestInit) => apiRequest<T>(url, { ...options, method: 'DELETE' }),
+};
 
 export default api;
