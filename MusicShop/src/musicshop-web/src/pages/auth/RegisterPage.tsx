@@ -1,5 +1,5 @@
 import React from 'react';
-import { RegisterForm } from '@/components/auth/RegisterForm';
+import { RegisterForm } from '@/features/auth';
 
 export default function RegisterPage() {
   return (
@@ -8,3 +8,4 @@ export default function RegisterPage() {
     </div>
   );
 }
+

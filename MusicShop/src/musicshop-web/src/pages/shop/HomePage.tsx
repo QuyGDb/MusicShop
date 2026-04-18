@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
-import { buttonVariants } from '@/components/ui/button';
+import { useAuth } from '@/shared/hooks/useAuth';
+import { buttonVariants } from '@/shared/components';
 import { ShoppingBag } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn } from '@/shared/lib/utils';
 
 export default function HomePage() {
   const { user, accessToken } = useAuth();
@@ -53,3 +53,6 @@ export default function HomePage() {
     </main>
   );
 }
+
+
+

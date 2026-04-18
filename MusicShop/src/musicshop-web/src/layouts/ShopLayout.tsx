@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
-import { Navbar } from '@/components/features/Navbar';
+import { Navbar } from '@/widgets/navbar/ui/Navbar';
 
 export const ShopLayout: React.FC = () => {
   return (
@@ -24,3 +24,4 @@ export const ShopLayout: React.FC = () => {
     </div>
   );
 };
+
