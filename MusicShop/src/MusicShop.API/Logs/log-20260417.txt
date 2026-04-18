@@ -1,0 +1,402 @@
+2026-04-17 21:12:05.297 +07:00 [INF] Checking database for seeding...
+2026-04-17 21:12:10.805 +07:00 [ERR] An error occurred during database initialization/seeding.
+System.InvalidOperationException: An exception has been raised that is likely due to a transient failure.
+ ---> Npgsql.NpgsqlException (0x80004005): Failed to connect to 127.0.0.1:5432
+ ---> System.Net.Sockets.SocketException (10061): No connection could be made because the target machine actively refused it.
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.ThrowException(SocketError error, CancellationToken cancellationToken)
+   at System.Net.Sockets.Socket.AwaitableSocketAsyncEventArgs.System.Threading.Tasks.Sources.IValueTaskSource.GetResult(Int16 token)
+   at Npgsql.Internal.NpgsqlConnector.ConnectAsync(NpgsqlTimeout timeout, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.ConnectAsync(NpgsqlTimeout timeout, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.RawOpen(NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.<Open>g__OpenCore|209_0(NpgsqlConnector conn, String username, SslMode sslMode, GssEncryptionMode gssEncMode, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.Internal.NpgsqlConnector.Open(NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.PoolingDataSource.OpenNewConnector(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.PoolingDataSource.<Get>g__RentAsync|33_0(NpgsqlConnection conn, NpgsqlTimeout timeout, Boolean async, CancellationToken cancellationToken)
+   at Npgsql.NpgsqlConnection.<Open>g__OpenAsync|42_0(Boolean async, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenInternalAsync(Boolean errorsExpected, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalConnection.OpenAsync(CancellationToken cancellationToken, Boolean errorsExpected)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlDatabaseCreator.<>c__DisplayClass18_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlDatabaseCreator.<>c__DisplayClass18_0.<<ExistsAsync>b__0>d.MoveNext()
+--- End of stack trace from previous location ---
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   --- End of inner exception stack trace ---
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.ExecuteAsync[TState,TResult](TState state, Func`4 operation, Func`4 verifySucceeded, CancellationToken cancellationToken)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalDatabaseCreator.EnsureCreatedAsync(CancellationToken cancellationToken)
+   at MusicShop.Infrastructure.Persistence.DbInitializer.SeedAsync(AppDbContext context) in D:\Pine tree\MusicShop\src\MusicShop.Infrastructure\Persistence\DbInitializer.cs:line 21
+   at Program.<Main>$(String[] args) in D:\Pine tree\MusicShop\src\MusicShop.API\Program.cs:line 114
+2026-04-17 21:12:10.868 +07:00 [INF] User profile is available. Using 'C:\Users\usopp\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-04-17 21:12:10.979 +07:00 [INF] Now listening on: http://localhost:5000
+2026-04-17 21:12:10.980 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-04-17 21:12:10.981 +07:00 [INF] Hosting environment: Development
+2026-04-17 21:12:10.982 +07:00 [INF] Content root path: D:\Pine tree\MusicShop\src\MusicShop.API
+2026-04-17 21:13:41.333 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - null null
+2026-04-17 21:13:41.333 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - null null
+2026-04-17 21:13:41.405 +07:00 [WRN] Failed to determine the https port for redirect.
+2026-04-17 21:13:41.408 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:13:41.408 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:13:41.419 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - 204 null null 88.9474ms
+2026-04-17 21:13:41.419 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - 204 null null 88.9457ms
+2026-04-17 21:13:41.422 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - application/json null
+2026-04-17 21:13:41.435 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:13:42.745 +07:00 [INF] Failed to validate the token.
+Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '4/16/2026 11:29:34 AM', Current time (UTC): '4/17/2026 2:13:42 PM'.
+   at Microsoft.IdentityModel.Tokens.ValidatorUtilities.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.Tokens.Validators.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateTokenPayloadAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateJWSAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+2026-04-17 21:13:42.751 +07:00 [INF] Bearer was not authenticated. Failure message: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '4/16/2026 11:29:34 AM', Current time (UTC): '4/17/2026 2:13:42 PM'.
+2026-04-17 21:13:42.755 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 21:13:42.788 +07:00 [INF] Route matched with {action = "GetProducts", controller = "Products"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[System.Collections.Generic.IReadOnlyList`1[MusicShop.Application.DTOs.Shop.ProductListItemDto]]]] GetProducts(MusicShop.Application.UseCases.Shop.Products.Queries.GetProducts.GetProductsQuery, System.Threading.CancellationToken) on controller MusicShop.API.Controllers.ProductsController (MusicShop.API).
+2026-04-17 21:13:42.799 +07:00 [WRN] You do not have a valid license key for the Lucky Penny software MediatR. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+2026-04-17 21:13:43.352 +07:00 [INF] Executed DbCommand (25ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Products" AS p
+WHERE p."IsActive"
+2026-04-17 21:13:43.571 +07:00 [INF] Executed DbCommand (18ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT p0."Id", p0."CoverUrl", p0."CreatedAt", p0."Description", p0."Format", p0."IsActive", p0."IsLimited", p0."IsPreorder", p0."LimitedQty", p0."Name", p0."PreorderReleaseDate", p0."ReleaseVersionId", p0."Slug", p0."UpdatedAt", r."Id", r0."Id", a."Id", p1."Id", p1."CreatedAt", p1."IsAvailable", p1."IsSigned", p1."Price", p1."ProductId", p1."StockQty", p1."UpdatedAt", p1."VariantName", r."CatalogNumber", r."CreatedAt", r."Format", r."LabelId", r."Notes", r."PressingCountry", r."PressingYear", r."ReleaseId", r."UpdatedAt", r0."ArtistId", r0."CoverUrl", r0."CreatedAt", r0."Description", r0."Slug", r0."Title", r0."Type", r0."UpdatedAt", r0."Year", a."Bio", a."Country", a."CreatedAt", a."ImageUrl", a."Name", a."Slug", a."UpdatedAt"
+FROM (
+    SELECT p."Id", p."CoverUrl", p."CreatedAt", p."Description", p."Format", p."IsActive", p."IsLimited", p."IsPreorder", p."LimitedQty", p."Name", p."PreorderReleaseDate", p."ReleaseVersionId", p."Slug", p."UpdatedAt"
+    FROM "Products" AS p
+    WHERE p."IsActive"
+    ORDER BY p."CreatedAt" DESC
+    LIMIT @p1 OFFSET @p
+) AS p0
+LEFT JOIN "ReleaseVersions" AS r ON p0."ReleaseVersionId" = r."Id"
+LEFT JOIN "Releases" AS r0 ON r."ReleaseId" = r0."Id"
+LEFT JOIN "Artists" AS a ON r0."ArtistId" = a."Id"
+LEFT JOIN "ProductVariants" AS p1 ON p0."Id" = p1."ProductId"
+ORDER BY p0."CreatedAt" DESC, p0."Id", r."Id", r0."Id", a."Id"
+2026-04-17 21:13:43.608 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[System.Collections.Generic.IReadOnlyList`1[[MusicShop.Application.DTOs.Shop.ProductListItemDto, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-04-17 21:13:43.649 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - application/json null
+2026-04-17 21:13:43.651 +07:00 [INF] Executed action MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API) in 857.4189ms
+2026-04-17 21:13:43.652 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:13:43.653 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 21:13:43.654 +07:00 [INF] Failed to validate the token.
+Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '4/16/2026 11:29:34 AM', Current time (UTC): '4/17/2026 2:13:43 PM'.
+   at Microsoft.IdentityModel.Tokens.ValidatorUtilities.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.Tokens.Validators.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateTokenPayloadAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateJWSAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+2026-04-17 21:13:43.656 +07:00 [INF] Bearer was not authenticated. Failure message: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '4/16/2026 11:29:34 AM', Current time (UTC): '4/17/2026 2:13:43 PM'.
+2026-04-17 21:13:43.657 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 21:13:43.659 +07:00 [INF] Route matched with {action = "GetProducts", controller = "Products"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[System.Collections.Generic.IReadOnlyList`1[MusicShop.Application.DTOs.Shop.ProductListItemDto]]]] GetProducts(MusicShop.Application.UseCases.Shop.Products.Queries.GetProducts.GetProductsQuery, System.Threading.CancellationToken) on controller MusicShop.API.Controllers.ProductsController (MusicShop.API).
+2026-04-17 21:13:43.660 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - 200 null application/json; charset=utf-8 2237.1167ms
+2026-04-17 21:13:43.735 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Products" AS p
+WHERE p."IsActive"
+2026-04-17 21:13:43.741 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT p0."Id", p0."CoverUrl", p0."CreatedAt", p0."Description", p0."Format", p0."IsActive", p0."IsLimited", p0."IsPreorder", p0."LimitedQty", p0."Name", p0."PreorderReleaseDate", p0."ReleaseVersionId", p0."Slug", p0."UpdatedAt", r."Id", r0."Id", a."Id", p1."Id", p1."CreatedAt", p1."IsAvailable", p1."IsSigned", p1."Price", p1."ProductId", p1."StockQty", p1."UpdatedAt", p1."VariantName", r."CatalogNumber", r."CreatedAt", r."Format", r."LabelId", r."Notes", r."PressingCountry", r."PressingYear", r."ReleaseId", r."UpdatedAt", r0."ArtistId", r0."CoverUrl", r0."CreatedAt", r0."Description", r0."Slug", r0."Title", r0."Type", r0."UpdatedAt", r0."Year", a."Bio", a."Country", a."CreatedAt", a."ImageUrl", a."Name", a."Slug", a."UpdatedAt"
+FROM (
+    SELECT p."Id", p."CoverUrl", p."CreatedAt", p."Description", p."Format", p."IsActive", p."IsLimited", p."IsPreorder", p."LimitedQty", p."Name", p."PreorderReleaseDate", p."ReleaseVersionId", p."Slug", p."UpdatedAt"
+    FROM "Products" AS p
+    WHERE p."IsActive"
+    ORDER BY p."CreatedAt" DESC
+    LIMIT @p1 OFFSET @p
+) AS p0
+LEFT JOIN "ReleaseVersions" AS r ON p0."ReleaseVersionId" = r."Id"
+LEFT JOIN "Releases" AS r0 ON r."ReleaseId" = r0."Id"
+LEFT JOIN "Artists" AS a ON r0."ArtistId" = a."Id"
+LEFT JOIN "ProductVariants" AS p1 ON p0."Id" = p1."ProductId"
+ORDER BY p0."CreatedAt" DESC, p0."Id", r."Id", r0."Id", a."Id"
+2026-04-17 21:13:43.747 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[System.Collections.Generic.IReadOnlyList`1[[MusicShop.Application.DTOs.Shop.ProductListItemDto, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-04-17 21:13:43.749 +07:00 [INF] Executed action MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API) in 88.5671ms
+2026-04-17 21:13:43.750 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 21:13:43.751 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - 200 null application/json; charset=utf-8 101.9751ms
+2026-04-17 21:13:46.452 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - null null
+2026-04-17 21:13:46.455 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - null null
+2026-04-17 21:13:46.458 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:13:46.461 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:13:46.462 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - 204 null null 9.7395ms
+2026-04-17 21:13:46.463 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - 204 null null 8.2308ms
+2026-04-17 21:13:46.466 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - application/json null
+2026-04-17 21:13:46.472 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:13:46.477 +07:00 [INF] Failed to validate the token.
+Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '4/16/2026 11:29:34 AM', Current time (UTC): '4/17/2026 2:13:46 PM'.
+   at Microsoft.IdentityModel.Tokens.ValidatorUtilities.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.Tokens.Validators.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateTokenPayloadAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateJWSAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+2026-04-17 21:13:46.479 +07:00 [INF] Bearer was not authenticated. Failure message: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '4/16/2026 11:29:34 AM', Current time (UTC): '4/17/2026 2:13:46 PM'.
+2026-04-17 21:13:46.480 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 21:13:46.481 +07:00 [INF] Route matched with {action = "GetProducts", controller = "Products"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[System.Collections.Generic.IReadOnlyList`1[MusicShop.Application.DTOs.Shop.ProductListItemDto]]]] GetProducts(MusicShop.Application.UseCases.Shop.Products.Queries.GetProducts.GetProductsQuery, System.Threading.CancellationToken) on controller MusicShop.API.Controllers.ProductsController (MusicShop.API).
+2026-04-17 21:13:46.490 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Products" AS p
+WHERE p."IsActive"
+2026-04-17 21:13:46.495 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT p0."Id", p0."CoverUrl", p0."CreatedAt", p0."Description", p0."Format", p0."IsActive", p0."IsLimited", p0."IsPreorder", p0."LimitedQty", p0."Name", p0."PreorderReleaseDate", p0."ReleaseVersionId", p0."Slug", p0."UpdatedAt", r."Id", r0."Id", a."Id", p1."Id", p1."CreatedAt", p1."IsAvailable", p1."IsSigned", p1."Price", p1."ProductId", p1."StockQty", p1."UpdatedAt", p1."VariantName", r."CatalogNumber", r."CreatedAt", r."Format", r."LabelId", r."Notes", r."PressingCountry", r."PressingYear", r."ReleaseId", r."UpdatedAt", r0."ArtistId", r0."CoverUrl", r0."CreatedAt", r0."Description", r0."Slug", r0."Title", r0."Type", r0."UpdatedAt", r0."Year", a."Bio", a."Country", a."CreatedAt", a."ImageUrl", a."Name", a."Slug", a."UpdatedAt"
+FROM (
+    SELECT p."Id", p."CoverUrl", p."CreatedAt", p."Description", p."Format", p."IsActive", p."IsLimited", p."IsPreorder", p."LimitedQty", p."Name", p."PreorderReleaseDate", p."ReleaseVersionId", p."Slug", p."UpdatedAt"
+    FROM "Products" AS p
+    WHERE p."IsActive"
+    ORDER BY p."CreatedAt" DESC
+    LIMIT @p1 OFFSET @p
+) AS p0
+LEFT JOIN "ReleaseVersions" AS r ON p0."ReleaseVersionId" = r."Id"
+LEFT JOIN "Releases" AS r0 ON r."ReleaseId" = r0."Id"
+LEFT JOIN "Artists" AS a ON r0."ArtistId" = a."Id"
+LEFT JOIN "ProductVariants" AS p1 ON p0."Id" = p1."ProductId"
+ORDER BY p0."CreatedAt" DESC, p0."Id", r."Id", r0."Id", a."Id"
+2026-04-17 21:13:46.501 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[System.Collections.Generic.IReadOnlyList`1[[MusicShop.Application.DTOs.Shop.ProductListItemDto, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-04-17 21:13:46.503 +07:00 [INF] Executed action MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API) in 20.478ms
+2026-04-17 21:13:46.504 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - application/json null
+2026-04-17 21:13:46.504 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 21:13:46.506 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:13:46.508 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - 200 null application/json; charset=utf-8 42.077ms
+2026-04-17 21:13:46.509 +07:00 [INF] Failed to validate the token.
+Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '4/16/2026 11:29:34 AM', Current time (UTC): '4/17/2026 2:13:46 PM'.
+   at Microsoft.IdentityModel.Tokens.ValidatorUtilities.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.Tokens.Validators.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateTokenPayloadAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateJWSAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+2026-04-17 21:13:46.514 +07:00 [INF] Bearer was not authenticated. Failure message: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '4/16/2026 11:29:34 AM', Current time (UTC): '4/17/2026 2:13:46 PM'.
+2026-04-17 21:13:46.516 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 21:13:46.517 +07:00 [INF] Route matched with {action = "GetProducts", controller = "Products"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[System.Collections.Generic.IReadOnlyList`1[MusicShop.Application.DTOs.Shop.ProductListItemDto]]]] GetProducts(MusicShop.Application.UseCases.Shop.Products.Queries.GetProducts.GetProductsQuery, System.Threading.CancellationToken) on controller MusicShop.API.Controllers.ProductsController (MusicShop.API).
+2026-04-17 21:13:46.521 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Products" AS p
+WHERE p."IsActive"
+2026-04-17 21:13:46.526 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT p0."Id", p0."CoverUrl", p0."CreatedAt", p0."Description", p0."Format", p0."IsActive", p0."IsLimited", p0."IsPreorder", p0."LimitedQty", p0."Name", p0."PreorderReleaseDate", p0."ReleaseVersionId", p0."Slug", p0."UpdatedAt", r."Id", r0."Id", a."Id", p1."Id", p1."CreatedAt", p1."IsAvailable", p1."IsSigned", p1."Price", p1."ProductId", p1."StockQty", p1."UpdatedAt", p1."VariantName", r."CatalogNumber", r."CreatedAt", r."Format", r."LabelId", r."Notes", r."PressingCountry", r."PressingYear", r."ReleaseId", r."UpdatedAt", r0."ArtistId", r0."CoverUrl", r0."CreatedAt", r0."Description", r0."Slug", r0."Title", r0."Type", r0."UpdatedAt", r0."Year", a."Bio", a."Country", a."CreatedAt", a."ImageUrl", a."Name", a."Slug", a."UpdatedAt"
+FROM (
+    SELECT p."Id", p."CoverUrl", p."CreatedAt", p."Description", p."Format", p."IsActive", p."IsLimited", p."IsPreorder", p."LimitedQty", p."Name", p."PreorderReleaseDate", p."ReleaseVersionId", p."Slug", p."UpdatedAt"
+    FROM "Products" AS p
+    WHERE p."IsActive"
+    ORDER BY p."CreatedAt" DESC
+    LIMIT @p1 OFFSET @p
+) AS p0
+LEFT JOIN "ReleaseVersions" AS r ON p0."ReleaseVersionId" = r."Id"
+LEFT JOIN "Releases" AS r0 ON r."ReleaseId" = r0."Id"
+LEFT JOIN "Artists" AS a ON r0."ArtistId" = a."Id"
+LEFT JOIN "ProductVariants" AS p1 ON p0."Id" = p1."ProductId"
+ORDER BY p0."CreatedAt" DESC, p0."Id", r."Id", r0."Id", a."Id"
+2026-04-17 21:13:46.534 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[System.Collections.Generic.IReadOnlyList`1[[MusicShop.Application.DTOs.Shop.ProductListItemDto, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-04-17 21:13:46.536 +07:00 [INF] Executed action MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API) in 17.4291ms
+2026-04-17 21:13:46.539 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 21:13:46.540 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - 200 null application/json; charset=utf-8 36.0748ms
+2026-04-17 21:13:54.377 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/auth/login - null null
+2026-04-17 21:13:54.380 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:13:54.381 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/auth/login - 204 null null 3.491ms
+2026-04-17 21:13:54.383 +07:00 [INF] Request starting HTTP/1.1 POST http://localhost:5000/api/v1/auth/login - application/json 61
+2026-04-17 21:13:54.386 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:13:54.387 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.AuthController.Login (MusicShop.API)'
+2026-04-17 21:13:54.394 +07:00 [INF] Route matched with {action = "Login", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[MusicShop.Application.DTOs.Auth.AuthResponse]]] Login(MusicShop.Application.UseCases.Auth.Queries.Login.LoginQuery) on controller MusicShop.API.Controllers.AuthController (MusicShop.API).
+2026-04-17 21:13:54.453 +07:00 [INF] Executed DbCommand (4ms) [Parameters=[@request_Email='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."CreatedAt", u."Email", u."ExternalId", u."FullName", u."IdentityProvider", u."PasswordHash", u."Role", u."UpdatedAt"
+FROM "Users" AS u
+WHERE u."Email" = @request_Email
+LIMIT 1
+2026-04-17 21:13:54.502 +07:00 [INF] Executing ObjectResult, writing value of type 'Microsoft.AspNetCore.Mvc.ProblemDetails'.
+2026-04-17 21:13:54.516 +07:00 [INF] Executed action MusicShop.API.Controllers.AuthController.Login (MusicShop.API) in 120.6133ms
+2026-04-17 21:13:54.517 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.AuthController.Login (MusicShop.API)'
+2026-04-17 21:13:54.518 +07:00 [INF] Request finished HTTP/1.1 POST http://localhost:5000/api/v1/auth/login - 401 null application/problem+json; charset=utf-8 134.7938ms
+2026-04-17 21:13:59.683 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/auth/google-login - null null
+2026-04-17 21:13:59.685 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:13:59.686 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/auth/google-login - 204 null null 3.0744ms
+2026-04-17 21:13:59.687 +07:00 [INF] Request starting HTTP/1.1 POST http://localhost:5000/api/v1/auth/google-login - application/json 1208
+2026-04-17 21:13:59.692 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:13:59.692 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.AuthController.GoogleLogin (MusicShop.API)'
+2026-04-17 21:13:59.700 +07:00 [INF] Route matched with {action = "GoogleLogin", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[MusicShop.Application.DTOs.Auth.AuthResponse]]] GoogleLogin(MusicShop.Application.UseCases.Auth.Commands.GoogleLogin.GoogleLoginCommand) on controller MusicShop.API.Controllers.AuthController (MusicShop.API).
+2026-04-17 21:14:00.321 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[@payload_Email='?', @payload_ExternalId='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."CreatedAt", u."Email", u."ExternalId", u."FullName", u."IdentityProvider", u."PasswordHash", u."Role", u."UpdatedAt"
+FROM "Users" AS u
+WHERE u."Email" = @payload_Email OR (u."IdentityProvider" = 'Google' AND u."ExternalId" = @payload_ExternalId)
+LIMIT 1
+2026-04-17 21:14:00.428 +07:00 [INF] Executed DbCommand (5ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (DbType = DateTime), @p2='?' (DbType = DateTime), @p3='?', @p4='?' (DbType = DateTime), @p5='?', @p6='?' (DbType = DateTime), @p7='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "RefreshTokens" ("Id", "CreatedAt", "ExpiresAt", "ReplacedByTokenHash", "RevokedAt", "TokenHash", "UpdatedAt", "UserId")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7);
+2026-04-17 21:14:00.439 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[MusicShop.Application.DTOs.Auth.AuthResponse, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-04-17 21:14:00.448 +07:00 [INF] Executed action MusicShop.API.Controllers.AuthController.GoogleLogin (MusicShop.API) in 746.2067ms
+2026-04-17 21:14:00.449 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.AuthController.GoogleLogin (MusicShop.API)'
+2026-04-17 21:14:00.450 +07:00 [INF] Request finished HTTP/1.1 POST http://localhost:5000/api/v1/auth/google-login - 200 null application/json; charset=utf-8 762.7593ms
+2026-04-17 21:15:25.437 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - null null
+2026-04-17 21:15:25.437 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - null null
+2026-04-17 21:15:25.439 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:15:25.441 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:15:25.442 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - 204 null null 4.3306ms
+2026-04-17 21:15:25.442 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - 204 null null 4.8646ms
+2026-04-17 21:15:25.445 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - application/json null
+2026-04-17 21:15:25.450 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:15:25.460 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 21:15:25.461 +07:00 [INF] Route matched with {action = "GetProducts", controller = "Products"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[System.Collections.Generic.IReadOnlyList`1[MusicShop.Application.DTOs.Shop.ProductListItemDto]]]] GetProducts(MusicShop.Application.UseCases.Shop.Products.Queries.GetProducts.GetProductsQuery, System.Threading.CancellationToken) on controller MusicShop.API.Controllers.ProductsController (MusicShop.API).
+2026-04-17 21:15:25.468 +07:00 [INF] Executed DbCommand (4ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Products" AS p
+WHERE p."IsActive"
+2026-04-17 21:15:25.474 +07:00 [INF] Executed DbCommand (4ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT p0."Id", p0."CoverUrl", p0."CreatedAt", p0."Description", p0."Format", p0."IsActive", p0."IsLimited", p0."IsPreorder", p0."LimitedQty", p0."Name", p0."PreorderReleaseDate", p0."ReleaseVersionId", p0."Slug", p0."UpdatedAt", r."Id", r0."Id", a."Id", p1."Id", p1."CreatedAt", p1."IsAvailable", p1."IsSigned", p1."Price", p1."ProductId", p1."StockQty", p1."UpdatedAt", p1."VariantName", r."CatalogNumber", r."CreatedAt", r."Format", r."LabelId", r."Notes", r."PressingCountry", r."PressingYear", r."ReleaseId", r."UpdatedAt", r0."ArtistId", r0."CoverUrl", r0."CreatedAt", r0."Description", r0."Slug", r0."Title", r0."Type", r0."UpdatedAt", r0."Year", a."Bio", a."Country", a."CreatedAt", a."ImageUrl", a."Name", a."Slug", a."UpdatedAt"
+FROM (
+    SELECT p."Id", p."CoverUrl", p."CreatedAt", p."Description", p."Format", p."IsActive", p."IsLimited", p."IsPreorder", p."LimitedQty", p."Name", p."PreorderReleaseDate", p."ReleaseVersionId", p."Slug", p."UpdatedAt"
+    FROM "Products" AS p
+    WHERE p."IsActive"
+    ORDER BY p."CreatedAt" DESC
+    LIMIT @p1 OFFSET @p
+) AS p0
+LEFT JOIN "ReleaseVersions" AS r ON p0."ReleaseVersionId" = r."Id"
+LEFT JOIN "Releases" AS r0 ON r."ReleaseId" = r0."Id"
+LEFT JOIN "Artists" AS a ON r0."ArtistId" = a."Id"
+LEFT JOIN "ProductVariants" AS p1 ON p0."Id" = p1."ProductId"
+ORDER BY p0."CreatedAt" DESC, p0."Id", r."Id", r0."Id", a."Id"
+2026-04-17 21:15:25.480 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[System.Collections.Generic.IReadOnlyList`1[[MusicShop.Application.DTOs.Shop.ProductListItemDto, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-04-17 21:15:25.481 +07:00 [INF] Executed action MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API) in 18.5357ms
+2026-04-17 21:15:25.482 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - application/json null
+2026-04-17 21:15:25.482 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 21:15:25.484 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:15:25.485 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - 200 null application/json; charset=utf-8 39.8837ms
+2026-04-17 21:15:25.486 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 21:15:25.488 +07:00 [INF] Route matched with {action = "GetProducts", controller = "Products"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[System.Collections.Generic.IReadOnlyList`1[MusicShop.Application.DTOs.Shop.ProductListItemDto]]]] GetProducts(MusicShop.Application.UseCases.Shop.Products.Queries.GetProducts.GetProductsQuery, System.Threading.CancellationToken) on controller MusicShop.API.Controllers.ProductsController (MusicShop.API).
+2026-04-17 21:15:25.492 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Products" AS p
+WHERE p."IsActive"
+2026-04-17 21:15:25.496 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT p0."Id", p0."CoverUrl", p0."CreatedAt", p0."Description", p0."Format", p0."IsActive", p0."IsLimited", p0."IsPreorder", p0."LimitedQty", p0."Name", p0."PreorderReleaseDate", p0."ReleaseVersionId", p0."Slug", p0."UpdatedAt", r."Id", r0."Id", a."Id", p1."Id", p1."CreatedAt", p1."IsAvailable", p1."IsSigned", p1."Price", p1."ProductId", p1."StockQty", p1."UpdatedAt", p1."VariantName", r."CatalogNumber", r."CreatedAt", r."Format", r."LabelId", r."Notes", r."PressingCountry", r."PressingYear", r."ReleaseId", r."UpdatedAt", r0."ArtistId", r0."CoverUrl", r0."CreatedAt", r0."Description", r0."Slug", r0."Title", r0."Type", r0."UpdatedAt", r0."Year", a."Bio", a."Country", a."CreatedAt", a."ImageUrl", a."Name", a."Slug", a."UpdatedAt"
+FROM (
+    SELECT p."Id", p."CoverUrl", p."CreatedAt", p."Description", p."Format", p."IsActive", p."IsLimited", p."IsPreorder", p."LimitedQty", p."Name", p."PreorderReleaseDate", p."ReleaseVersionId", p."Slug", p."UpdatedAt"
+    FROM "Products" AS p
+    WHERE p."IsActive"
+    ORDER BY p."CreatedAt" DESC
+    LIMIT @p1 OFFSET @p
+) AS p0
+LEFT JOIN "ReleaseVersions" AS r ON p0."ReleaseVersionId" = r."Id"
+LEFT JOIN "Releases" AS r0 ON r."ReleaseId" = r0."Id"
+LEFT JOIN "Artists" AS a ON r0."ArtistId" = a."Id"
+LEFT JOIN "ProductVariants" AS p1 ON p0."Id" = p1."ProductId"
+ORDER BY p0."CreatedAt" DESC, p0."Id", r."Id", r0."Id", a."Id"
+2026-04-17 21:15:25.501 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[System.Collections.Generic.IReadOnlyList`1[[MusicShop.Application.DTOs.Shop.ProductListItemDto, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-04-17 21:15:25.503 +07:00 [INF] Executed action MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API) in 12.7213ms
+2026-04-17 21:15:25.504 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 21:15:25.505 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - 200 null application/json; charset=utf-8 22.7614ms
+2026-04-17 21:16:37.463 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - null null
+2026-04-17 21:16:37.464 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - null null
+2026-04-17 21:16:37.466 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:16:37.468 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:16:37.468 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - 204 null null 4.8913ms
+2026-04-17 21:16:37.469 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - 204 null null 5.3229ms
+2026-04-17 21:16:37.471 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - application/json null
+2026-04-17 21:16:37.476 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:16:37.477 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 21:16:37.478 +07:00 [INF] Route matched with {action = "GetProducts", controller = "Products"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[System.Collections.Generic.IReadOnlyList`1[MusicShop.Application.DTOs.Shop.ProductListItemDto]]]] GetProducts(MusicShop.Application.UseCases.Shop.Products.Queries.GetProducts.GetProductsQuery, System.Threading.CancellationToken) on controller MusicShop.API.Controllers.ProductsController (MusicShop.API).
+2026-04-17 21:16:37.483 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Products" AS p
+WHERE p."IsActive"
+2026-04-17 21:16:37.487 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT p0."Id", p0."CoverUrl", p0."CreatedAt", p0."Description", p0."Format", p0."IsActive", p0."IsLimited", p0."IsPreorder", p0."LimitedQty", p0."Name", p0."PreorderReleaseDate", p0."ReleaseVersionId", p0."Slug", p0."UpdatedAt", r."Id", r0."Id", a."Id", p1."Id", p1."CreatedAt", p1."IsAvailable", p1."IsSigned", p1."Price", p1."ProductId", p1."StockQty", p1."UpdatedAt", p1."VariantName", r."CatalogNumber", r."CreatedAt", r."Format", r."LabelId", r."Notes", r."PressingCountry", r."PressingYear", r."ReleaseId", r."UpdatedAt", r0."ArtistId", r0."CoverUrl", r0."CreatedAt", r0."Description", r0."Slug", r0."Title", r0."Type", r0."UpdatedAt", r0."Year", a."Bio", a."Country", a."CreatedAt", a."ImageUrl", a."Name", a."Slug", a."UpdatedAt"
+FROM (
+    SELECT p."Id", p."CoverUrl", p."CreatedAt", p."Description", p."Format", p."IsActive", p."IsLimited", p."IsPreorder", p."LimitedQty", p."Name", p."PreorderReleaseDate", p."ReleaseVersionId", p."Slug", p."UpdatedAt"
+    FROM "Products" AS p
+    WHERE p."IsActive"
+    ORDER BY p."CreatedAt" DESC
+    LIMIT @p1 OFFSET @p
+) AS p0
+LEFT JOIN "ReleaseVersions" AS r ON p0."ReleaseVersionId" = r."Id"
+LEFT JOIN "Releases" AS r0 ON r."ReleaseId" = r0."Id"
+LEFT JOIN "Artists" AS a ON r0."ArtistId" = a."Id"
+LEFT JOIN "ProductVariants" AS p1 ON p0."Id" = p1."ProductId"
+ORDER BY p0."CreatedAt" DESC, p0."Id", r."Id", r0."Id", a."Id"
+2026-04-17 21:16:37.491 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[System.Collections.Generic.IReadOnlyList`1[[MusicShop.Application.DTOs.Shop.ProductListItemDto, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-04-17 21:16:37.493 +07:00 [INF] Executed action MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API) in 13.1768ms
+2026-04-17 21:16:37.494 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - application/json null
+2026-04-17 21:16:37.494 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 21:16:37.497 +07:00 [INF] CORS policy execution successful.
+2026-04-17 21:16:37.497 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - 200 null application/json; charset=utf-8 26.0741ms
+2026-04-17 21:16:37.498 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 21:16:37.501 +07:00 [INF] Route matched with {action = "GetProducts", controller = "Products"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[System.Collections.Generic.IReadOnlyList`1[MusicShop.Application.DTOs.Shop.ProductListItemDto]]]] GetProducts(MusicShop.Application.UseCases.Shop.Products.Queries.GetProducts.GetProductsQuery, System.Threading.CancellationToken) on controller MusicShop.API.Controllers.ProductsController (MusicShop.API).
+2026-04-17 21:16:37.505 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Products" AS p
+WHERE p."IsActive"
+2026-04-17 21:16:37.509 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT p0."Id", p0."CoverUrl", p0."CreatedAt", p0."Description", p0."Format", p0."IsActive", p0."IsLimited", p0."IsPreorder", p0."LimitedQty", p0."Name", p0."PreorderReleaseDate", p0."ReleaseVersionId", p0."Slug", p0."UpdatedAt", r."Id", r0."Id", a."Id", p1."Id", p1."CreatedAt", p1."IsAvailable", p1."IsSigned", p1."Price", p1."ProductId", p1."StockQty", p1."UpdatedAt", p1."VariantName", r."CatalogNumber", r."CreatedAt", r."Format", r."LabelId", r."Notes", r."PressingCountry", r."PressingYear", r."ReleaseId", r."UpdatedAt", r0."ArtistId", r0."CoverUrl", r0."CreatedAt", r0."Description", r0."Slug", r0."Title", r0."Type", r0."UpdatedAt", r0."Year", a."Bio", a."Country", a."CreatedAt", a."ImageUrl", a."Name", a."Slug", a."UpdatedAt"
+FROM (
+    SELECT p."Id", p."CoverUrl", p."CreatedAt", p."Description", p."Format", p."IsActive", p."IsLimited", p."IsPreorder", p."LimitedQty", p."Name", p."PreorderReleaseDate", p."ReleaseVersionId", p."Slug", p."UpdatedAt"
+    FROM "Products" AS p
+    WHERE p."IsActive"
+    ORDER BY p."CreatedAt" DESC
+    LIMIT @p1 OFFSET @p
+) AS p0
+LEFT JOIN "ReleaseVersions" AS r ON p0."ReleaseVersionId" = r."Id"
+LEFT JOIN "Releases" AS r0 ON r."ReleaseId" = r0."Id"
+LEFT JOIN "Artists" AS a ON r0."ArtistId" = a."Id"
+LEFT JOIN "ProductVariants" AS p1 ON p0."Id" = p1."ProductId"
+ORDER BY p0."CreatedAt" DESC, p0."Id", r."Id", r0."Id", a."Id"
+2026-04-17 21:16:37.514 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[System.Collections.Generic.IReadOnlyList`1[[MusicShop.Application.DTOs.Shop.ProductListItemDto, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-04-17 21:16:37.515 +07:00 [INF] Executed action MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API) in 12.8359ms
+2026-04-17 21:16:37.517 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 21:16:37.518 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - 200 null application/json; charset=utf-8 23.7954ms
+2026-04-17 23:42:50.111 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - null null
+2026-04-17 23:42:50.111 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - null null
+2026-04-17 23:42:50.122 +07:00 [INF] CORS policy execution successful.
+2026-04-17 23:42:50.122 +07:00 [INF] CORS policy execution successful.
+2026-04-17 23:42:50.128 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - 204 null null 17.9899ms
+2026-04-17 23:42:50.129 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Products?page=1&limit=12 - 204 null null 18.5919ms
+2026-04-17 23:42:50.132 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - application/json null
+2026-04-17 23:42:50.142 +07:00 [INF] CORS policy execution successful.
+2026-04-17 23:42:50.154 +07:00 [INF] Failed to validate the token.
+Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '4/17/2026 2:29:00 PM', Current time (UTC): '4/17/2026 4:42:50 PM'.
+   at Microsoft.IdentityModel.Tokens.ValidatorUtilities.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.Tokens.Validators.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateTokenPayloadAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateJWSAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+2026-04-17 23:42:50.165 +07:00 [INF] Bearer was not authenticated. Failure message: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '4/17/2026 2:29:00 PM', Current time (UTC): '4/17/2026 4:42:50 PM'.
+2026-04-17 23:42:50.167 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 23:42:50.173 +07:00 [INF] Route matched with {action = "GetProducts", controller = "Products"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[System.Collections.Generic.IReadOnlyList`1[MusicShop.Application.DTOs.Shop.ProductListItemDto]]]] GetProducts(MusicShop.Application.UseCases.Shop.Products.Queries.GetProducts.GetProductsQuery, System.Threading.CancellationToken) on controller MusicShop.API.Controllers.ProductsController (MusicShop.API).
+2026-04-17 23:42:50.389 +07:00 [INF] Executed DbCommand (30ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Products" AS p
+WHERE p."IsActive"
+2026-04-17 23:42:50.412 +07:00 [INF] Executed DbCommand (17ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT p0."Id", p0."CoverUrl", p0."CreatedAt", p0."Description", p0."Format", p0."IsActive", p0."IsLimited", p0."IsPreorder", p0."LimitedQty", p0."Name", p0."PreorderReleaseDate", p0."ReleaseVersionId", p0."Slug", p0."UpdatedAt", r."Id", r0."Id", a."Id", p1."Id", p1."CreatedAt", p1."IsAvailable", p1."IsSigned", p1."Price", p1."ProductId", p1."StockQty", p1."UpdatedAt", p1."VariantName", r."CatalogNumber", r."CreatedAt", r."Format", r."LabelId", r."Notes", r."PressingCountry", r."PressingYear", r."ReleaseId", r."UpdatedAt", r0."ArtistId", r0."CoverUrl", r0."CreatedAt", r0."Description", r0."Slug", r0."Title", r0."Type", r0."UpdatedAt", r0."Year", a."Bio", a."Country", a."CreatedAt", a."ImageUrl", a."Name", a."Slug", a."UpdatedAt"
+FROM (
+    SELECT p."Id", p."CoverUrl", p."CreatedAt", p."Description", p."Format", p."IsActive", p."IsLimited", p."IsPreorder", p."LimitedQty", p."Name", p."PreorderReleaseDate", p."ReleaseVersionId", p."Slug", p."UpdatedAt"
+    FROM "Products" AS p
+    WHERE p."IsActive"
+    ORDER BY p."CreatedAt" DESC
+    LIMIT @p1 OFFSET @p
+) AS p0
+LEFT JOIN "ReleaseVersions" AS r ON p0."ReleaseVersionId" = r."Id"
+LEFT JOIN "Releases" AS r0 ON r."ReleaseId" = r0."Id"
+LEFT JOIN "Artists" AS a ON r0."ArtistId" = a."Id"
+LEFT JOIN "ProductVariants" AS p1 ON p0."Id" = p1."ProductId"
+ORDER BY p0."CreatedAt" DESC, p0."Id", r."Id", r0."Id", a."Id"
+2026-04-17 23:42:50.423 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[System.Collections.Generic.IReadOnlyList`1[[MusicShop.Application.DTOs.Shop.ProductListItemDto, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-04-17 23:42:50.425 +07:00 [INF] Executed action MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API) in 250.1651ms
+2026-04-17 23:42:50.426 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 23:42:50.427 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - 200 null application/json; charset=utf-8 295.1683ms
+2026-04-17 23:42:50.427 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - application/json null
+2026-04-17 23:42:50.431 +07:00 [INF] CORS policy execution successful.
+2026-04-17 23:42:50.432 +07:00 [INF] Failed to validate the token.
+Microsoft.IdentityModel.Tokens.SecurityTokenExpiredException: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '4/17/2026 2:29:00 PM', Current time (UTC): '4/17/2026 4:42:50 PM'.
+   at Microsoft.IdentityModel.Tokens.ValidatorUtilities.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.Tokens.Validators.ValidateLifetime(Nullable`1 notBefore, Nullable`1 expires, SecurityToken securityToken, TokenValidationParameters validationParameters)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateTokenPayloadAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+   at Microsoft.IdentityModel.JsonWebTokens.JsonWebTokenHandler.ValidateJWSAsync(JsonWebToken jsonWebToken, TokenValidationParameters validationParameters, BaseConfiguration configuration)
+2026-04-17 23:42:50.434 +07:00 [INF] Bearer was not authenticated. Failure message: IDX10223: Lifetime validation failed. The token is expired. ValidTo (UTC): '4/17/2026 2:29:00 PM', Current time (UTC): '4/17/2026 4:42:50 PM'.
+2026-04-17 23:42:50.434 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 23:42:50.435 +07:00 [INF] Route matched with {action = "GetProducts", controller = "Products"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[System.Collections.Generic.IReadOnlyList`1[MusicShop.Application.DTOs.Shop.ProductListItemDto]]]] GetProducts(MusicShop.Application.UseCases.Shop.Products.Queries.GetProducts.GetProductsQuery, System.Threading.CancellationToken) on controller MusicShop.API.Controllers.ProductsController (MusicShop.API).
+2026-04-17 23:42:50.440 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Products" AS p
+WHERE p."IsActive"
+2026-04-17 23:42:50.470 +07:00 [INF] Executed DbCommand (28ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT p0."Id", p0."CoverUrl", p0."CreatedAt", p0."Description", p0."Format", p0."IsActive", p0."IsLimited", p0."IsPreorder", p0."LimitedQty", p0."Name", p0."PreorderReleaseDate", p0."ReleaseVersionId", p0."Slug", p0."UpdatedAt", r."Id", r0."Id", a."Id", p1."Id", p1."CreatedAt", p1."IsAvailable", p1."IsSigned", p1."Price", p1."ProductId", p1."StockQty", p1."UpdatedAt", p1."VariantName", r."CatalogNumber", r."CreatedAt", r."Format", r."LabelId", r."Notes", r."PressingCountry", r."PressingYear", r."ReleaseId", r."UpdatedAt", r0."ArtistId", r0."CoverUrl", r0."CreatedAt", r0."Description", r0."Slug", r0."Title", r0."Type", r0."UpdatedAt", r0."Year", a."Bio", a."Country", a."CreatedAt", a."ImageUrl", a."Name", a."Slug", a."UpdatedAt"
+FROM (
+    SELECT p."Id", p."CoverUrl", p."CreatedAt", p."Description", p."Format", p."IsActive", p."IsLimited", p."IsPreorder", p."LimitedQty", p."Name", p."PreorderReleaseDate", p."ReleaseVersionId", p."Slug", p."UpdatedAt"
+    FROM "Products" AS p
+    WHERE p."IsActive"
+    ORDER BY p."CreatedAt" DESC
+    LIMIT @p1 OFFSET @p
+) AS p0
+LEFT JOIN "ReleaseVersions" AS r ON p0."ReleaseVersionId" = r."Id"
+LEFT JOIN "Releases" AS r0 ON r."ReleaseId" = r0."Id"
+LEFT JOIN "Artists" AS a ON r0."ArtistId" = a."Id"
+LEFT JOIN "ProductVariants" AS p1 ON p0."Id" = p1."ProductId"
+ORDER BY p0."CreatedAt" DESC, p0."Id", r."Id", r0."Id", a."Id"
+2026-04-17 23:42:50.477 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[System.Collections.Generic.IReadOnlyList`1[[MusicShop.Application.DTOs.Shop.ProductListItemDto, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-04-17 23:42:50.480 +07:00 [INF] Executed action MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API) in 42.6148ms
+2026-04-17 23:42:50.482 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.ProductsController.GetProducts (MusicShop.API)'
+2026-04-17 23:42:50.483 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/api/v1/Products?page=1&limit=12 - 200 null application/json; charset=utf-8 55.6355ms
