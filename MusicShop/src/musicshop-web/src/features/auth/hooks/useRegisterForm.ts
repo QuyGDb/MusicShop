@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { authService } from '@/features/auth/services/authService';
 import { useSubmitState } from '@/shared/hooks/useSubmitState';
 import { useAuthRedirect } from '@/shared/hooks/useAuthRedirect';
@@ -32,7 +31,7 @@ export function useRegisterForm() {
     confirmPassword
   );
 
-  const onSubmit = useCallback(async (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setServerError(null);
     
@@ -54,7 +53,7 @@ export function useRegisterForm() {
     } finally {
       setIsSubmitting(false);
     }
-  }, [fullName, email, password, validate, redirectAfterAuth, setIsSubmitting, setServerError]);
+  };
 
   return {
     fullName,

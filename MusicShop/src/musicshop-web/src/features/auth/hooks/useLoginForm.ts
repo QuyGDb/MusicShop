@@ -1,4 +1,3 @@
-import { useCallback } from 'react';
 import { CredentialResponse } from '@react-oauth/google';
 import { useFormFields } from './useFormFields';
 import { useLoginValidation } from './useLoginValidation';
@@ -15,7 +14,7 @@ export function useLoginForm() {
     submitGoogleLogin 
   } = useLoginSubmit();
 
-  const onSubmit = useCallback(async (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setServerError(null);
     
@@ -24,9 +23,9 @@ export function useLoginForm() {
     }
 
     await submitLogin(email, password);
-  }, [email, password, validate, setServerError, submitLogin]);
+  };
 
-  const handleGoogleSuccess = useCallback(async (credentialResponse: CredentialResponse) => {
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     setServerError(null);
     const idToken = credentialResponse.credential;
     
@@ -35,7 +34,7 @@ export function useLoginForm() {
     }
 
     await submitGoogleLogin(idToken);
-  }, [setServerError, submitGoogleLogin]);
+  };
 
   return {
     email,

@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 
 interface RegisterErrors {
   fullName?: string;
@@ -15,7 +15,7 @@ export function useRegisterValidation(
 ) {
   const [errors, setErrors] = useState<RegisterErrors>({});
 
-  const validate = useCallback(() => {
+  const validate = () => {
     const newErrors: RegisterErrors = {};
     
     if (!fullName || fullName.length < 2) {
@@ -36,7 +36,7 @@ export function useRegisterValidation(
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [fullName, email, password, confirmPassword]);
+  };
 
   return { errors, validate };
 }

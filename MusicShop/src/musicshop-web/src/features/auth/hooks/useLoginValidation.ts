@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 
 interface LoginErrors {
   email?: string;
@@ -8,7 +8,7 @@ interface LoginErrors {
 export function useLoginValidation(email: string, password: string) {
   const [errors, setErrors] = useState<LoginErrors>({});
 
-  const validate = useCallback(() => {
+  const validate = () => {
     const newErrors: LoginErrors = {};
     
     if (!email) {
@@ -25,7 +25,7 @@ export function useLoginValidation(email: string, password: string) {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  }, [email, password]);
+  };
 
   return { errors, validate };
 }
