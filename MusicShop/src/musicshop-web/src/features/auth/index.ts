@@ -5,4 +5,6 @@ export * from './hooks/useRegisterForm';
 export * from './hooks/useFormFields';
 export * from './hooks/useLoginValidation';
 export * from './hooks/useLoginSubmit';
+export * from './hooks/useRegisterFields';
+export * from './hooks/useRegisterValidation';
 export * from './services/authService';

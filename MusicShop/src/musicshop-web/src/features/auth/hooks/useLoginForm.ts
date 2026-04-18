@@ -9,25 +9,25 @@ export function useLoginForm() {
   const { errors, validate } = useLoginValidation(email, password);
   const { 
     isSubmitting, 
-    apiError, 
-    setApiError, 
+    serverError, 
+    setServerError, 
     submitLogin, 
     submitGoogleLogin 
   } = useLoginSubmit();
 
   const onSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    setApiError(null);
+    setServerError(null);
     
     if (!validate()) {
       return;
     }
 
     await submitLogin(email, password);
-  }, [email, password, validate, setApiError, submitLogin]);
+  }, [email, password, validate, setServerError, submitLogin]);
 
   const handleGoogleSuccess = useCallback(async (credentialResponse: CredentialResponse) => {
-    setApiError(null);
+    setServerError(null);
     const idToken = credentialResponse.credential;
     
     if (!idToken) {
@@ -35,7 +35,7 @@ export function useLoginForm() {
     }
 
     await submitGoogleLogin(idToken);
-  }, [setApiError, submitGoogleLogin]);
+  }, [setServerError, submitGoogleLogin]);
 
   return {
     email,
@@ -43,10 +43,10 @@ export function useLoginForm() {
     password,
     setPassword,
     isSubmitting,
-    apiError,
+    serverError,
     errors,
     onSubmit,
     handleGoogleSuccess,
-    setApiError
+    setServerError
   };
 }

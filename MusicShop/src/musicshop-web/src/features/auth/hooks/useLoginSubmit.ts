@@ -1,52 +1,50 @@
-import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useCallback } from 'react';
 import { authService } from '@/features/auth/services/authService';
-import { useAuth } from '@/shared/hooks/useAuth';
+import { useSubmitState } from '@/shared/hooks/useSubmitState';
+import { useAuthRedirect } from '@/shared/hooks/useAuthRedirect';
 
 export function useLoginSubmit() {
-  const navigate = useNavigate();
-  const { setAuth } = useAuth();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [apiError, setApiError] = useState<string | null>(null);
+  const { isSubmitting, setIsSubmitting, serverError, setServerError } = useSubmitState();
+  const { redirectAfterAuth } = useAuthRedirect();
 
   const submitLogin = useCallback(async (email: string, password: string) => {
+    setServerError(null);
     setIsSubmitting(true);
     try {
       const result = await authService.login({ email, password });
       if (result.success && result.data) {
-        setAuth(result.data.user, result.data.accessToken);
-        navigate('/');
+        redirectAfterAuth(result.data.user, result.data.accessToken);
       } else {
-        setApiError(result.error?.message || 'Login failed');
+        setServerError(result.error?.message || 'Login failed');
       }
     } catch {
-      setApiError('An unexpected error occurred');
+      setServerError('An unexpected error occurred');
     } finally {
       setIsSubmitting(false);
     }
-  }, [navigate, setAuth]);
+  }, [redirectAfterAuth, setIsSubmitting, setServerError]);
 
   const submitGoogleLogin = useCallback(async (idToken: string) => {
+    setServerError(null);
     setIsSubmitting(true);
     try {
       const result = await authService.googleLogin(idToken);
       if (result.success && result.data) {
-        setAuth(result.data.user, result.data.accessToken);
-        navigate('/');
+        redirectAfterAuth(result.data.user, result.data.accessToken);
       } else {
-        setApiError(result.error?.message || 'Google login failed');
+        setServerError(result.error?.message || 'Google login failed');
       }
     } catch {
-      setApiError('An unexpected error occurred');
+      setServerError('An unexpected error occurred');
     } finally {
       setIsSubmitting(false);
     }
-  }, [navigate, setAuth]);
+  }, [redirectAfterAuth, setIsSubmitting, setServerError]);
 
   return { 
     isSubmitting, 
-    apiError, 
-    setApiError, 
+    serverError, 
+    setServerError, 
     submitLogin, 
     submitGoogleLogin 
   };

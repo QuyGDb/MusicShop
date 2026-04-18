@@ -10,11 +10,11 @@ export function LoginForm() {
     password,
     setPassword,
     isSubmitting,
-    apiError,
+    serverError,
     errors,
     onSubmit,
     handleGoogleSuccess,
-    setApiError
+    setServerError
   } = useLoginForm();
 
   return (
@@ -59,9 +59,9 @@ export function LoginForm() {
               <p className="text-sm text-red-500">{errors.password}</p>
             )}
           </div>
-          {apiError && (
+          {serverError && (
             <div className="p-3 text-sm bg-red-900/20 border border-red-900/50 text-red-400 rounded-md">
-              {apiError}
+              {serverError}
             </div>
           )}
           <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white" disabled={isSubmitting}>
@@ -82,7 +82,7 @@ export function LoginForm() {
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={() => {
-              setApiError('Google login was unsuccessful');
+              setServerError('Google login was unsuccessful');
             }}
             theme="filled_black"
             shape="pill"
@@ -101,6 +101,3 @@ export function LoginForm() {
     </Card>
   );
 }
-
-
-
