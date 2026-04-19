@@ -60,10 +60,10 @@ export function useRegisterForm() {
     try {
       const result = await authService.register({ email, password, fullName });
 
-      if (result.success && result.data) {
+      if (result.success) {
         redirectAfterAuth(result.data.user, result.data.accessToken);
       } else {
-        setServerError(result.error?.message || 'Registration failed');
+        setServerError(result.error.message || 'Registration failed');
       }
     } catch {
        setServerError('Network error or server unavailable.');

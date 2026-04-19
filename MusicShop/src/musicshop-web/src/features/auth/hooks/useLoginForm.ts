@@ -13,13 +13,13 @@ export function useLoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<LoginErrors>({});
-  
+
   const { isSubmitting, setIsSubmitting, serverError, setServerError } = useSubmitState();
   const { redirectAfterAuth } = useAuthRedirect();
 
   const validate = () => {
     const newErrors: LoginErrors = {};
-    
+
     if (!email) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(email)) {
@@ -39,7 +39,7 @@ export function useLoginForm() {
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setServerError(null);
-    
+
     if (!validate()) {
       return;
     }
@@ -47,10 +47,10 @@ export function useLoginForm() {
     setIsSubmitting(true);
     try {
       const result = await authService.login({ email, password });
-      if (result.success && result.data) {
+      if (result.success) {
         redirectAfterAuth(result.data.user, result.data.accessToken);
       } else {
-        setServerError(result.error?.message || 'Login failed');
+        setServerError(result.error.message || 'Login failed');
       }
     } catch {
       setServerError('An unexpected error occurred');
@@ -62,7 +62,7 @@ export function useLoginForm() {
   const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     setServerError(null);
     const idToken = credentialResponse.credential;
-    
+
     if (!idToken) {
       return;
     }
@@ -70,10 +70,10 @@ export function useLoginForm() {
     setIsSubmitting(true);
     try {
       const result = await authService.googleLogin(idToken);
-      if (result.success && result.data) {
+      if (result.success) {
         redirectAfterAuth(result.data.user, result.data.accessToken);
       } else {
-        setServerError(result.error?.message || 'Google login failed');
+        setServerError(result.error.message || 'Google login failed');
       }
     } catch {
       setServerError('An unexpected error occurred');

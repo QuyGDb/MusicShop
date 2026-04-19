@@ -20,28 +20,38 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
  */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(() => {
-    return localStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken');
+    return (token === 'undefined' || token === 'null') ? null : token;
   });
 
   const [user, setUser] = useState<User | null>(() => {
     const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        return JSON.parse(storedUser);
-      } catch (error) {
-        console.error('Failed to parse user from local storage:', error);
-        localStorage.removeItem('user');
-      }
+    
+    // Check for invalid or empty values before parsing
+    if (!storedUser || storedUser === 'undefined' || storedUser === 'null') {
+      return null;
     }
-    return null;
+
+    try {
+      return JSON.parse(storedUser);
+    } catch (error) {
+      console.error('Failed to parse user from local storage:', error);
+      localStorage.removeItem('user');
+      return null;
+    }
   });
 
   // Update authentication state and persist to local storage
   const setAuth = (newUser: User, newToken: string) => {
-    setUser(newUser);
-    setAccessToken(newToken);
-    localStorage.setItem('accessToken', newToken);
-    localStorage.setItem('user', JSON.stringify(newUser));
+    // Only persist if we have valid data
+    if (newUser && newToken) {
+      setUser(newUser);
+      setAccessToken(newToken);
+      localStorage.setItem('accessToken', newToken);
+      localStorage.setItem('user', JSON.stringify(newUser));
+    } else {
+      console.warn('setAuth called with invalid data:', { newUser, newToken });
+    }
   };
 
   // Clear authentication state and local storage
