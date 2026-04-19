@@ -84,7 +84,6 @@ public class AuthController(IMediator mediator) : BaseApiController
         return HandleResult(result);
     }
 
-    [Authorize]
     [HttpPost("logout")]
     public async Task<ActionResult<ApiResponse<Unit>>> Logout()
     {

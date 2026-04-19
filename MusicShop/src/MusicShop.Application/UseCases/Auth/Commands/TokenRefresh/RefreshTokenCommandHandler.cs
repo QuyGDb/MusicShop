@@ -5,33 +5,22 @@ using MusicShop.Domain.Entities.System;
 using MusicShop.Domain.Common;
 using MusicShop.Domain.Errors;
 using MusicShop.Domain.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace MusicShop.Application.UseCases.Auth.Commands.TokenRefresh;
 
-public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, Result<AuthResponse>>
+public class RefreshTokenCommandHandler(
+    IRepository<User> userRepository,
+    IRepository<RefreshToken> refreshTokenRepository,
+    IRefreshTokenHasher refreshTokenHasher,
+    ITokenService tokenService,
+    IUnitOfWork unitOfWork,
+    ILogger<RefreshTokenCommandHandler> logger) : IRequestHandler<RefreshTokenCommand, Result<AuthResponse>>
 {
-    private readonly IRepository<User> _userRepository;
-    private readonly IRepository<RefreshToken> _refreshTokenRepository;
-    private readonly IRefreshTokenHasher _refreshTokenHasher;
-    private readonly ITokenService _tokenService;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public RefreshTokenCommandHandler(
-        IRepository<User> userRepository,
-        IRepository<RefreshToken> refreshTokenRepository,
-        IRefreshTokenHasher refreshTokenHasher,
-        ITokenService tokenService,
-        IUnitOfWork unitOfWork)
-    {
-        _userRepository = userRepository;
-        _refreshTokenRepository = refreshTokenRepository;
-        _refreshTokenHasher = refreshTokenHasher;
-        _tokenService = tokenService;
-        _unitOfWork = unitOfWork;
-    }
-
     public async Task<Result<AuthResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
+        logger.LogInformation("Refreshing tokens for request: {RefreshToken}", request.RefreshToken?[..Math.Min(request.RefreshToken.Length, 10)] + "...");
+
         // Basic input validation
         if (string.IsNullOrWhiteSpace(request.RefreshToken))
         {
@@ -40,10 +29,10 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
 
         // 1. Hash the incoming Refresh Token for comparison
         // We store only hashes in the DB for security, so we must hash the input to match
-        string currentRefreshTokenHash = _refreshTokenHasher.Hash(request.RefreshToken);
+        string currentRefreshTokenHash = refreshTokenHasher.Hash(request.RefreshToken);
 
         // 2. Look up the token record in the database
-        RefreshToken? existingRefreshToken = await _refreshTokenRepository
+        RefreshToken? existingRefreshToken = await refreshTokenRepository
             .FirstOrDefaultAsync(x => x.TokenHash == currentRefreshTokenHash, cancellationToken);
 
         // If no token is found => invalid or untracked token
@@ -66,25 +55,25 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
         }
 
         // 5. Retrieve the user to issue new tokens
-        User? user = await _userRepository.GetByIdAsync(existingRefreshToken.UserId, cancellationToken);
+        User? user = await userRepository.GetByIdAsync(existingRefreshToken.UserId, cancellationToken);
         if (user == null)
         {
             return Result<AuthResponse>.Failure(AuthErrors.UserNotFound);
         }
 
         // 6. Generate a new set of Access and Refresh tokens
-        (string accessToken, DateTime accessTokenExpiresAtUtc) = _tokenService.GenerateAccessToken(user);
-        (string newRefreshToken, DateTime newRefreshTokenExpiresAtUtc) = _tokenService.GenerateRefreshToken();
-        string newRefreshTokenHash = _refreshTokenHasher.Hash(newRefreshToken);
+        (string accessToken, DateTime accessTokenExpiresAtUtc) = tokenService.GenerateAccessToken(user);
+        (string newRefreshToken, DateTime newRefreshTokenExpiresAtUtc) = tokenService.GenerateRefreshToken();
+        string newRefreshTokenHash = refreshTokenHasher.Hash(newRefreshToken);
 
         // 7. Perform Refresh Token Rotation
         existingRefreshToken.ReplacedByTokenHash = newRefreshTokenHash;
         existingRefreshToken.RevokedAt = DateTime.UtcNow;
         existingRefreshToken.UpdatedAt = DateTime.UtcNow;
-        _refreshTokenRepository.Update(existingRefreshToken);
+        refreshTokenRepository.Update(existingRefreshToken);
 
         // 8. Save the new Refresh Token record
-        _refreshTokenRepository.Add(new RefreshToken
+        refreshTokenRepository.Add(new RefreshToken
         {
             UserId = user.Id,
             TokenHash = newRefreshTokenHash,
@@ -92,7 +81,7 @@ public class RefreshTokenCommandHandler : IRequestHandler<RefreshTokenCommand, R
         });
 
         // 9. Persist all changes in a single atomic transaction
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         // Return the fresh auth credentials to the client
         return Result<AuthResponse>.Success(user.ToAuthResponse(accessToken, newRefreshToken, accessTokenExpiresAtUtc));

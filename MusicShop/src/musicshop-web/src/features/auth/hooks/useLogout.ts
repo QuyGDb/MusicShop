@@ -7,17 +7,19 @@ export function useLogout() {
   const navigate = useNavigate();
 
   const logout = async () => {
-    // Retrieve the refresh token from storage before clearing auth state
-    const storedRefreshToken = localStorage.getItem('refreshToken') ?? '';
+    // 1. Best-effort server-side invalidation
+    // We do this BEFORE clearing local state so the HttpClient can still access the token
+    if (accessToken) {
+      try {
+        await authService.logout();
+      } catch (error) {
+        console.error('Server-side logout failed:', error);
+      }
+    }
 
-    // Optimistically clear client-side auth state immediately
+    // 2. Clear client-side auth state and navigate
     clearAuth();
     navigate('/');
-
-    // Best-effort server-side invalidation — does not block UI
-    if (accessToken) {
-      await authService.logout();
-    }
   };
 
   return { logout };
