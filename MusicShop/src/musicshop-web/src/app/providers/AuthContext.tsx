@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '@/features/auth/types';
+import { authService } from '@/features/auth/services/authService';
 
 /**
  * Defines the shape of the authentication context.
@@ -8,6 +9,7 @@ import { User } from '@/features/auth/types';
 interface AuthContextType {
   user: User | null;
   accessToken: string | null;
+  isLoading: boolean;
   setAuth: (user: User, token: string) => void;
   clearAuth: () => void;
 }
@@ -19,6 +21,7 @@ export const AuthContext = createContext<AuthContextType | undefined>(undefined)
  * Provider component that wraps the application and supplies auth state.
  */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [isLoading, setIsLoading] = useState(true);
   const [accessToken, setAccessToken] = useState<string | null>(() => {
     const token = localStorage.getItem('accessToken');
     return (token === 'undefined' || token === 'null') ? null : token;
@@ -40,6 +43,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return null;
     }
   });
+
+  // Verify session on startup
+  useEffect(() => {
+    const initAuth = async () => {
+      if (!accessToken) {
+        setIsLoading(false);
+        return;
+      }
+
+      try {
+        const result = await authService.getMe();
+        if (result.success) {
+          setUser(result.data);
+          // If we have a user but no stored user data, sync it
+          localStorage.setItem('user', JSON.stringify(result.data));
+        } else if (result.error.status === 401) {
+          // Token expired and refresh failed (handled by HttpClient silently if possible)
+          // If we still get 401 here, it means even refresh failed
+          clearAuth();
+        }
+      } catch (error) {
+        console.error('Session verification failed:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initAuth();
+  }, [accessToken]);
 
   // Update authentication state and persist to local storage
   const setAuth = (newUser: User, newToken: string) => {
@@ -64,7 +96,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     // Provide the combined state and actions to the rest of the app
-    <AuthContext.Provider value={{ user, accessToken, setAuth, clearAuth }}>
+    <AuthContext.Provider value={{ user, accessToken, isLoading, setAuth, clearAuth }}>
       {children}
     </AuthContext.Provider>
   );

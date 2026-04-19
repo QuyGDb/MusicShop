@@ -52,9 +52,9 @@ export const authService = {
   /**
    * POST /auth/refresh — Refreshes the access token using the refresh token
    */
-  refreshToken: async (refreshToken: string): Promise<AuthResult> => {
+  refreshToken: async (): Promise<AuthResult> => {
     try {
-      const data = await http.post<AuthResponse>('/auth/refresh', { refreshToken });
+      const data = await http.post<AuthResponse>('/auth/refresh');
       return { success: true, data };
     } catch (error) {
       return handleHttpError(error);
@@ -76,9 +76,9 @@ export const authService = {
   /**
    * POST /auth/logout — Invalidates the refresh token on the server
    */
-  logout: async (refreshToken: string): Promise<SimpleResult> => {
+  logout: async (): Promise<SimpleResult> => {
     try {
-      await http.post('/auth/logout', { refreshToken });
+      await http.post('/auth/logout');
       return { success: true };
     } catch (error) {
       return handleHttpError(error);

@@ -95,6 +95,13 @@ app.UseHttpsRedirection();
 // Enable CORS
 app.UseCors("FrontendPolicy");
 
+// HTTP Security Headers
+app.Use(async (context, next) =>
+{
+    context.Response.Headers.Append("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
+    await next();
+});
+
 // Use Authentication & Authorization
 app.UseAuthentication();
 app.UseAuthorization();

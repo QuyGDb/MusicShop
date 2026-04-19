@@ -62,9 +62,11 @@ public class AuthController(IMediator mediator) : BaseApiController
     [HttpPost("refresh")]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public async Task<ActionResult<ApiResponse<AuthResponse>>> RefreshToken([FromBody] RefreshTokenCommand command)
+    public async Task<ActionResult<ApiResponse<AuthResponse>>> RefreshToken()
     {
-        Result<AuthResponse> result = await mediator.Send(command);
+        string refreshToken = Request.Cookies["refreshToken"] ?? string.Empty;
+        
+        Result<AuthResponse> result = await mediator.Send(new RefreshTokenCommand(refreshToken));
         
         if (result.IsSuccess)
         {
@@ -84,9 +86,17 @@ public class AuthController(IMediator mediator) : BaseApiController
 
     [Authorize]
     [HttpPost("logout")]
-    public async Task<ActionResult<ApiResponse<Unit>>> Logout([FromBody] LogoutCommand command)
+    public async Task<ActionResult<ApiResponse<Unit>>> Logout()
     {
-        Result<Unit> result = await mediator.Send(command);
+        string refreshToken = Request.Cookies["refreshToken"] ?? string.Empty;
+        
+        Result<Unit> result = await mediator.Send(new LogoutCommand(refreshToken));
+        
+        if (result.IsSuccess)
+        {
+            Response.Cookies.Delete("refreshToken");
+        }
+        
         return HandleResult(result);
     }
 

@@ -6,9 +6,22 @@ export interface HttpOptions extends RequestInit {
 
 class HttpClient {
   private baseURL: string;
+  private isRefreshing = false;
+  private refreshSubscribers: ((token: string) => void)[] = [];
 
   constructor(baseURL: string) {
     this.baseURL = baseURL;
+  }
+
+  // Subscribe to token refresh
+  private onTokenRefreshed(token: string) {
+    this.refreshSubscribers.forEach((callback) => callback(token));
+    this.refreshSubscribers = [];
+  }
+
+  // Subscribe a request to retry after refresh
+  private addRefreshSubscriber(callback: (token: string) => void) {
+    this.refreshSubscribers.push(callback);
   }
 
   // Build URL with query parameters
@@ -59,6 +72,59 @@ class HttpClient {
     };
 
     const response = await fetch(url, config);
+
+    // 1. Handle 401 Unauthorized (Expired Token)
+    if (response.status === 401 && !endpoint.includes('/auth/login') && !endpoint.includes('/auth/refresh')) {
+      if (!this.isRefreshing) {
+        this.isRefreshing = true;
+        
+        // We attempt refresh if we had an accessToken (session exists)
+        // The refreshToken is now strictly in an HttpOnly cookie
+        const hasSession = !!localStorage.getItem('accessToken');
+
+        if (hasSession) {
+          try {
+            // Attempt to refresh token using raw fetch to avoid recursion
+            // Credentials 'include' ensures the HttpOnly cookie is sent
+            const refreshResponse = await fetch(this.buildURL('/auth/refresh'), {
+              method: 'POST',
+            });
+
+            if (refreshResponse.ok) {
+              const data = await refreshResponse.json();
+              const newToken = data.accessToken;
+
+              // Persist new access token and user data
+              localStorage.setItem('accessToken', newToken);
+              if (data.user) {
+                localStorage.setItem('user', JSON.stringify(data.user));
+              }
+
+              this.onTokenRefreshed(newToken);
+              this.isRefreshing = false;
+
+              // Retry the original request
+              return this.request<T>(endpoint, options);
+            }
+          } catch (error) {
+            console.error('Failed to auto-refresh token:', error);
+          }
+        }
+
+        // If refresh fails or no session, perform cleanup
+        this.isRefreshing = false;
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('user');
+        // We don't throw here yet, we let the 401 bubble up as an HttpError below
+      } else {
+        // If already refreshing, wait for it to complete
+        return new Promise<T>((resolve, reject) => {
+          this.addRefreshSubscriber((token: string) => {
+            this.request<T>(endpoint, options).then(resolve).catch(reject);
+          });
+        });
+      }
+    }
 
     // Parse JSON safely
     const data = await response.json().catch(() => null);
