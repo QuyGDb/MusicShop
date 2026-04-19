@@ -26,7 +26,7 @@ export default function App() {
       </Route>
 
       {/* Fallback */}
-      <Route path="*" element={<div className="min-h-screen bg-black text-white flex items-center justify-center">404 - Page Not Found</div>} />
+      <Route path="*" element={<div className="min-h-screen bg-background text-foreground flex items-center justify-center">404 - Page Not Found</div>} />
     </Routes>
   );
 }

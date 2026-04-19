@@ -3,9 +3,24 @@
 @theme {
   --font-sans: "Geist", sans-serif;
   --font-mono: "Geist Mono", monospace;
-  
-  --color-background: #0a0a0a;
-  --color-foreground: #ededed;
+
+  /* ── Backgrounds ── */
+  --color-background: #f5f0eb;   /* Page background — cream */
+  --color-surface: #ffffff;       /* Cards, panels — white */
+  --color-muted: #f0ebe4;         /* Subtle fill — input bg, hover bg */
+
+  /* ── Text ── */
+  --color-foreground: #1c1917;        /* Primary text */
+  --color-muted-foreground: #78716c;  /* Secondary text */
+  --color-subtle: #a8a29e;            /* Placeholder, disabled */
+
+  /* ── Border ── */
+  --color-border: #e7e2dd;
+
+  /* ── Primary (Amber/Gold) ── */
+  --color-primary: #d97706;
+  --color-primary-dark: #b45309;
+  --color-primary-foreground: #ffffff;
 }
 
 @layer base {
