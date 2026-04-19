@@ -2,4 +2,8 @@ export * from './components/LoginForm';
 export * from './components/RegisterForm';
 export * from './hooks/useLoginForm';
 export * from './hooks/useRegisterForm';
+export * from './hooks/useCurrentUser';
+export * from './hooks/useLogout';
+export * from './hooks/useChangePassword';
 export * from './services/authService';
+export * from './types';

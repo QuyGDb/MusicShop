@@ -1,21 +1,16 @@
 import React from 'react';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/shared/hooks/useAuth';
+import { useLogout } from '@/features/auth';
 import { Button, buttonVariants } from '@/shared/components';
-import { Music, LogOut, User as UserIcon, ShoppingBag, Search } from 'lucide-react';
+import { Music, LogOut, User as UserIcon, Search } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
 export function Navbar() {
-  const { user, accessToken, clearAuth } = useAuth();
-  // Simulate isAuthenticated for UI since accessToken dictates auth now
+  const { user, accessToken } = useAuth();
   const isAuthenticated = !!accessToken;
-  const navigate = useNavigate();
   const { pathname } = useLocation();
-
-  const handleLogout = () => {
-    clearAuth();
-    navigate('/');
-  };
+  const { logout } = useLogout();
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -67,7 +62,7 @@ export function Navbar() {
                 <UserIcon className="h-4 w-4" />
                 <span className="hidden sm:inline">{user?.fullName}</span>
               </Link>
-              <Button variant="ghost" size="sm" onClick={handleLogout} className="text-neutral-400 hover:text-white">
+              <Button variant="ghost" size="sm" onClick={logout} className="text-neutral-400 hover:text-white">
                 <LogOut className="h-4 w-4 mr-1" />
                 <span className="hidden sm:inline">Logout</span>
               </Button>
