@@ -1,27 +1,38 @@
 import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { authService } from '../services/authService';
 import { ChangePasswordRequest } from '../types';
-import { useSubmitState } from '@/shared/hooks/useSubmitState';
 
 export function useChangePassword() {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [validationError, setValidationError] = useState<string | null>(null);
 
-  const { isSubmitting, setIsSubmitting, serverError, setServerError } = useSubmitState();
+  const mutation = useMutation({
+    mutationFn: authService.changePassword,
+    onSuccess: () => {
+      setSuccessMessage('Password changed successfully.');
+      setValidationError(null);
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmNewPassword('');
+    },
+  });
 
   const validate = (): boolean => {
+    setValidationError(null);
     if (!currentPassword) {
-      setServerError('Current password is required.');
+      setValidationError('Current password is required.');
       return false;
     }
     if (newPassword.length < 6) {
-      setServerError('New password must be at least 6 characters.');
+      setValidationError('New password must be at least 6 characters.');
       return false;
     }
     if (newPassword !== confirmNewPassword) {
-      setServerError('New passwords do not match.');
+      setValidationError('New passwords do not match.');
       return false;
     }
     return true;
@@ -29,14 +40,11 @@ export function useChangePassword() {
 
   const onSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setServerError(null);
     setSuccessMessage(null);
 
     if (!validate()) {
       return;
     }
-
-    setIsSubmitting(true);
 
     const payload: ChangePasswordRequest = {
       currentPassword,
@@ -44,19 +52,12 @@ export function useChangePassword() {
       confirmNewPassword,
     };
 
-    const result = await authService.changePassword(payload);
-
-    if (result.success) {
-      setSuccessMessage('Password changed successfully.');
-      setCurrentPassword('');
-      setNewPassword('');
-      setConfirmNewPassword('');
-    } else {
-      setServerError(result.error.message);
-    }
-
-    setIsSubmitting(false);
+    mutation.mutate(payload);
   };
+
+  // Combine mutation error and client-side validation error
+  const isSubmitting = mutation.isPending;
+  const serverError = validationError || (mutation.error instanceof Error ? mutation.error.message : null);
 
   return {
     currentPassword,

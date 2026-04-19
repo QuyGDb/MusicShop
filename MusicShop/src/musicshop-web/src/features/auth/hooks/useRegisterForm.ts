@@ -1,6 +1,6 @@
 import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { authService } from '@/features/auth/services/authService';
-import { useSubmitState } from '@/shared/hooks/useSubmitState';
 import { useAuthRedirect } from '@/shared/hooks/useAuthRedirect';
 
 interface RegisterErrors {
@@ -17,13 +17,14 @@ export function useRegisterForm() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState<RegisterErrors>({});
 
-  const { 
-    isSubmitting, 
-    setIsSubmitting, 
-    serverError, 
-    setServerError 
-  } = useSubmitState();
   const { redirectAfterAuth } = useAuthRedirect();
+  
+  const registerMutation = useMutation({
+    mutationFn: authService.register,
+    onSuccess: (data) => {
+      redirectAfterAuth(data.user, data.accessToken);
+    },
+  });
   
   const validate = () => {
     const newErrors: RegisterErrors = {};
@@ -50,27 +51,16 @@ export function useRegisterForm() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setServerError(null);
     
     if (!validate()) {
       return;
     }
     
-    setIsSubmitting(true);
-    try {
-      const result = await authService.register({ email, password, fullName });
-
-      if (result.success) {
-        redirectAfterAuth(result.data.user, result.data.accessToken);
-      } else {
-        setServerError(result.error.message || 'Registration failed');
-      }
-    } catch {
-       setServerError('Network error or server unavailable.');
-    } finally {
-      setIsSubmitting(false);
-    }
+    registerMutation.mutate({ email, password, fullName });
   };
+
+  const isSubmitting = registerMutation.isPending;
+  const serverError = registerMutation.error instanceof Error ? registerMutation.error.message : null;
 
   return {
     fullName,
