@@ -29,3 +29,9 @@ export interface ProductFilters {
   page?: number;
   limit?: number;
 }
+
+export interface Genre {
+  id: string;
+  name: string;
+  slug: string;
+}

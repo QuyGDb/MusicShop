@@ -1,8 +1,7 @@
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 export function useProductFilters() {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   // Current filter values from URL
   const selectedFormat = searchParams.get('format');
@@ -13,7 +12,7 @@ export function useProductFilters() {
   const searchQuery = searchParams.get('q') || '';
 
   const updateFilters = (key: string, value: string | null) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams);
     if (value) {
       params.set(key, value);
     } else {
@@ -21,17 +20,17 @@ export function useProductFilters() {
     }
     // Always reset to page 1 on filter change
     params.set('page', '1');
-    navigate(`/products?${params.toString()}`);
+    setSearchParams(params, { replace: true });
   };
 
   const clearFilters = () => {
-    navigate('/products');
+    setSearchParams({}, { replace: true });
   };
 
   const setPage = (pageNum: number) => {
-    const params = new URLSearchParams(searchParams.toString());
+    const params = new URLSearchParams(searchParams);
     params.set('page', pageNum.toString());
-    navigate(`/products?${params.toString()}`);
+    setSearchParams(params);
   };
 
   return {

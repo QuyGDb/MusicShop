@@ -87,6 +87,7 @@ export function LoginForm() {
             theme="filled_black"
             shape="pill"
             width="384"
+            text="signin_with"
           />
         </div>
       </CardContent>

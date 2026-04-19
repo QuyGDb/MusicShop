@@ -1,8 +1,9 @@
 import React from 'react';
 import { ReleaseFormat } from '../types';
-import { Label, Checkbox, Slider, Button, Badge } from '@/shared/components';
+import { Label, Checkbox, Slider, Button, Badge, Skeleton } from '@/shared/components';
 import { Disc, Music, CassetteTape, Filter, RotateCcw } from 'lucide-react';
 import { useProductFilters } from '../hooks/useProductFilters';
+import { useGenres } from '../hooks/useGenres';
 
 export function FilterBar() {
   const {
@@ -13,6 +14,8 @@ export function FilterBar() {
     updateFilters,
     clearFilters
   } = useProductFilters();
+
+  const { genres, loading: loadingGenres } = useGenres();
 
   return (
     <div className="w-full lg:w-64 space-y-8 bg-neutral-900/50 p-6 rounded-2xl border border-neutral-800 backdrop-blur-sm sticky top-24">
@@ -78,25 +81,31 @@ export function FilterBar() {
         />
       </div>
 
-      {/* Static Genres (Ideally from API) */}
+      {/* Dynamic Genres */}
       <div className="space-y-4">
         <Label className="text-sm font-semibold text-neutral-300">Popular Genres</Label>
         <div className="flex flex-wrap gap-2">
-          {['Rock', 'Jazz', 'Classical', 'Electronic', 'Pop', 'Hip Hop'].map((genre) => (
-            <Badge
-              key={genre}
-              variant={selectedGenre === genre ? 'default' : 'outline'}
-              className={`cursor-pointer px-3 py-1 transition-all ${selectedGenre === genre ? 'bg-blue-600' : 'hover:border-blue-500 hover:text-blue-400'}`}
-              onClick={() => updateFilters('genre', selectedGenre === genre ? null : genre)}
-            >
-              {genre}
-            </Badge>
-          ))}
+          {loadingGenres ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="h-7 w-16 rounded-full bg-neutral-800" />
+            ))
+          ) : (
+            genres.map((genre) => (
+              <Badge
+                key={genre.id}
+                variant={selectedGenre === genre.name ? 'default' : 'outline'}
+                className={`cursor-pointer px-3 py-1 transition-all ${selectedGenre === genre.name ? 'bg-blue-600' : 'hover:border-blue-500 hover:text-blue-400'}`}
+                onClick={() => updateFilters('genre', selectedGenre === genre.name ? null : genre.name)}
+              >
+                {genre.name}
+              </Badge>
+            ))
+          )}
         </div>
       </div>
     </div>
   );
-};
+}
 
 
 
