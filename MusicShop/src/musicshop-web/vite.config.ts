@@ -11,7 +11,10 @@ const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(file
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: 3000
+    port: 3000,
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
+    }
   },
   resolve: {
     alias: {

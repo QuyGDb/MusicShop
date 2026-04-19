@@ -4,6 +4,15 @@ export interface HttpOptions extends RequestInit {
   params?: Record<string, string | number | boolean | undefined | null>;
 }
 
+export interface ProblemDetails {
+  type?: string;
+  title?: string;
+  status?: number;
+  detail?: string;
+  instance?: string;
+  [key: string]: any;
+}
+
 class HttpClient {
   private baseURL: string;
   private isRefreshing = false;
@@ -127,17 +136,21 @@ class HttpClient {
     }
 
     // Parse JSON safely
-    const data = await response.json().catch(() => null);
+    const responseBody = await response.json().catch(() => null);
 
     if (!response.ok) {
+      const errorBody = responseBody as ProblemDetails;
+      
+      const errorMessage = errorBody?.detail || errorBody?.title || 'Request failed';
+
       throw new HttpError(
-        data?.message || 'Request failed',
+        errorMessage,
         response.status,
-        data
+        responseBody
       );
     }
 
-    return data as T;
+    return responseBody as T;
   }
 
   // Public methods

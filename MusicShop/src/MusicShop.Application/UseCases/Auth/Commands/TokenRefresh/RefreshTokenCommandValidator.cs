@@ -6,5 +6,7 @@ public sealed class RefreshTokenCommandValidator : AbstractValidator<RefreshToke
 {
     public RefreshTokenCommandValidator()
     {
+        RuleFor(x => x.RefreshToken)
+            .NotEmpty().WithMessage("Refresh token is required.");
     }
 }

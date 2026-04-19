@@ -16,7 +16,7 @@ export function useLogout() {
 
     // Best-effort server-side invalidation — does not block UI
     if (accessToken) {
-      await authService.logout(storedRefreshToken);
+      await authService.logout();
     }
   };
 

@@ -71,7 +71,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     initAuth();
-  }, [accessToken]);
+  }, []);
 
   // Update authentication state and persist to local storage
   const setAuth = (newUser: User, newToken: string) => {
