@@ -53,18 +53,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
 
       try {
-        const result = await authService.getMe();
-        if (result.success) {
-          setUser(result.data);
-          // If we have a user but no stored user data, sync it
-          localStorage.setItem('user', JSON.stringify(result.data));
-        } else if (result.error.status === 401) {
-          // Token expired and refresh failed (handled by HttpClient silently if possible)
-          // If we still get 401 here, it means even refresh failed
+        const userData = await authService.getMe();
+        setUser(userData);
+        // Sync stored user data
+        localStorage.setItem('user', JSON.stringify(userData));
+      } catch (error: any) {
+        console.error('Session verification failed:', error);
+        if (error.status === 401) {
           clearAuth();
         }
-      } catch (error) {
-        console.error('Session verification failed:', error);
       } finally {
         setIsLoading(false);
       }

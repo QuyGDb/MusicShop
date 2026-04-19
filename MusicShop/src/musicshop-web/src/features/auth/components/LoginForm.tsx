@@ -13,8 +13,7 @@ export function LoginForm() {
     serverError,
     errors,
     onSubmit,
-    handleGoogleSuccess,
-    setServerError
+    handleGoogleSuccess
   } = useLoginForm();
 
   return (
@@ -82,7 +81,7 @@ export function LoginForm() {
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={() => {
-              setServerError('Google login was unsuccessful');
+              console.error('Google login was unsuccessful');
             }}
             theme="filled_black"
             shape="pill"

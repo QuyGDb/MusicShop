@@ -1,7 +1,7 @@
 import { useState } from 'react';
+import { useMutation } from '@tanstack/react-query';
 import { CredentialResponse } from '@react-oauth/google';
 import { authService } from '@/features/auth/services/authService';
-import { useSubmitState } from '@/shared/hooks/useSubmitState';
 import { useAuthRedirect } from '@/shared/hooks/useAuthRedirect';
 
 interface LoginErrors {
@@ -13,9 +13,24 @@ export function useLoginForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<LoginErrors>({});
-
-  const { isSubmitting, setIsSubmitting, serverError, setServerError } = useSubmitState();
+  
   const { redirectAfterAuth } = useAuthRedirect();
+
+  // Standard Login Mutation
+  const loginMutation = useMutation({
+    mutationFn: authService.login,
+    onSuccess: (data) => {
+      redirectAfterAuth(data.user, data.accessToken);
+    },
+  });
+
+  // Google Login Mutation
+  const googleLoginMutation = useMutation({
+    mutationFn: authService.googleLogin,
+    onSuccess: (data) => {
+      redirectAfterAuth(data.user, data.accessToken);
+    },
+  });
 
   const validate = () => {
     const newErrors: LoginErrors = {};
@@ -38,49 +53,28 @@ export function useLoginForm() {
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setServerError(null);
 
     if (!validate()) {
       return;
     }
 
-    setIsSubmitting(true);
-    try {
-      const result = await authService.login({ email, password });
-      if (result.success) {
-        redirectAfterAuth(result.data.user, result.data.accessToken);
-      } else {
-        setServerError(result.error.message || 'Login failed');
-      }
-    } catch {
-      setServerError('An unexpected error occurred');
-    } finally {
-      setIsSubmitting(false);
-    }
+    loginMutation.mutate({ email, password });
   };
 
-  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
-    setServerError(null);
+  const handleGoogleSuccess = (credentialResponse: CredentialResponse) => {
     const idToken = credentialResponse.credential;
 
     if (!idToken) {
       return;
     }
 
-    setIsSubmitting(true);
-    try {
-      const result = await authService.googleLogin(idToken);
-      if (result.success) {
-        redirectAfterAuth(result.data.user, result.data.accessToken);
-      } else {
-        setServerError(result.error.message || 'Google login failed');
-      }
-    } catch {
-      setServerError('An unexpected error occurred');
-    } finally {
-      setIsSubmitting(false);
-    }
+    googleLoginMutation.mutate(idToken);
   };
+
+  // Combine loading and error states for the UI
+  const isSubmitting = loginMutation.isPending || googleLoginMutation.isPending;
+  const error = loginMutation.error || googleLoginMutation.error;
+  const serverError = error instanceof Error ? error.message : null;
 
   return {
     email,
@@ -91,7 +85,6 @@ export function useLoginForm() {
     serverError,
     errors,
     onSubmit,
-    handleGoogleSuccess,
-    setServerError
+    handleGoogleSuccess
   };
 }
