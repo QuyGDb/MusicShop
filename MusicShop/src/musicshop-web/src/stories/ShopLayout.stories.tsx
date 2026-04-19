@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { ShopLayout } from './ShopLayout';
+import { ShopLayout } from '@/layouts/ShopLayout';
 import { AuthProvider } from '@/app/providers/AuthContext';
 import React from 'react';
 
@@ -24,4 +24,3 @@ export default meta;
 type Story = StoryObj<typeof ShopLayout>;
 
 export const Default: Story = {};
-

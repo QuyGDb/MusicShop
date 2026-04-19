@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Navbar } from './Navbar';
+import { Navbar } from '@/widgets/navbar/ui/Navbar';
 import { AuthProvider } from '@/app/providers/AuthContext';
 import React from 'react';
 
@@ -37,4 +37,3 @@ export const Authenticated: Story = {
     },
   ],
 };
-
