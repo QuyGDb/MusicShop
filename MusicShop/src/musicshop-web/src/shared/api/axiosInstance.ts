@@ -1,4 +1,5 @@
 import axios, { AxiosError, InternalAxiosRequestConfig, AxiosRequestConfig } from 'axios';
+import { getAccessToken, setAccessToken } from './tokenStore';
 
 /**
  * Custom Axios instance type that reflects the behavior of our response interceptor
@@ -25,11 +26,11 @@ const axiosInstance = axios.create({
 
 /**
  * Request Interceptor: Attach the access token to the Authorization header.
- * We read from localStorage to keep state consistent between tabs.
+ * We read from the in-memory tokenStore for security.
  */
 axiosInstance.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('accessToken');
+    const token = getAccessToken();
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -92,7 +93,7 @@ axiosInstance.interceptors.response.use(
         );
 
         const { accessToken } = response.data.data;
-        localStorage.setItem('accessToken', accessToken);
+        setAccessToken(accessToken);
 
         isRefreshing = false;
         onTokenRefreshed(accessToken);
@@ -107,7 +108,7 @@ axiosInstance.interceptors.response.use(
         refreshSubscribers = []; // Clear queue on failure
 
         // Refresh failed (e.g. 400 Bad Request or 401 Logout)
-        localStorage.removeItem('accessToken');
+        setAccessToken(null);
         (axiosInstance as any).onUnauthorized?.();
 
         return Promise.reject(refreshError);

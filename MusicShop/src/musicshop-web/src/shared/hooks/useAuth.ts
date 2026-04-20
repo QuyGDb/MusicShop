@@ -1,17 +1,17 @@
-import { useContext } from 'react';
-import { AuthContext } from '@/app/providers/AuthContext';
+import { useAuthStore } from '@/store/useAuthStore';
 
 /**
- * Custom hook to access authentication context.
- * Must be used within an AuthProvider.
+ * Custom hook to access reactive authentication state and actions.
  */
 export function useAuth() {
-  const context = useContext(AuthContext);
+  const { accessToken, setAuth, clearAuth, isInitializing } = useAuthStore();
   
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider root component');
-  }
-  
-  return context;
+  return {
+    accessToken,
+    setAuth,
+    clearAuth,
+    isInitializing,
+    isAuthenticated: !!accessToken,
+  };
 }
 

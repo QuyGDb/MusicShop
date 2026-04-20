@@ -7,3 +7,4 @@ export * from './hooks/useLogout';
 export * from './hooks/useChangePassword';
 export * from './services/authService';
 export * from './types';
+export * from './schemas';

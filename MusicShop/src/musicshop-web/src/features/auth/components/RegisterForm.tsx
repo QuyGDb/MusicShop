@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button, Input, Label, Alert, AlertDescription, AlertTitle } from '@/shared/components';
 import { AlertCircle, Loader2, UserPlus } from 'lucide-react';
-import { useRegisterForm, registerSchema } from '@/features/auth/hooks/useRegisterForm';
+import { useRegisterForm, registerSchema } from '@/features/auth';
 
 export function RegisterForm() {
   const {

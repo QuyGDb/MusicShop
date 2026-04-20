@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import { ShopLayout } from '@/layouts/ShopLayout';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import HomePage from '@/pages/shop/HomePage';
@@ -8,11 +8,15 @@ import TermsPage from '@/pages/shop/TermsPage';
 import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
 import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
+import { useAuth } from '@/shared/hooks/useAuth';
 
 export default function App() {
-  const { isLoading } = useCurrentUser();
+  const { isInitializing, accessToken } = useAuth();
+  const { isLoading: isUserLoading } = useCurrentUser();
 
-  if (isLoading) {
+  const isBuffering = isInitializing || (!!accessToken && isUserLoading);
+
+  if (isBuffering) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
         <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
@@ -26,14 +30,14 @@ export default function App() {
       <Route element={<ShopLayout />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/products" element={<ProductListPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/profile" element={accessToken ? <ProfilePage /> : <Navigate to="/login" />} />
         <Route path="/terms" element={<TermsPage />} />
       </Route>
 
       {/* Auth Routes */}
       <Route element={<AuthLayout />}>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route path="/login" element={accessToken ? <Navigate to="/" /> : <LoginPage />} />
+        <Route path="/register" element={accessToken ? <Navigate to="/" /> : <RegisterPage />} />
       </Route>
 
       {/* Fallback */}
