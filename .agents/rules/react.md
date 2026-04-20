@@ -9,9 +9,7 @@ trigger: always_on
 - TailwindCSS + shadcn/ui for UI components
 - React Router v6 for routing
 - TanStack Query (React Query) for server state
-- Zustand for global client state
-- React Hook Form + Zod for forms and validation
-- Axios for HTTP client
+
 
 ## Project Structure
 ```
