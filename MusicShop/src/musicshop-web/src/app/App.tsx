@@ -14,6 +14,7 @@ import ArtistManagementPage from '@/pages/admin/ArtistManagementPage';
 import LabelManagementPage from '@/pages/admin/LabelManagementPage';
 import GenreManagementPage from '@/pages/admin/GenreManagementPage';
 import ReleaseManagementPage from '@/pages/admin/ReleaseManagementPage';
+import OrderManagementPage from '@/pages/admin/OrderManagementPage';
 import { useAuthStore } from '@/store/useAuthStore';
 
 export default function App() {
@@ -49,6 +50,7 @@ export default function App() {
         <Route path="labels" element={<LabelManagementPage />} />
         <Route path="genres" element={<GenreManagementPage />} />
         <Route path="releases" element={<ReleaseManagementPage />} />
+        <Route path="orders" element={<OrderManagementPage />} />
         {/* Future admin sub-routes will go here */}
       </Route>
 
