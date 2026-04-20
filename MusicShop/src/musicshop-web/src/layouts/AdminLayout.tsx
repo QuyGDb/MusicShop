@@ -7,7 +7,10 @@ import {
   ShoppingBag, 
   Settings, 
   ArrowLeft,
-  Music
+  Music,
+  UserCircle,
+  Hash,
+  Tag
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -22,10 +25,12 @@ export function AdminLayout({ children }: AdminLayoutProps) {
 
   const sidebarLinks = [
     { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { name: 'Products', href: '/admin/products', icon: Package },
+    { name: 'Artists', href: '/admin/artists', icon: UserCircle },
+    { name: 'Releases', href: '/admin/releases', icon: Music },
+    { name: 'Labels', href: '/admin/labels', icon: Tag },
+    { name: 'Genres', href: '/admin/genres', icon: Hash },
     { name: 'Orders', href: '/admin/orders', icon: ShoppingBag },
     { name: 'Customers', href: '/admin/customers', icon: Users },
-    { name: 'Settings', href: '/admin/settings', icon: Settings },
   ];
 
   return (

@@ -10,6 +10,9 @@ import RegisterPage from '@/pages/auth/RegisterPage';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { AdminRoute } from '@/features/auth/components/AdminRoute';
 import AdminDashboardPage from '@/pages/admin/AdminDashboardPage';
+import ArtistManagementPage from '@/pages/admin/ArtistManagementPage';
+import LabelManagementPage from '@/pages/admin/LabelManagementPage';
+import GenreManagementPage from '@/pages/admin/GenreManagementPage';
 import { useAuthStore } from '@/store/useAuthStore';
 
 export default function App() {
@@ -41,6 +44,9 @@ export default function App() {
         }
       >
         <Route index element={<AdminDashboardPage />} />
+        <Route path="artists" element={<ArtistManagementPage />} />
+        <Route path="labels" element={<LabelManagementPage />} />
+        <Route path="genres" element={<GenreManagementPage />} />
         {/* Future admin sub-routes will go here */}
       </Route>
 
