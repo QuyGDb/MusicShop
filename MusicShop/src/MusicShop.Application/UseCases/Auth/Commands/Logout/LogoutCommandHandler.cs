@@ -10,8 +10,7 @@ namespace MusicShop.Application.UseCases.Auth.Commands.Logout;
 public class LogoutCommandHandler(
     IRepository<RefreshToken> refreshTokenRepository,
     IRefreshTokenHasher refreshTokenHasher,
-    IUnitOfWork unitOfWork,
-    ILogger<LogoutCommandHandler> logger) : IRequestHandler<LogoutCommand, Result<Unit>>
+    IUnitOfWork unitOfWork) : IRequestHandler<LogoutCommand, Result<Unit>>
 {
     public async Task<Result<Unit>> Handle(LogoutCommand request, CancellationToken cancellationToken)
     {
@@ -19,7 +18,6 @@ public class LogoutCommandHandler(
         {
             return Result<Unit>.Success(Unit.Value);
         }
-
         string tokenHash = refreshTokenHasher.Hash(request.RefreshToken);
 
         RefreshToken? refreshToken = await refreshTokenRepository.FirstOrDefaultAsync(

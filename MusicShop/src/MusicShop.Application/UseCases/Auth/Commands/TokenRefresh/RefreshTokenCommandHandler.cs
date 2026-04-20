@@ -14,12 +14,10 @@ public class RefreshTokenCommandHandler(
     IRepository<RefreshToken> refreshTokenRepository,
     IRefreshTokenHasher refreshTokenHasher,
     ITokenService tokenService,
-    IUnitOfWork unitOfWork,
-    ILogger<RefreshTokenCommandHandler> logger) : IRequestHandler<RefreshTokenCommand, Result<AuthResponse>>
+    IUnitOfWork unitOfWork) : IRequestHandler<RefreshTokenCommand, Result<AuthResponse>>
 {
     public async Task<Result<AuthResponse>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Refreshing tokens for request: {RefreshToken}", request.RefreshToken?[..Math.Min(request.RefreshToken.Length, 10)] + "...");
 
         // Basic input validation
         if (string.IsNullOrWhiteSpace(request.RefreshToken))

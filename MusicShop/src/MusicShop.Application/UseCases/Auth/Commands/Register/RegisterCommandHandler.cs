@@ -24,6 +24,10 @@ public class RegisterCommandHandler(
 
         if (existingUser != null)
         {
+            if (existingUser.PasswordHash == null)
+            {
+                return Result<AuthResponse>.Failure(AuthErrors.ExternalProviderOnly);
+            }
             return Result<AuthResponse>.Failure(AuthErrors.EmailAlreadyExists);
         }
 

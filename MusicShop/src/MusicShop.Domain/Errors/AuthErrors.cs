@@ -48,4 +48,9 @@ public static class AuthErrors
         "Auth.GoogleError",
         "Error while verifying Google Token.",
         ErrorType.Failure);
+
+    public static readonly Error ExternalProviderOnly = new(
+        "Auth.ExternalProviderOnly",
+        "This account is linked to Google. Please sign in with Google.",
+        ErrorType.Unauthorized);
 }

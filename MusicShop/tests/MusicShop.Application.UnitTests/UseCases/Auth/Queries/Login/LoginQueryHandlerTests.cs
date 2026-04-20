@@ -42,7 +42,7 @@ public class LoginQueryHandlerTests
     public async Task Handle_ShouldReturnFailure_WhenUserDoesNotExist()
     {
         // Arrange
-        LoginQuery query = new LoginQuery("nonexistent@example.com", "any-password");
+        LoginQuery query = new("nonexistent@example.com", "any-password");
         _userRepository.FirstOrDefaultAsync(Arg.Any<Expression<Func<User, bool>>>(), Arg.Any<CancellationToken>())
             .Returns((User?)null);
 
@@ -60,7 +60,7 @@ public class LoginQueryHandlerTests
         // Arrange
         LoginQuery query = new LoginQuery("external@example.com", "any-password");
         User user = new User { Email = "external@example.com", PasswordHash = null };
-        
+
         _userRepository.FirstOrDefaultAsync(Arg.Any<Expression<Func<User, bool>>>(), Arg.Any<CancellationToken>())
             .Returns(user);
 
@@ -78,10 +78,10 @@ public class LoginQueryHandlerTests
         // Arrange
         LoginQuery query = new LoginQuery("user@example.com", "wrong-password");
         User user = new User { Email = "user@example.com", PasswordHash = "correct-hash" };
-        
+
         _userRepository.FirstOrDefaultAsync(Arg.Any<Expression<Func<User, bool>>>(), Arg.Any<CancellationToken>())
             .Returns(user);
-        
+
         _passwordHasher.Verify(query.Password, user.PasswordHash).Returns(false);
 
         // Act
@@ -105,9 +105,9 @@ public class LoginQueryHandlerTests
 
         _userRepository.FirstOrDefaultAsync(Arg.Any<Expression<Func<User, bool>>>(), Arg.Any<CancellationToken>())
             .Returns(user);
-        
+
         _passwordHasher.Verify(query.Password, user.PasswordHash).Returns(true);
-        
+
         _tokenService.GenerateAccessToken(user).Returns((accessToken, accessTokenExpiry));
         _tokenService.GenerateRefreshToken().Returns((refreshToken, refreshTokenExpiry));
         _refreshTokenHasher.Hash(refreshToken).Returns("refresh-token-hash");
@@ -119,7 +119,7 @@ public class LoginQueryHandlerTests
         result.IsSuccess.Should().BeTrue();
         result.Value.AccessToken.Should().Be(accessToken);
         result.Value.RefreshToken.Should().Be(refreshToken);
-        
+
         _refreshTokenRepository.Received(1).Add(Arg.Any<RefreshToken>());
         await _unitOfWork.Received(1).SaveChangesAsync(Arg.Any<CancellationToken>());
     }
