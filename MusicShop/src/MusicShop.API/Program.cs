@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using MusicShop.API.Middleware;
 using MusicShop.Infrastructure.Persistence;
+using MusicShop.Domain.Interfaces;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -115,10 +116,11 @@ using (IServiceScope scope = app.Services.CreateScope())
     try
     {
         AppDbContext context = services.GetRequiredService<AppDbContext>();
+        IPasswordHasher passwordHasher = services.GetRequiredService<IPasswordHasher>();
         ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
 
         logger.LogInformation("Checking database for seeding...");
-        await DbInitializer.SeedAsync(context);
+        await DbInitializer.SeedAsync(context, passwordHasher);
         logger.LogInformation("Database initialization complete.");
     }
     catch (Exception ex)

@@ -2,7 +2,9 @@ using Bogus;
 using Microsoft.EntityFrameworkCore;
 using MusicShop.Domain.Entities.Catalog;
 using MusicShop.Domain.Entities.Shop;
+using MusicShop.Domain.Entities.System;
 using MusicShop.Domain.Enums;
+using MusicShop.Domain.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,10 +17,26 @@ namespace MusicShop.Infrastructure.Persistence;
 /// </summary>
 public static class DbInitializer
 {
-    public static async Task SeedAsync(AppDbContext context)
+    public static async Task SeedAsync(AppDbContext context, IPasswordHasher passwordHasher)
     {
         // 0. Ensure database is created
         await context.Database.EnsureCreatedAsync();
+
+        // 0.5. Seed Admin User if not exists
+        if (!await context.Users.AnyAsync(u => u.Role == UserRole.Admin))
+        {
+            var adminUser = new User
+            {
+                Id = Guid.NewGuid(),
+                Email = "admin@musicshop.com",
+                FullName = "System Admin",
+                PasswordHash = passwordHasher.Hash("Admin@123"),
+                Role = UserRole.Admin,
+                IdentityProvider = "Local"
+            };
+            await context.Users.AddAsync(adminUser);
+            await context.SaveChangesAsync();
+        }
 
         // Check if seeding is needed (we use Genres as a marker)
         if (await context.Genres.AnyAsync())

@@ -41,7 +41,7 @@ export default function ProfilePage() {
               <label className="text-xs text-neutral-500 uppercase font-bold tracking-wider">Role</label>
               <div className="flex items-center gap-2 text-lg">
                 <Shield className="h-4 w-4 text-neutral-600" />
-                User
+                {user?.role || 'N/A'}
               </div>
             </div>
           </CardContent>
