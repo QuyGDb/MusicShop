@@ -1,5 +1,4 @@
-import { http } from '@/shared/services/http';
-import { HttpError } from '@/shared/services/HttpError';
+import http from '@/shared/api/axiosInstance';
 import { ApiResponse } from '@/shared/types/api';
 import { Genre } from '../types';
 

@@ -7,18 +7,15 @@ import ProfilePage from '@/pages/shop/ProfilePage';
 import TermsPage from '@/pages/shop/TermsPage';
 import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
-import { useAuth } from '@/shared/hooks/useAuth';
+import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
 
 export default function App() {
-  const { isLoading } = useAuth();
+  const { isLoading } = useCurrentUser();
 
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
-        <div className="flex flex-col items-center gap-4">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-          <p className="text-muted-foreground animate-pulse font-medium">Initializing session...</p>
-        </div>
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }

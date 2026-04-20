@@ -1,4 +1,4 @@
-import { http } from '@/shared/services/http';
+import http from '@/shared/api/axiosInstance';
 import { ApiResponse, MetaData } from '@/shared/types/api';
 import { ProductListItem, ProductFilters } from '../types';
 

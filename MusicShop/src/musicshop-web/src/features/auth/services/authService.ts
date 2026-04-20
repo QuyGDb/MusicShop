@@ -1,4 +1,4 @@
-import { http } from '@/shared/services/http';
+import http from '@/shared/api/axiosInstance';
 import { ApiResponse } from '@/shared/types/api';
 import { AuthResponse, User, LoginRequest, RegisterRequest, ChangePasswordRequest } from '../types';
 

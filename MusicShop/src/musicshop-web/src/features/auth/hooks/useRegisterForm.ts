@@ -22,7 +22,7 @@ export function useRegisterForm() {
   const registerMutation = useMutation({
     mutationFn: authService.register,
     onSuccess: (data) => {
-      redirectAfterAuth(data.user, data.accessToken);
+      redirectAfterAuth(data.accessToken);
     },
   });
   

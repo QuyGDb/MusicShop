@@ -20,7 +20,7 @@ export function useLoginForm() {
   const loginMutation = useMutation({
     mutationFn: authService.login,
     onSuccess: (data) => {
-      redirectAfterAuth(data.user, data.accessToken);
+      redirectAfterAuth(data.accessToken);
     },
   });
 
@@ -28,7 +28,7 @@ export function useLoginForm() {
   const googleLoginMutation = useMutation({
     mutationFn: authService.googleLogin,
     onSuccess: (data) => {
-      redirectAfterAuth(data.user, data.accessToken);
+      redirectAfterAuth(data.accessToken);
     },
   });
 

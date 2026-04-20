@@ -1,5 +1,5 @@
 import { QueryClient, QueryCache, MutationCache } from '@tanstack/react-query';
-import { HttpError } from '@/shared/services/HttpError';
+import axios from 'axios';
 
 /**
  * Global QueryClient configuration.
@@ -18,17 +18,19 @@ export const queryClient = new QueryClient({
   },
   queryCache: new QueryCache({
     onError: (error) => {
-      if (error instanceof HttpError) {
-        console.error(`[Global Query Error]: ${error.message} (${error.status})`);
-        // Here we could trigger a global toast/notification
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data?.detail || error.response?.data?.title || error.message;
+        const status = error.response?.status || 'network error';
+        console.error(`[Global Query Error]: ${message} (${status})`);
       }
     },
   }),
   mutationCache: new MutationCache({
     onError: (error) => {
-      if (error instanceof HttpError) {
-        console.error(`[Global Mutation Error]: ${error.message} (${error.status})`);
-        // Here we could trigger a global toast/notification
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data?.detail || error.response?.data?.title || error.message;
+        const status = error.response?.status || 'network error';
+        console.error(`[Global Mutation Error]: ${message} (${status})`);
       }
     },
   }),
