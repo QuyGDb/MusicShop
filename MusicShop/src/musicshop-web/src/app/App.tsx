@@ -7,6 +7,9 @@ import ProfilePage from '@/pages/shop/ProfilePage';
 import TermsPage from '@/pages/shop/TermsPage';
 import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
+import { AdminLayout } from '@/layouts/AdminLayout';
+import { AdminRoute } from '@/features/auth/components/AdminRoute';
+import AdminDashboardPage from '@/pages/admin/AdminDashboardPage';
 import { useAuthStore } from '@/store/useAuthStore';
 
 export default function App() {
@@ -26,6 +29,19 @@ export default function App() {
       <Route element={<AuthLayout />}>
         <Route path="/login" element={accessToken ? <Navigate to="/" /> : <LoginPage />} />
         <Route path="/register" element={accessToken ? <Navigate to="/" /> : <RegisterPage />} />
+      </Route>
+
+      {/* Admin Routes */}
+      <Route
+        path="/admin"
+        element={
+          <AdminRoute>
+            <AdminLayout />
+          </AdminRoute>
+        }
+      >
+        <Route index element={<AdminDashboardPage />} />
+        {/* Future admin sub-routes will go here */}
       </Route>
 
       {/* Fallback */}

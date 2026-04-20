@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useLogout } from '@/features/auth';
 import { Button, buttonVariants } from '@/shared/components';
-import { Music, LogOut, User as UserIcon, Search } from 'lucide-react';
+import { Music, LogOut, User as UserIcon, Search, Shield } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
 export function Navbar() {
@@ -56,6 +56,15 @@ export function Navbar() {
 
           {isAuthenticated ? (
             <>
+              {user?.role === 'Admin' && (
+                <Link to="/admin" className={cn(
+                  "text-sm font-medium hover:text-primary transition-colors flex items-center gap-1 mr-2",
+                  pathname.startsWith('/admin') ? "text-primary" : "text-muted-foreground"
+                )}>
+                  <Shield className="h-4 w-4" />
+                  <span className="hidden sm:inline">Admin Panel</span>
+                </Link>
+              )}
               <Link to="/profile" className={cn(
                 "text-sm font-medium hover:text-primary transition-colors flex items-center gap-1",
                 pathname === '/profile' ? "text-primary" : "text-muted-foreground"
