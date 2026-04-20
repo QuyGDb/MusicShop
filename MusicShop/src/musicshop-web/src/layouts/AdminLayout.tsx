@@ -10,7 +10,8 @@ import {
   Music,
   UserCircle,
   Hash,
-  Tag
+  Tag,
+  Layers
 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -31,6 +32,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
     { name: 'Genres', href: '/admin/genres', icon: Hash },
     { name: 'Orders', href: '/admin/orders', icon: ShoppingBag },
     { name: 'Customers', href: '/admin/customers', icon: Users },
+    { name: 'Curation', href: '/admin/collections', icon: Layers },
   ];
 
   return (

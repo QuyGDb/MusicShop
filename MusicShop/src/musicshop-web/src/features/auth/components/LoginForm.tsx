@@ -12,21 +12,22 @@ export function LoginForm() {
   } = useLoginForm();
 
   return (
-    <Card className="w-full max-w-md mx-auto shadow-lg border-neutral-800 bg-neutral-900/50 backdrop-blur-sm">
-      <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold text-center">Sign In</CardTitle>
-        <CardDescription className="text-center text-neutral-400">
-          Enter your credentials to access your account
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div className="w-full max-w-md mx-auto space-y-6">
+      <div className="text-center space-y-2">
+        <h1 className="text-3xl font-bold tracking-tight">Sign In</h1>
+        <p className="text-neutral-400">Enter your credentials to access your account</p>
+      </div>
+
+      <div className="bg-neutral-900/40 backdrop-blur-md border border-neutral-800 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl group-hover:bg-blue-600/20 transition-colors duration-500" />
+
         <form
           onSubmit={(e) => {
             e.preventDefault();
             e.stopPropagation();
             form.handleSubmit();
           }}
-          className="space-y-4"
+          className="space-y-5 relative z-10"
         >
           <form.Field
             name="email"
@@ -36,7 +37,7 @@ export function LoginForm() {
           >
             {(field) => (
               <div className="space-y-2">
-                <Label htmlFor={field.name}>Email</Label>
+                <Label htmlFor={field.name} className="text-sm font-medium text-neutral-300">Email</Label>
                 <Input
                   id={field.name}
                   name={field.name}
@@ -45,10 +46,10 @@ export function LoginForm() {
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  className="bg-neutral-800 border-neutral-700"
+                  className={`bg-neutral-950/50 border-neutral-800 focus:border-blue-500 h-11 transition-all ${field.state.meta.errors && field.state.meta.errors.length > 0 ? 'border-red-500/50' : ''}`}
                 />
                 {field.state.meta.errors && (
-                  <p className="text-sm text-red-500">{field.state.meta.errors.join(', ')}</p>
+                  <p className="text-xs text-red-500 mt-1">{field.state.meta.errors.join(', ')}</p>
                 )}
               </div>
             )}
@@ -63,7 +64,7 @@ export function LoginForm() {
             {(field) => (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor={field.name}>Password</Label>
+                  <Label htmlFor={field.name} className="text-sm font-medium text-neutral-300">Password</Label>
                   <Button type="button" variant="link" className="p-0 h-auto text-xs text-neutral-400">
                     Forgot password?
                   </Button>
@@ -75,10 +76,10 @@ export function LoginForm() {
                   value={field.state.value}
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
-                  className="bg-neutral-800 border-neutral-700"
+                  className={`bg-neutral-950/50 border-neutral-800 focus:border-blue-500 h-11 transition-all ${field.state.meta.errors && field.state.meta.errors.length > 0 ? 'border-red-500/50' : ''}`}
                 />
                 {field.state.meta.errors && (
-                  <p className="text-sm text-red-500">{field.state.meta.errors.join(', ')}</p>
+                  <p className="text-xs text-red-500 mt-1">{field.state.meta.errors.join(', ')}</p>
                 )}
               </div>
             )}
@@ -89,21 +90,24 @@ export function LoginForm() {
               {serverError}
             </div>
           )}
-          <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold h-12 rounded-xl transition-all shadow-lg shadow-blue-600/20 active:scale-[0.98]"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? 'Processing...' : 'Sign In'}
           </Button>
         </form>
 
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-neutral-700"></span>
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-neutral-900 px-2 text-neutral-400">Or continue with</span>
-          </div>
+        <div className="relative my-8 z-10 flex items-center gap-4">
+          <div className="flex-1 h-[1px] bg-gradient-to-r from-transparent via-neutral-700 to-neutral-700"></div>
+          <span className="text-[10px] font-black uppercase tracking-[0.2em] text-neutral-300 whitespace-nowrap">
+            Or continue with
+          </span>
+          <div className="flex-1 h-[1px] bg-gradient-to-l from-transparent via-neutral-700 to-neutral-700"></div>
         </div>
 
-        <div className="flex justify-center w-full">
+        <div className="flex justify-center w-full relative z-10">
           <GoogleLogin
             onSuccess={handleGoogleSuccess}
             onError={() => {
@@ -115,15 +119,14 @@ export function LoginForm() {
             text="signin_with"
           />
         </div>
-      </CardContent>
-      <CardFooter className="flex flex-wrap items-center justify-center gap-1 text-sm text-neutral-400">
-        <p className="text-center text-sm text-neutral-500">
-          Don't have an account?{' '}
-          <Link to="/register" className="text-blue-500 font-semibold hover:text-blue-400 transition-colors">
-            Sign Up
-          </Link>
-        </p>
-      </CardFooter>
-    </Card>
+      </div>
+
+      <p className="text-center text-sm text-neutral-500">
+        Don't have an account?{' '}
+        <Link to="/register" className="text-blue-500 font-semibold hover:text-blue-400 transition-colors">
+          Sign Up
+        </Link>
+      </p>
+    </div>
   );
 }

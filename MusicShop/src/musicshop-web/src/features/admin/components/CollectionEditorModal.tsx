@@ -41,7 +41,7 @@ const MOCK_PRODUCTS: CollectionItem[] = [
   { id: 'item-4', productId: 'p4', title: 'Moonbeam', artistName: 'VHS Dreams', price: 25.00, coverUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&q=80' },
 ];
 
-export default function CollectionEditorModal({ collectionId, onClose }: CollectionEditorModalProps) {
+export function CollectionEditorModal({ collectionId, onClose }: CollectionEditorModalProps) {
   const [items, setItems] = useState<CollectionItem[]>(MOCK_PRODUCTS);
   const [title, setTitle] = useState('New Arrivals');
   const [description, setDescription] = useState('Explore the latest synth treasures in our catalog.');

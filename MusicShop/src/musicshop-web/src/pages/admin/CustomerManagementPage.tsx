@@ -24,7 +24,7 @@ import {
   CardContent 
 } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
-import UserEditModal from '@/features/admin/components/UserEditModal';
+import { UserEditModal } from '@/features/admin';
 
 export type UserRole = 'Admin' | 'Customer';
 export type UserStatus = 'Active' | 'Locked';

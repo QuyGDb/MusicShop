@@ -20,7 +20,7 @@ import {
   CardContent 
 } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
-import OrderDetailsModal from '@/features/admin/components/OrderDetailsModal';
+import { OrderDetailsModal } from '@/features/admin';
 
 export type OrderStatus = 'Pending' | 'Processing' | 'Shipped' | 'Delivered' | 'Cancelled';
 

@@ -29,7 +29,7 @@ interface OrderDetailsModalProps {
   onClose: () => void;
 }
 
-export default function OrderDetailsModal({ orderId, onClose }: OrderDetailsModalProps) {
+export function OrderDetailsModal({ orderId, onClose }: OrderDetailsModalProps) {
   const [status, setStatus] = useState<OrderStatus>('Processing');
   const [isUpdating, setIsUpdating] = useState(false);
 

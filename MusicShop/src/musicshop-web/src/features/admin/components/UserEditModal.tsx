@@ -26,7 +26,7 @@ interface UserEditModalProps {
   onClose: () => void;
 }
 
-export default function UserEditModal({ user, onClose }: UserEditModalProps) {
+export function UserEditModal({ user, onClose }: UserEditModalProps) {
   const [role, setRole] = useState<UserRole>(user.role);
   const [status, setStatus] = useState<UserStatus>(user.status);
   const [isSaving, setIsSaving] = useState(false);

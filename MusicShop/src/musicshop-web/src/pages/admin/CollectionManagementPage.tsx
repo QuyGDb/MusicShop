@@ -22,7 +22,7 @@ import {
   CardContent 
 } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
-import CollectionEditorModal from '@/features/admin/components/CollectionEditorModal';
+import { CollectionEditorModal } from '@/features/admin';
 
 interface Collection {
   id: string;

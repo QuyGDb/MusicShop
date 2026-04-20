@@ -18,7 +18,7 @@ import {
   CardContent 
 } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
-import ReleaseForm from '@/features/admin/components/ReleaseForm';
+import { ReleaseForm } from '@/features/admin';
 
 interface Release {
   id: string;
