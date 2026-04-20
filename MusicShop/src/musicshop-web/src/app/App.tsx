@@ -13,6 +13,7 @@ import AdminDashboardPage from '@/pages/admin/AdminDashboardPage';
 import ArtistManagementPage from '@/pages/admin/ArtistManagementPage';
 import LabelManagementPage from '@/pages/admin/LabelManagementPage';
 import GenreManagementPage from '@/pages/admin/GenreManagementPage';
+import ReleaseManagementPage from '@/pages/admin/ReleaseManagementPage';
 import { useAuthStore } from '@/store/useAuthStore';
 
 export default function App() {
@@ -47,6 +48,7 @@ export default function App() {
         <Route path="artists" element={<ArtistManagementPage />} />
         <Route path="labels" element={<LabelManagementPage />} />
         <Route path="genres" element={<GenreManagementPage />} />
+        <Route path="releases" element={<ReleaseManagementPage />} />
         {/* Future admin sub-routes will go here */}
       </Route>
 
