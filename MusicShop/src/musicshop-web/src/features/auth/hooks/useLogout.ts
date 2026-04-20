@@ -1,9 +1,10 @@
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
-import { useAuth } from '@/shared/hooks/useAuth';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export function useLogout() {
-  const { clearAuth, accessToken } = useAuth();
+  const clearAuth = useAuthStore((state) => state.clearAuth);
+  const accessToken = useAuthStore((state) => state.accessToken);
   const navigate = useNavigate();
 
   const logout = async () => {

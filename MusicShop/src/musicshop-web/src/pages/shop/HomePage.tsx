@@ -1,14 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '@/shared/hooks/useAuth';
-import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
+import { useAuthStore } from '@/store/useAuthStore';
 import { buttonVariants } from '@/shared/components';
 import { ShoppingBag } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
 export default function HomePage() {
-  const { accessToken } = useAuth();
-  const { user } = useCurrentUser();
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const user = useAuthStore((state) => state.user);
   const isAuthenticated = !!accessToken;
 
   return (
@@ -25,7 +24,7 @@ export default function HomePage() {
 
         <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
           {isAuthenticated
-            ? `Welcome back, ${user?.fullName}! Are you ready to explore our latest collection?`
+            ? `Welcome back, ${user?.fullName || 'Music Lover'}! Are you ready to explore our latest collection?`
             : "Explore thousands of high-quality vinyl records and CDs. Sign up now to start your musical journey."
           }
         </p>

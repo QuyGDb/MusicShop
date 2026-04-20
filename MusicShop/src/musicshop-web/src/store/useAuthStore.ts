@@ -1,12 +1,14 @@
 import { create } from 'zustand';
 import { setAccessToken as setGlobalAccessToken } from '@/shared/api/tokenStore';
+import { User } from '@/features/auth/types';
 
 interface AuthState {
   accessToken: string | null;
+  user: User | null;
   isInitializing: boolean;
   
   // Actions
-  setAuth: (token: string) => void;
+  setAuth: (token: string, user: User) => void;
   clearAuth: () => void;
   setInitializing: (value: boolean) => void;
 }
@@ -17,16 +19,17 @@ interface AuthState {
  */
 export const useAuthStore = create<AuthState>((set) => ({
   accessToken: null,
+  user: null,
   isInitializing: true,
 
-  setAuth: (token: string) => {
+  setAuth: (token: string, user: User) => {
     setGlobalAccessToken(token);
-    set({ accessToken: token, isInitializing: false });
+    set({ accessToken: token, user, isInitializing: false });
   },
 
   clearAuth: () => {
     setGlobalAccessToken(null);
-    set({ accessToken: null, isInitializing: false });
+    set({ accessToken: null, user: null, isInitializing: false });
   },
 
   setInitializing: (value: boolean) => {

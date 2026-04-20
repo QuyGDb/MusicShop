@@ -1,12 +1,13 @@
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/shared/hooks/useAuth';
+import { useAuthStore } from '@/store/useAuthStore';
+import { User } from '@/features/auth/types';
 
 export function useAuthRedirect() {
   const navigate = useNavigate();
-  const { setAuth } = useAuth();
+  const setAuth = useAuthStore((state) => state.setAuth);
 
-  const redirectAfterAuth = (accessToken: string) => {
-    setAuth(accessToken);
+  const redirectAfterAuth = (accessToken: string, user: User) => {
+    setAuth(accessToken, user);
     navigate('/');
   };
 

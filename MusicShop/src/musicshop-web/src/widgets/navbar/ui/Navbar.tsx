@@ -1,15 +1,14 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { useAuth } from '@/shared/hooks/useAuth';
-import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
+import { useAuthStore } from '@/store/useAuthStore';
 import { useLogout } from '@/features/auth';
 import { Button, buttonVariants } from '@/shared/components';
 import { Music, LogOut, User as UserIcon, Search } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 
 export function Navbar() {
-  const { accessToken } = useAuth();
-  const { user } = useCurrentUser();
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const user = useAuthStore((state) => state.user);
   const isAuthenticated = !!accessToken;
   const { pathname } = useLocation();
   const { logout } = useLogout();

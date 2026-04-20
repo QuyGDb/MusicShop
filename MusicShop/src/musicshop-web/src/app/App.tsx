@@ -7,22 +7,10 @@ import ProfilePage from '@/pages/shop/ProfilePage';
 import TermsPage from '@/pages/shop/TermsPage';
 import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
-import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
-import { useAuth } from '@/shared/hooks/useAuth';
+import { useAuthStore } from '@/store/useAuthStore';
 
 export default function App() {
-  const { isInitializing, accessToken } = useAuth();
-  const { isLoading: isUserLoading } = useCurrentUser();
-
-  const isBuffering = isInitializing || (!!accessToken && isUserLoading);
-
-  if (isBuffering) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background text-foreground">
-        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
-  }
+  const accessToken = useAuthStore((state) => state.accessToken);
 
   return (
     <Routes>

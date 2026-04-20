@@ -1,13 +1,11 @@
-import React from 'react';
-import { useAuth } from '@/shared/hooks/useAuth';
-import { useCurrentUser } from '@/features/auth/hooks/useCurrentUser';
+import { useAuthStore } from '@/store/useAuthStore';
 import { Navigate } from 'react-router-dom';
 import { Card, CardHeader, CardTitle, CardContent } from '@/shared/components';
 import { User, Mail, Shield } from 'lucide-react';
 
 export default function ProfilePage() {
-  const { accessToken } = useAuth();
-  const { user } = useCurrentUser();
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const user = useAuthStore((state) => state.user);
 
   if (!accessToken) {
     return <Navigate to="/login" replace />;
