@@ -62,10 +62,10 @@ axiosInstance.interceptors.response.use(
 
     // Handle 401 and avoid infinite loops
     if (
-      error.response?.status === 401 && 
+      error.response?.status === 401 &&
       originalRequest &&
-      !originalRequest._retry && 
-      !originalRequest.url?.includes('/auth/login') && 
+      !originalRequest._retry &&
+      !originalRequest.url?.includes('/auth/login') &&
       !originalRequest.url?.includes('/auth/refresh')
     ) {
       if (isRefreshing) {
@@ -109,7 +109,7 @@ axiosInstance.interceptors.response.use(
         // Refresh failed (e.g. 400 Bad Request or 401 Logout)
         localStorage.removeItem('accessToken');
         (axiosInstance as any).onUnauthorized?.();
-        
+
         return Promise.reject(refreshError);
       }
     }

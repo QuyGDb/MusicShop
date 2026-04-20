@@ -1,7 +1,7 @@
 import { Button, Input, Label, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/components';
 import { Link } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
-import { useLoginForm } from '@/features/auth';
+import { useLoginForm, loginSchema } from '@/features/auth';
 
 export function LoginForm() {
   const {
@@ -31,11 +31,7 @@ export function LoginForm() {
           <form.Field
             name="email"
             validators={{
-              onChange: ({ value }) => {
-                if (!value) return 'Email is required';
-                if (!/\S+@\S+\.\S+/.test(value)) return 'Email is invalid';
-                return undefined;
-              },
+              onChange: loginSchema.shape.email,
             }}
           >
             {(field) => (
@@ -61,11 +57,7 @@ export function LoginForm() {
           <form.Field
             name="password"
             validators={{
-              onChange: ({ value }) => {
-                if (!value) return 'Password is required';
-                if (value.length < 6) return 'Password must be at least 6 characters';
-                return undefined;
-              },
+              onChange: loginSchema.shape.password,
             }}
           >
             {(field) => (

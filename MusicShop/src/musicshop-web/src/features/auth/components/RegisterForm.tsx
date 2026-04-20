@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button, Input, Label, Alert, AlertDescription, AlertTitle } from '@/shared/components';
 import { AlertCircle, Loader2, UserPlus } from 'lucide-react';
-import { useRegisterForm } from '@/features/auth/hooks/useRegisterForm';
+import { useRegisterForm, registerSchema } from '@/features/auth/hooks/useRegisterForm';
 
 export function RegisterForm() {
   const {
@@ -44,10 +44,7 @@ export function RegisterForm() {
           <form.Field
             name="fullName"
             validators={{
-              onChange: ({ value }) => {
-                if (!value || value.length < 2) return 'Full Name must be at least 2 characters';
-                return undefined;
-              },
+              onChange: registerSchema.shape.fullName,
             }}
           >
             {(field) => (
@@ -72,11 +69,7 @@ export function RegisterForm() {
           <form.Field
             name="email"
             validators={{
-              onChange: ({ value }) => {
-                if (!value) return 'Email is required';
-                if (!/\S+@\S+\.\S+/.test(value)) return 'Valid email is required';
-                return undefined;
-              },
+              onChange: registerSchema.shape.email,
             }}
           >
             {(field) => (
@@ -102,10 +95,7 @@ export function RegisterForm() {
           <form.Field
             name="password"
             validators={{
-              onChange: ({ value }) => {
-                if (!value || value.length < 6) return 'Password must be at least 6 characters';
-                return undefined;
-              },
+              onChange: registerSchema.shape.password,
             }}
           >
             {(field) => (
@@ -131,6 +121,7 @@ export function RegisterForm() {
           <form.Field
             name="confirmPassword"
             validators={{
+              onChangeListenTo: ['password'],
               onChange: ({ value, fieldApi }) => {
                 if (value !== fieldApi.form.getFieldValue('password')) {
                   return 'Passwords do not match';
