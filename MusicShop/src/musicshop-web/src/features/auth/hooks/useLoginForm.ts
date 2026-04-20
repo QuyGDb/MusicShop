@@ -1,19 +1,10 @@
-import { useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
+import { useForm } from '@tanstack/react-form';
 import { CredentialResponse } from '@react-oauth/google';
 import { authService } from '@/features/auth/services/authService';
 import { useAuthRedirect } from '@/shared/hooks/useAuthRedirect';
 
-interface LoginErrors {
-  email?: string;
-  password?: string;
-}
-
 export function useLoginForm() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<LoginErrors>({});
-  
   const { redirectAfterAuth } = useAuthRedirect();
 
   // Standard Login Mutation
@@ -32,34 +23,15 @@ export function useLoginForm() {
     },
   });
 
-  const validate = () => {
-    const newErrors: LoginErrors = {};
-
-    if (!email) {
-      newErrors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      newErrors.email = 'Email is invalid';
-    }
-
-    if (!password) {
-      newErrors.password = 'Password is required';
-    } else if (password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const onSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!validate()) {
-      return;
-    }
-
-    loginMutation.mutate({ email, password });
-  };
+  const form = useForm({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    onSubmit: async ({ value }) => {
+      loginMutation.mutate(value);
+    },
+  });
 
   const handleGoogleSuccess = (credentialResponse: CredentialResponse) => {
     const idToken = credentialResponse.credential;
@@ -77,14 +49,9 @@ export function useLoginForm() {
   const serverError = error instanceof Error ? error.message : null;
 
   return {
-    email,
-    setEmail,
-    password,
-    setPassword,
+    form,
     isSubmitting,
     serverError,
-    errors,
-    onSubmit,
     handleGoogleSuccess
   };
 }

@@ -5,14 +5,9 @@ import { useLoginForm } from '@/features/auth';
 
 export function LoginForm() {
   const {
-    email,
-    setEmail,
-    password,
-    setPassword,
+    form,
     isSubmitting,
     serverError,
-    errors,
-    onSubmit,
     handleGoogleSuccess
   } = useLoginForm();
 
@@ -25,39 +20,78 @@ export function LoginForm() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={onSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="name@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="bg-neutral-800 border-neutral-700"
-            />
-            {errors.email && (
-              <p className="text-sm text-red-500">{errors.email}</p>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            form.handleSubmit();
+          }}
+          className="space-y-4"
+        >
+          <form.Field
+            name="email"
+            validators={{
+              onChange: ({ value }) => {
+                if (!value) return 'Email is required';
+                if (!/\S+@\S+\.\S+/.test(value)) return 'Email is invalid';
+                return undefined;
+              },
+            }}
+          >
+            {(field) => (
+              <div className="space-y-2">
+                <Label htmlFor={field.name}>Email</Label>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  type="email"
+                  placeholder="name@example.com"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  className="bg-neutral-800 border-neutral-700"
+                />
+                {field.state.meta.errors && (
+                  <p className="text-sm text-red-500">{field.state.meta.errors.join(', ')}</p>
+                )}
+              </div>
             )}
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
-              <Button type="button" variant="link" className="p-0 h-auto text-xs text-neutral-400">
-                Forgot password?
-              </Button>
-            </div>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="bg-neutral-800 border-neutral-700"
-            />
-            {errors.password && (
-              <p className="text-sm text-red-500">{errors.password}</p>
+          </form.Field>
+
+          <form.Field
+            name="password"
+            validators={{
+              onChange: ({ value }) => {
+                if (!value) return 'Password is required';
+                if (value.length < 6) return 'Password must be at least 6 characters';
+                return undefined;
+              },
+            }}
+          >
+            {(field) => (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor={field.name}>Password</Label>
+                  <Button type="button" variant="link" className="p-0 h-auto text-xs text-neutral-400">
+                    Forgot password?
+                  </Button>
+                </div>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  type="password"
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  className="bg-neutral-800 border-neutral-700"
+                />
+                {field.state.meta.errors && (
+                  <p className="text-sm text-red-500">{field.state.meta.errors.join(', ')}</p>
+                )}
+              </div>
             )}
-          </div>
+          </form.Field>
+
           {serverError && (
             <div className="p-3 text-sm bg-red-900/20 border border-red-900/50 text-red-400 rounded-md">
               {serverError}
