@@ -45,30 +45,6 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     }
 }
 
-public class AIConversationConfiguration : IEntityTypeConfiguration<AIConversation>
-{
-    public void Configure(EntityTypeBuilder<AIConversation> builder)
-    {
-        builder.HasKey(x => x.Id);
-        
-        builder.HasMany(x => x.Messages)
-            .WithOne(x => x.Conversation)
-            .HasForeignKey(x => x.ConversationId)
-            .OnDelete(DeleteBehavior.Cascade);
-    }
-}
-
-public class AIMessageConfiguration : IEntityTypeConfiguration<AIMessage>
-{
-    public void Configure(EntityTypeBuilder<AIMessage> builder)
-    {
-        builder.HasKey(x => x.Id);
-        
-        builder.Property(x => x.Role).IsRequired().HasMaxLength(50);
-        builder.Property(x => x.Content).IsRequired();
-    }
-}
-
 public class NotificationLogConfiguration : IEntityTypeConfiguration<NotificationLog>
 {
     public void Configure(EntityTypeBuilder<NotificationLog> builder)

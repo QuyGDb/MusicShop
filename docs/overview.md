@@ -4,12 +4,12 @@
 
 ## 1. Project Overview
 
-> AI-powered Music Shop · ASP.NET Core 10 · Claude API · pgvector  
+> Music Shop · ASP.NET Core 10
 
 ### 1.1 Overview
 MusicShop is an online platform for selling physical media (vinyl, CD, cassette). The Admin is the sole manager of the catalog.
 
-The key differentiator from standard shops is the integration of an **AI Agent** that helps customers find products, answers music-related questions, and provides personalized recommendations based on interests.
+The key differentiator is the detailed catalog management and specialized attributes for different physical media formats.
 
 
 ---
@@ -26,8 +26,7 @@ The key differentiator from standard shops is the integration of an **AI Agent**
 3. [Sản phẩm & Bán hàng](#3-sản-phẩm--bán-hàng)
 4. [Quy trình đơn hàng](#4-quy-trình-đơn-hàng)
 5. [Thanh toán](#5-thanh-toán)
-6. [Tính năng AI](#6-tính-năng-ai)
-7. [Thông báo & Sự kiện nghiệp vụ](#7-thông-báo--sự-kiện-nghiệp-vụ)
+6. [Thông báo & Sự kiện nghiệp vụ](#6-thông-báo--sự-kiện-nghiệp-vụ)
 
 ## 0. Tổng quan tính năng
 
@@ -69,10 +68,6 @@ The key differentiator from standard shops is the integration of an **AI Agent**
 * Thêm / xóa sản phẩm khỏi Collection
 * Nhận thông báo khi sản phẩm trong Wantlist có hàng trở lại
 
-### 0.7 AI
-* Chat với trợ lý AI để tìm kiếm và khám phá sản phẩm (Guest + Customer)
-* Lưu lịch sử hội thoại AI (Customer)
-* Nhận gợi ý sản phẩm cá nhân hóa (Customer)
 
 ### 0.8 Thông báo
 * Gửi email xác nhận khi đơn được tạo
@@ -87,8 +82,8 @@ The key differentiator from standard shops is the integration of an **AI Agent**
 
 | Vai trò | Mô tả | Quyền hạn |
 |---|---|---|
-| **Guest** | Khách vãng lai, chưa đăng nhập | Xem danh mục, tìm kiếm & lọc sản phẩm, chat AI (lưu tạm 30 phút) |
-| **Customer** | Khách hàng đã đăng ký (Email hoặc Google) | Mua hàng, theo dõi đơn, Wantlist, Collection, nhận gợi ý AI cá nhân hóa, chat AI lưu lịch sử lâu dài |
+| **Guest** | Khách vãng lai, chưa đăng nhập | Xem danh mục, tìm kiếm & lọc sản phẩm |
+| **Customer** | Khách hàng đã đăng ký (Email hoặc Google) | Mua hàng, theo dõi đơn, Wantlist, Collection |
 | **Admin** | Chủ shop | Quản lý catalog, xác nhận / ship / hủy đơn, xem báo cáo doanh thu, xem log hành động |
 
 ---
@@ -230,57 +225,11 @@ Mỗi lần thanh toán lưu: số tiền, phương thức thanh toán, mã giao
 
 ---
 
-## 6. Tính năng AI
-
-### 6.1 Chat Agent
-
-Trợ lý trò chuyện giúp khách hàng tìm kiếm và khám phá sản phẩm.
-
-**Phạm vi hoạt động:**
-- Chỉ trả lời các câu hỏi trong phạm vi âm nhạc và sản phẩm của shop.
-- Tự động trích dẫn sản phẩm liên quan kèm link khi phù hợp.
-- Không hỗ trợ đặt hàng qua chat.
-
-**Lịch sử hội thoại:**
-- Guest: lịch sử lưu tạm, mất sau 30 phút không hoạt động.
-- Customer: lịch sử được lưu lâu dài vào tài khoản.
-
-**Ví dụ hội thoại:**
-
-```
-Khách:  "Có đĩa nhạc phim kinh dị nào không?"
-Agent:  "Hiện shop có một số soundtrack kinh dị hay:
-         • Halloween 40th Anniversary — John Carpenter (850k)
-           Bản limited blue vinyl, remastered 2018
-         • Hellraiser OST — Mondo exclusive 140g (1.2M)
-           Còn 2 bản cuối
-         Bạn thích phong cách nào — ambient horror hay orchestral score?"
-
-Khách:  "Vinyl 140g khác 180g thế nào?"
-Agent:  "140g là standard chất lượng tốt, 180g là audiophile grade —
-         nặng hơn, ít rung động hơn khi play, thường dùng cho limited pressing..."
-```
-
-### 6.2 Gợi ý cá nhân hóa
-
-Hệ thống gợi ý sản phẩm phù hợp dựa trên thói quen và sở thích của từng khách hàng.
-
-**Điều kiện kích hoạt:**
-- Khách hàng cần có ít nhất 1 đơn hàng hoàn thành **hoặc** 3 sản phẩm trong Wantlist.
-
-**Quy tắc lọc:**
-- Không gợi ý sản phẩm đã có trong Collection của khách hàng.
-- Không gợi ý sản phẩm đang hết hàng.
-
-**Tần suất cập nhật:**
-- Làm mới mỗi 24 giờ.
-- Làm mới ngay khi khách hàng có hoạt động mới (mua hàng, thêm wantlist…).
-
 ---
 
-## 7. Thông báo & Sự kiện nghiệp vụ
+## 6. Thông báo & Sự kiện nghiệp vụ
 
-### 7.1 Thông báo theo vòng đời đơn hàng
+### 6.1 Thông báo theo vòng đời đơn hàng
 
 | Sự kiện | Hành động thông báo |
 |---|---|

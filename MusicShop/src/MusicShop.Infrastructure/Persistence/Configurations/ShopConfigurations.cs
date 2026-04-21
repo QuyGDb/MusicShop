@@ -127,18 +127,3 @@ public class CuratedCollectionItemConfiguration : IEntityTypeConfiguration<Curat
     }
 }
 
-public class RecommendationConfiguration : IEntityTypeConfiguration<Recommendation>
-{
-    public void Configure(EntityTypeBuilder<Recommendation> builder)
-    {
-        builder.HasKey(x => x.Id);
-
-        builder.HasOne(x => x.ProductVariant)
-            .WithMany() // ProductVariant doesn't need to track recommendations
-            .HasForeignKey(x => x.ProductVariantId)
-            .IsRequired()
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasIndex(x => x.UserId);
-    }
-}

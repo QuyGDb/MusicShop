@@ -8,9 +8,8 @@ using System.Reflection;
 
 namespace MusicShop.Infrastructure.Persistence;
 
-public class AppDbContext : DbContext
+public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     // Table mapping according to ERD numbering
 
@@ -49,12 +48,7 @@ public class AppDbContext : DbContext
     public DbSet<WantlistItem> WantlistItems => Set<WantlistItem>();
     public DbSet<UserCollection> UserCollections => Set<UserCollection>();
 
-    // 7. AI Features
-    public DbSet<AIConversation> AIConversations => Set<AIConversation>();
-    public DbSet<AIMessage> AIMessages => Set<AIMessage>();
-    public DbSet<Recommendation> Recommendations => Set<Recommendation>();
-
-    // 8. Notifications (System)
+    // 7. Notifications (System)
     public DbSet<NotificationLog> NotificationLogs => Set<NotificationLog>();
 
     // Legacy/Extra
