@@ -46,15 +46,14 @@ The key differentiator is the detailed catalog management and specialized attrib
 ### 0.3 Mua hàng
 * Thêm sản phẩm vào giỏ hàng
 * Đặt hàng
-* Chọn phương thức thanh toán (VNPAY / COD)
+* Chọn phương thức thanh toán (Stripe)
 * Đặt hàng trước (Pre-order)
 * Theo dõi trạng thái đơn hàng
 * Hủy đơn hàng (Customer: chỉ khi Pending / Admin: từ Confirmed trở đi)
 * Đánh giá sản phẩm sau khi đơn hoàn thành
 
 ### 0.4 Thanh toán
-* Thanh toán online qua cổng VNPAY
-* Thanh toán COD (tiền mặt khi nhận hàng)
+* Thanh toán online qua cổng Stripe
 * Ghi nhận lịch sử giao dịch
 
 ### 0.5 Quản lý đơn hàng (Admin)
@@ -216,8 +215,7 @@ Khách hàng có thể để lại đánh giá (rating 1–5 sao + nhận xét) 
 
 | Phương thức | Mô tả |
 |---|---|
-| **VNPAY** | Thanh toán online qua cổng VNPAY |
-| **COD** | Thanh toán tiền mặt khi nhận hàng |
+| **Stripe** | Thanh toán online qua cổng Stripe |
 
 ### 5.2 Thông tin ghi nhận
 

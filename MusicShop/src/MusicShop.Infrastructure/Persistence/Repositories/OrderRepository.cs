@@ -21,7 +21,7 @@ public sealed class OrderRepository(AppDbContext context) : GenericRepository<Or
     public async Task<IEnumerable<Order>> GetByUserIdAsync(Guid userId, CancellationToken ct = default)
     {
         return await _dbSet
-            .Where(order => order.CustomerId == userId)
+            .Where(order => order.UserId == userId)
             .OrderByDescending(order => order.CreatedAt)
             .ToListAsync(ct);
     }
@@ -34,7 +34,7 @@ public sealed class OrderRepository(AppDbContext context) : GenericRepository<Or
         CancellationToken ct = default)
     {
         IQueryable<Order> query = _dbSet.AsNoTracking()
-            .Where(order => order.CustomerId == userId)
+            .Where(order => order.UserId == userId)
             .AsQueryable();
 
         if (status.HasValue)

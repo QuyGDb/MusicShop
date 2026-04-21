@@ -1,82 +1,59 @@
 import { useState } from 'react';
 import { 
-  Music, 
   Plus, 
   Search, 
   Filter, 
-  MoreVertical, 
   Edit2, 
   Trash2,
-  ListMusic,
   Disc,
   Calendar,
-  Building
+  Building,
+  Loader2
 } from 'lucide-react';
 import { 
   Button, 
   Card, 
-  CardContent 
+  CardContent,
+  Skeleton
 } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
 import { ReleaseForm } from '@/features/admin';
-
-interface Release {
-  id: string;
-  title: string;
-  artistName: string;
-  labelName: string;
-  year: number;
-  type: string;
-  coverUrl: string;
-  versionsCount: number;
-}
-
-const MOCK_RELEASES: Release[] = [
-  { 
-    id: '1', 
-    title: 'Endless Summer', 
-    artistName: 'The Midnight', 
-    labelName: 'Self Released', 
-    year: 2016, 
-    type: 'Album', 
-    coverUrl: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=400&q=80',
-    versionsCount: 2
-  },
-  { 
-    id: '2', 
-    title: 'Dark All Day', 
-    artistName: 'Gunship', 
-    labelName: 'Horsie In The Hedge', 
-    year: 2018, 
-    type: 'Album', 
-    coverUrl: 'https://images.unsplash.com/photo-1514525253361-bee243870eb2?w=400&q=80',
-    versionsCount: 3
-  },
-  { 
-    id: '3', 
-    title: 'Uncanny Valley', 
-    artistName: 'Perturbator', 
-    labelName: 'Blood Music', 
-    year: 2016, 
-    type: 'Album', 
-    coverUrl: 'https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=400&q=80',
-    versionsCount: 1
-  },
-];
+import { useReleases, useDeleteRelease } from '@/features/catalog/hooks/useReleases';
+import { Release } from '@/features/catalog/types';
 
 export default function ReleaseManagementPage() {
   const [showForm, setShowForm] = useState(false);
-  const [releases, setReleases] = useState<Release[]>(MOCK_RELEASES);
-  
+  const [editingRelease, setEditingRelease] = useState<Release | null>(null);
+  const [page, setPage] = useState(1);
+
+  const { data: releasesData, isLoading } = useReleases(page, 10);
+  const deleteReleaseMutation = useDeleteRelease();
+
+  const handleOpenCreate = () => {
+    setEditingRelease(null);
+    setShowForm(true);
+  };
+
+  const handleOpenEdit = (release: Release) => {
+    setEditingRelease(release);
+    setShowForm(true);
+  };
+
+  const handleDelete = (id: string) => {
+    if (window.confirm('Are you sure you want to delete this release? This will remove all associated versions and tracks.')) {
+      deleteReleaseMutation.mutate(id);
+    }
+  };
+
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-4xl font-extrabold tracking-tight text-foreground">Releases & Inventory</h1>
-          <p className="text-muted-foreground">Manage your musical catalog, tracklists, and physical stock.</p>
+          <h1 className="text-4xl font-extrabold tracking-tight text-foreground">Releases Catalog</h1>
+          <p className="text-muted-foreground">Manage your musical catalog, tracklists, and physical editions.</p>
         </div>
         <Button 
-          onClick={() => setShowForm(true)} 
+          onClick={handleOpenCreate} 
           className="bg-primary hover:bg-primary-dark text-primary-foreground h-12 px-6 rounded-xl shadow-lg shadow-primary/20"
         >
           <Plus className="h-5 w-5 mr-2" />
@@ -86,7 +63,10 @@ export default function ReleaseManagementPage() {
 
       {showForm ? (
         <div className="animate-in zoom-in-95 duration-300">
-           <ReleaseForm onCancel={() => setShowForm(false)} />
+           <ReleaseForm 
+            initialData={editingRelease} 
+            onCancel={() => setShowForm(false)} 
+           />
         </div>
       ) : (
         <>
@@ -107,72 +87,92 @@ export default function ReleaseManagementPage() {
               </Button>
                <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2">
                 <Calendar className="h-4 w-4" />
-                Year
+                Latest
               </Button>
             </div>
           </div>
 
           {/* Releases List */}
           <div className="grid grid-cols-1 gap-4">
-            {releases.map((release) => (
-              <Card key={release.id} className="bg-surface border-border overflow-hidden hover:shadow-md transition-all group p-0">
-                <CardContent className="p-0 flex flex-col md:flex-row items-stretch">
-                   {/* Cover Art */}
-                   <div className="w-full md:w-32 aspect-square relative shrink-0">
-                      <img 
-                        src={release.coverUrl} 
-                        alt={release.title} 
-                        className="w-full h-full object-cover" 
-                      />
-                   </div>
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <Skeleton key={i} className="h-32 w-full rounded-2xl bg-muted/50" />
+              ))
+            ) : (
+              releasesData?.items.map((release) => (
+                <Card key={release.id} className="bg-surface border-border overflow-hidden hover:shadow-md transition-all group p-0">
+                  <CardContent className="p-0 flex flex-col md:flex-row items-stretch">
+                     {/* Cover Art */}
+                     <div className="w-full md:w-32 aspect-square relative shrink-0">
+                        {release.coverUrl ? (
+                          <img 
+                            src={release.coverUrl} 
+                            alt={release.title} 
+                            className="w-full h-full object-cover" 
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-muted flex items-center justify-center">
+                            <Disc className="h-8 w-8 text-muted-foreground/20" />
+                          </div>
+                        )}
+                        <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent md:hidden" />
+                     </div>
 
-                   {/* Information Cluster */}
-                   <div className="flex-1 p-5 flex flex-col justify-center">
-                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                         <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                               <h3 className="text-xl font-bold text-foreground leading-tight">{release.title}</h3>
-                               <span className="px-2 py-0.5 bg-muted border border-border rounded text-[10px] font-bold text-muted-foreground uppercase">
-                                 {release.type}
-                               </span>
-                            </div>
-                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                               <span className="font-semibold text-primary">{release.artistName}</span>
-                               <span className="text-subtle">•</span>
-                               <span className="flex items-center gap-1">
-                                  <Building className="h-3 w-3" />
-                                  {release.labelName}
-                               </span>
-                               <span className="text-subtle">•</span>
-                               <span>{release.year}</span>
-                            </div>
-                         </div>
+                     {/* Information Cluster */}
+                     <div className="flex-1 p-5 flex flex-col justify-center">
+                        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                           <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                 <h3 className="text-xl font-bold text-foreground leading-tight">{release.title}</h3>
+                                 <span className="px-2 py-0.5 bg-muted border border-border rounded text-[10px] font-bold text-muted-foreground uppercase">
+                                   {release.type}
+                                 </span>
+                              </div>
+                              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                                 <span className="font-semibold text-primary">{release.artistName}</span>
+                                 <span className="text-subtle">•</span>
+                                 <span>{release.year}</span>
+                              </div>
+                           </div>
 
-                         {/* Quick Stats */}
-                         <div className="flex items-center gap-6 pr-4">
-                            <div className="text-center">
-                               <p className="text-[10px] font-black uppercase text-subtle tracking-tighter">Inventory</p>
-                               <div className="flex items-center gap-1.5 mt-0.5 text-foreground">
-                                  <Disc className="h-4 w-4 text-primary" />
-                                  <span className="font-bold">{release.versionsCount} Versions</span>
-                               </div>
-                            </div>
-                            <div className="h-8 w-px bg-border hidden md:block" />
-                            <div className="flex items-center gap-2">
-                               <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:text-primary rounded-xl">
-                                  <Edit2 className="h-4 w-4" />
-                               </Button>
-                               <Button variant="ghost" size="icon" className="h-10 w-10 text-muted-foreground hover:text-red-500 rounded-xl">
-                                  <Trash2 className="h-4 w-4" />
-                               </Button>
-                            </div>
-                         </div>
-                      </div>
-                   </div>
-                </CardContent>
-              </Card>
-            ))}
+                           {/* Actions */}
+                           <div className="flex items-center gap-2">
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-10 w-10 text-muted-foreground hover:text-primary rounded-xl"
+                                onClick={() => handleOpenEdit(release)}
+                              >
+                                 <Edit2 className="h-4 w-4" />
+                              </Button>
+                              <Button 
+                                variant="ghost" 
+                                size="icon" 
+                                className="h-10 w-10 text-muted-foreground hover:text-red-500 rounded-xl"
+                                onClick={() => handleDelete(release.id)}
+                                disabled={deleteReleaseMutation.isPending}
+                              >
+                                 {deleteReleaseMutation.isPending && deleteReleaseMutation.variables === release.id ? (
+                                   <Loader2 className="h-4 w-4 animate-spin" />
+                                 ) : (
+                                   <Trash2 className="h-4 w-4" />
+                                 )}
+                              </Button>
+                           </div>
+                        </div>
+                     </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
+          
+          {!isLoading && (releasesData?.items.length ?? 0) === 0 && (
+            <div className="text-center py-20 bg-muted/10 border-2 border-dashed border-border rounded-3xl">
+              <Disc className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
+              <p className="text-muted-foreground font-medium">Your catalog is silent. Create your first release!</p>
+            </div>
+          )}
         </>
       )}
     </div>

@@ -10,7 +10,7 @@ public class Payment : BaseEntity
 
     public decimal Amount { get; set; }
     public PaymentStatus Status { get; set; } = PaymentStatus.Pending;
-    public PaymentGateway Gateway { get; set; }
-    public string? TransactionId { get; set; }
+    public PaymentGateway Method { get; set; }
+    public string? TransactionCode { get; set; }
     public DateTime? PaidAt { get; set; }
 }

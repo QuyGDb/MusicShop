@@ -32,7 +32,7 @@ public sealed class StripeService : IStripeService
         {
             var options = new SessionCreateOptions
             {
-                PaymentMethodTypes = ["card"],
+                PaymentMethodTypes = new List<string> { "card" },
                 LineItems = [],
                 Mode = "payment",
                 SuccessUrl = successUrl,

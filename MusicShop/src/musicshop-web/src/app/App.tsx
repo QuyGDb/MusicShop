@@ -15,9 +15,11 @@ import ArtistManagementPage from '@/pages/admin/ArtistManagementPage';
 import LabelManagementPage from '@/pages/admin/LabelManagementPage';
 import GenreManagementPage from '@/pages/admin/GenreManagementPage';
 import ReleaseManagementPage from '@/pages/admin/ReleaseManagementPage';
+import ProductManagementPage from '@/pages/admin/ProductManagementPage';
 import OrderManagementPage from '@/pages/admin/OrderManagementPage';
 import CustomerManagementPage from '@/pages/admin/CustomerManagementPage';
 import CollectionManagementPage from '@/pages/admin/CollectionManagementPage';
+import ProductAdminDetailsPage from '@/pages/admin/ProductAdminDetailsPage';
 import { useAuthStore } from '@/store/useAuthStore';
 import axiosInstance from '@/shared/api/axiosInstance';
 
@@ -61,9 +63,11 @@ export default function App() {
         <Route path="labels" element={<LabelManagementPage />} />
         <Route path="genres" element={<GenreManagementPage />} />
         <Route path="releases" element={<ReleaseManagementPage />} />
+        <Route path="products" element={<ProductManagementPage />} />
         <Route path="orders" element={<OrderManagementPage />} />
         <Route path="customers" element={<CustomerManagementPage />} />
         <Route path="collections" element={<CollectionManagementPage />} />
+        <Route path="products/:id" element={<ProductAdminDetailsPage />} />
         {/* Future admin sub-routes will go here */}
       </Route>
 

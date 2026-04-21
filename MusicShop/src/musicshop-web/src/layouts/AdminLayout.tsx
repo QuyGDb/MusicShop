@@ -24,15 +24,31 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const { pathname } = useLocation();
   const user = useAuthStore((state) => state.user);
 
-  const sidebarLinks = [
-    { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { name: 'Artists', href: '/admin/artists', icon: UserCircle },
-    { name: 'Releases', href: '/admin/releases', icon: Music },
-    { name: 'Labels', href: '/admin/labels', icon: Tag },
-    { name: 'Genres', href: '/admin/genres', icon: Hash },
-    { name: 'Orders', href: '/admin/orders', icon: ShoppingBag },
-    { name: 'Customers', href: '/admin/customers', icon: Users },
-    { name: 'Curation', href: '/admin/collections', icon: Layers },
+  const sidebarGroups = [
+    {
+      title: 'Main',
+      links: [
+        { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
+      ]
+    },
+    {
+      title: 'Music Catalog',
+      links: [
+        { name: 'Artists', href: '/admin/artists', icon: UserCircle },
+        { name: 'Releases', href: '/admin/releases', icon: Music },
+        { name: 'Labels', href: '/admin/labels', icon: Tag },
+        { name: 'Genres', href: '/admin/genres', icon: Hash },
+      ]
+    },
+    {
+      title: 'Store & Customers',
+      links: [
+        { name: 'Products', href: '/admin/products', icon: Package },
+        { name: 'Orders', href: '/admin/orders', icon: ShoppingBag },
+        { name: 'Customers', href: '/admin/customers', icon: Users },
+        { name: 'Curation', href: '/admin/collections', icon: Layers },
+      ]
+    }
   ];
 
   return (
@@ -46,28 +62,37 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <span className="text-xl font-bold tracking-tight text-foreground">Admin Panel</span>
         </div>
 
-        <nav className="flex-1 px-4 py-4 space-y-1">
-          {sidebarLinks.map((link) => {
-            const Icon = link.icon;
-            const isActive = link.href === '/admin' 
-              ? pathname === '/admin' 
-              : pathname.startsWith(link.href);
-            return (
-              <Link
-                key={link.href}
-                to={link.href}
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all group",
-                  isActive 
-                    ? "bg-primary/10 text-primary" 
-                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                )}
-              >
-                <Icon className={cn("h-5 w-5", isActive ? "text-primary" : "text-subtle group-hover:text-muted-foreground")} />
-                {link.name}
-              </Link>
-            );
-          })}
+        <nav className="flex-1 px-4 py-4 space-y-8 overflow-y-auto">
+          {sidebarGroups.map((group) => (
+            <div key={group.title} className="space-y-2">
+              <h3 className="px-4 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/50">
+                {group.title}
+              </h3>
+              <div className="space-y-1">
+                {group.links.map((link) => {
+                  const Icon = link.icon;
+                  const isActive = link.href === '/admin' 
+                    ? pathname === '/admin' 
+                    : pathname.startsWith(link.href);
+                  return (
+                    <Link
+                      key={link.href}
+                      to={link.href}
+                      className={cn(
+                        "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all group",
+                        isActive 
+                          ? "bg-primary/10 text-primary border-l-2 border-primary rounded-l-none" 
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground border-l-2 border-transparent"
+                      )}
+                    >
+                      <Icon className={cn("h-5 w-5", isActive ? "text-primary" : "text-subtle group-hover:text-muted-foreground")} />
+                      {link.name}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </nav>
 
         <div className="p-4 border-t border-border">

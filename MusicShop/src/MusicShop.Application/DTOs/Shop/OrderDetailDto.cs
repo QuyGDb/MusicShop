@@ -5,8 +5,8 @@ namespace MusicShop.Application.DTOs.Shop;
 public sealed record OrderDetailDto(
     Guid Id,
     OrderStatus Status,
-    string ShippingName,
-    string ShippingPhone,
+    string RecipientName,
+    string Phone,
     string ShippingAddress,
     string? Note,
     decimal TotalAmount,
@@ -36,4 +36,4 @@ public sealed record PaymentDetailDto(
     PaymentGateway Method,
     PaymentStatus Status,
     DateTime? PaidAt,
-    string? TransactionId);
+    string? TransactionCode);

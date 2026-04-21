@@ -411,29 +411,32 @@ namespace MusicShop.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("CancelReason")
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("CancelledBy")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("Note")
                         .HasColumnType("text");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("RecipientName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<string>("ShippingAddress")
                         .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)");
-
-                    b.Property<string>("ShippingName")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
-
-                    b.Property<string>("ShippingPhone")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -448,6 +451,9 @@ namespace MusicShop.Infrastructure.Migrations
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -506,7 +512,7 @@ namespace MusicShop.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Gateway")
+                    b.Property<string>("Method")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -520,7 +526,7 @@ namespace MusicShop.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("TransactionId")
+                    b.Property<string>("TransactionCode")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")

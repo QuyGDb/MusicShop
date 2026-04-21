@@ -1,0 +1,6 @@
+export * from './types';
+export * from './services/productService';
+export * from './hooks/useProducts';
+export * from './hooks/useProductFilters';
+export * from './components/ProductCard';
+export * from './components/FilterBar';

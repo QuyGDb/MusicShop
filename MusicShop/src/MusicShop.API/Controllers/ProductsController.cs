@@ -42,6 +42,17 @@ public sealed class ProductsController(IMediator mediator) : BaseApiController
     }
 
     [Authorize(Roles = "admin")]
+    [HttpGet("admin/{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ApiResponse<ProductDetailDto>>> GetProductById(
+        Guid id,
+        CancellationToken cancellationToken)
+    {
+        var result = await mediator.Send(new GetProductByIdQuery(id), cancellationToken);
+        return HandleResult(result);
+    }
+
+    [Authorize(Roles = "admin")]
     [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<Guid>), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

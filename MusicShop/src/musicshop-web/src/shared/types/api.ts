@@ -15,3 +15,8 @@ export interface MetaData {
   limit: number;
   total: number;
 }
+
+export interface PaginatedResponse<T> {
+  items: T[];
+  meta: MetaData | null;
+}

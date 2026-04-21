@@ -38,9 +38,9 @@ public sealed class CreateOrderCommandHandler(
         // 2. Prepare Order
         Order order = new()
         {
-            CustomerId = userId,
-            ShippingName = request.ShippingName,
-            ShippingPhone = request.ShippingPhone,
+            UserId = userId,
+            RecipientName = request.RecipientName,
+            Phone = request.Phone,
             ShippingAddress = request.ShippingAddress,
             Note = request.Note,
             Status = OrderStatus.Pending
@@ -89,7 +89,7 @@ public sealed class CreateOrderCommandHandler(
         Payment payment = new()
         {
             Amount = totalAmount,
-            Gateway = request.PaymentMethod,
+            Method = request.PaymentGateway,
             Status = PaymentStatus.Pending
         };
 
@@ -116,7 +116,7 @@ public sealed class CreateOrderCommandHandler(
 
         return Result<CreateOrderResponse>.Success(new CreateOrderResponse(
             new OrderSummaryDto(order.Id, order.Status, order.TotalAmount, order.CreatedAt),
-            new PaymentSummaryDto(payment.Id, payment.Gateway, payment.Status, checkoutUrl)
+            new PaymentSummaryDto(payment.Id, payment.Method, payment.Status, checkoutUrl)
         ));
     }
 }

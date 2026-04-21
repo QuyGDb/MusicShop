@@ -115,7 +115,7 @@ Request → Controller → MediatR → Handler → Repository → DB
 | # | Tính năng | Phase gốc |
 |---|---|---|
 | 9 | Order state machine đầy đủ | Phase 3 |
-| 10 | Admin — CRUD products, quản lý orders + Revenue reports | Phase 6 |
+| 10 | Admin — CRUD products, quản lý orders | Phase 3 |
 | 11 | Meilisearch — full-text search sản phẩm | Phase 2 |
 | 12 | S3 upload ảnh sản phẩm | Phase 2 |
 | 13 | Distributed lock (Lua script) cho Hangfire | Phase 5 |
@@ -801,13 +801,13 @@ public async Task<Unit> Handle(UpdateOrderStatusCommand cmd, CancellationToken c
 
 ## Phase 4 — Payment
 
-> **Mục tiêu:** Tích hợp VNPAY, xử lý callback an toàn.
+> **Mục tiêu:** Tích hợp Stripe, xử lý callback an toàn.
 > **Tech nổi bật:** HMAC-SHA512, Webhook security, Idempotency
 
-### 4.1 VNPAY Integration
+### 4.1 Stripe Integration
 
 ```csharp
-public class VnPayService : IVnPayService
+public class StripeService : IStripeService
 {
     public string CreatePaymentUrl(Order order, string returnUrl)
     {
@@ -863,10 +863,10 @@ public class VnPayService : IVnPayService
 
 **IPN Handler — Idempotent:**
 ```csharp
-[HttpPost("vnpay/ipn")]
-public async Task<IActionResult> VnPayIpn([FromQuery] VnPayIpnQuery query)
+[HttpPost("Stripe/ipn")]
+public async Task<IActionResult> StripeIpn([FromQuery] StripeIpnQuery query)
 {
-    if (!_vnPayService.VerifySignature(Request.Query))
+    if (!_StripeService.VerifySignature(Request.Query))
         return Ok(new { RspCode = "97", Message = "Invalid signature" });
 
     var payment = await _paymentRepo.FindByOrderIdAsync(Guid.Parse(query.VnpTxnRef));
@@ -1016,215 +1016,6 @@ RecurringJob.AddOrUpdate<IRecommendationService>(
 
 ---
 
-## Phase 6 — Admin Dashboard & Reports
-
-> **Mục tiêu:** Báo cáo doanh thu, quản lý hệ thống.
-> **Tech nổi bật:** Dapper, Complex SQL, Response caching
-
-### 6.1 Dapper cho Report Queries
-
-```csharp
-public class RevenueReportRepository : IRevenueReportRepository
-{
-    private readonly IDbConnection _db;
-
-    public async Task<List<RevenueByMonthDto>> GetRevenueByMonthAsync(
-        DateTime from, DateTime to)
-    {
-        const string sql = @"
-            SELECT
-                DATE_TRUNC('month', o.created_at)   AS month,
-                p.format                             AS format,
-                COUNT(DISTINCT o.id)                 AS order_count,
-                SUM(oi.unit_price * oi.quantity)     AS revenue
-            FROM orders o
-                JOIN order_items oi ON oi.order_id = o.id
-                JOIN product_variants pv ON pv.id = oi.product_variant_id
-                JOIN products p ON p.id = pv.product_id
-            WHERE o.status = 'completed'
-              AND o.created_at BETWEEN @from AND @to
-            GROUP BY 1, 2
-            ORDER BY 1 DESC, 4 DESC";
-
-        var result = await _db.QueryAsync<RevenueByMonthDto>(sql, new { from, to });
-        return result.ToList();
-    }
-}
-```
-
-> EF Core cho CRUD, relationships, unit of work — Dapper cho read-heavy queries, reports, complex joins.
-
----
-
-## Phase 7 — AI Agent Chat *(Tier 3 — optional)*
-
-> **Mục tiêu:** Chat assistant, SSE streaming, gợi ý cá nhân hóa.
-> **Tech nổi bật:** Anthropic API, SSE, Content-based filtering
-
-### 7.1 EF Core Migration 6
-
-```
-ai_conversations, ai_messages, recommendations
-```
-
----
-
-### 7.2 AI Chat với SSE Streaming
-
-```csharp
-[HttpPost("{conversationId}/messages")]
-public async Task SendMessage(
-    Guid conversationId,
-    [FromBody] SendMessageRequest request,
-    CancellationToken ct)
-{
-    Response.Headers.Append("Content-Type", "text/event-stream");
-    Response.Headers.Append("Cache-Control", "no-cache");
-    Response.Headers.Append("X-Accel-Buffering", "no");
-
-    var history = await _messageRepo.GetByConversationAsync(conversationId, ct);
-
-    await _messageRepo.CreateAsync(new AiMessage
-    {
-        ConversationId = conversationId,
-        Role           = MessageRole.User,
-        Content        = request.Content,
-    }, ct);
-
-    var fullResponse = new StringBuilder();
-
-    await foreach (var chunk in _claudeService.StreamMessageAsync(history, request.Content, ct))
-    {
-        fullResponse.Append(chunk);
-        await Response.WriteAsync($"data: {JsonSerializer.Serialize(new { delta = chunk })}\n\n", ct);
-        await Response.Body.FlushAsync(ct);
-    }
-
-    await Response.WriteAsync("data: [DONE]\n\n", ct);
-
-    await _messageRepo.CreateAsync(new AiMessage
-    {
-        ConversationId = conversationId,
-        Role           = MessageRole.Assistant,
-        Content        = fullResponse.ToString(),
-    }, ct);
-
-    await _conversationRepo.UpdateActivityAsync(conversationId, ct);
-}
-```
-
-**Claude Service:**
-```csharp
-public class ClaudeService : IClaudeService
-{
-    private readonly HttpClient _http;
-
-    public async IAsyncEnumerable<string> StreamMessageAsync(
-        List<AiMessage> history,
-        string userMessage,
-        [EnumeratorCancellation] CancellationToken ct)
-    {
-        var messages = history
-            .Select(m => new { role = m.Role.ToString().ToLower(), content = m.Content })
-            .Append(new { role = "user", content = userMessage })
-            .ToList();
-
-        var request = new
-        {
-            model      = "claude-sonnet-4-6",
-            max_tokens = 1024,
-            stream     = true,
-            system     = VinylShopPrompts.SystemPrompt,
-            messages,
-        };
-
-        using var response = await _http.PostAsJsonAsync(
-            "https://api.anthropic.com/v1/messages", request, ct);
-
-        await foreach (var line in ReadSseAsync(response.Content, ct))
-        {
-            if (!line.StartsWith("data: ")) continue;
-            var json  = JsonDocument.Parse(line[6..]);
-            var delta = json.RootElement
-                .GetProperty("delta")
-                .GetProperty("text")
-                .GetString();
-
-            if (!string.IsNullOrEmpty(delta))
-                yield return delta;
-        }
-    }
-}
-```
-
----
-
-### 7.3 Recommendation Service — Content-Based Filtering
-
-```csharp
-public class RecommendationService : IRecommendationService
-{
-    public async Task GenerateForUserAsync(Guid userId, CancellationToken ct)
-    {
-        var completedOrderCount = await _orderRepo.CountCompletedAsync(userId, ct);
-        var wantlistCount       = await _wantlistRepo.CountAsync(userId, ct);
-
-        if (completedOrderCount == 0 && wantlistCount < 3) return;
-
-        var preferredGenreIds  = await GetPreferredGenreIdsAsync(userId, ct);
-        var preferredArtistIds = await GetPreferredArtistIdsAsync(userId, ct);
-        var ownedProductIds    = await _collectionRepo.GetProductIdsAsync(userId, ct);
-
-        var candidates = await _context.ProductVariants
-            .Include(v => v.Product.ReleaseVersion.Release)
-                .ThenInclude(r => r.Genres)
-            .Include(v => v.Product.ReleaseVersion.Release.Artist)
-            .Where(v => v.IsAvailable
-                && v.StockQty > 0
-                && !ownedProductIds.Contains(v.ProductId))
-            .ToListAsync(ct);
-
-        var scored = candidates.Select(v => new
-        {
-            Variant = v,
-            Score   = CalculateScore(v, preferredGenreIds, preferredArtistIds),
-        })
-        .Where(x => x.Score > 0)
-        .OrderByDescending(x => x.Score)
-        .Take(20)
-        .ToList();
-
-        var expiresAt = DateTime.UtcNow.AddHours(24);
-        await _recommendationRepo.UpsertAsync(userId, scored.Select(x =>
-            new Recommendation
-            {
-                UserId           = userId,
-                ProductVariantId = x.Variant.Id,
-                Score            = (float)x.Score,
-                GeneratedAt      = DateTime.UtcNow,
-                ExpiresAt        = expiresAt,
-            }), ct);
-    }
-
-    private double CalculateScore(
-        ProductVariant variant,
-        List<Guid> preferredGenres,
-        List<Guid> preferredArtists)
-    {
-        var release     = variant.Product.ReleaseVersion.Release;
-        var genreScore  = release.Genres.Count(g => preferredGenres.Contains(g.Id)) * 0.6;
-        var artistScore = preferredArtists.Contains(release.ArtistId) ? 0.4 : 0;
-        return genreScore + artistScore;
-    }
-}
-```
-
----
-
-
-
----
-
 ## Tổng hợp Roadmap
 
 ```
@@ -1232,13 +1023,13 @@ Tuần 1 — Foundation + Auth + Products
   Clean Architecture, EF Core, JWT, Redis cache, Catalog
 
 Tuần 2 — Orders + Payment + Email
-  Checkout transaction, Pessimistic lock, VNPAY, Hangfire
+  Checkout transaction, Pessimistic lock, Stripe, Hangfire
 
 Tuần 3 — Stabilization
   Unit tests, Integration tests, Fix bugs
 
 Tuần 4 — Tier 2 Backend mở rộng
-  State machine, Admin CRUD, Revenue reports (Dapper),
+  State machine, Admin CRUD, 
   Meilisearch, S3 upload, Distributed lock, Testcontainers
   [Tier 3 nếu còn giờ: AI Chat]
 ```
@@ -1254,8 +1045,6 @@ Tuần 4 — Tier 2 Backend mở rộng
 | 3 | EF Core transactions, Pessimistic locking, State machine pattern, Hangfire enqueue |
 | 4 | HMAC-SHA512, Webhook security, Idempotency, IOptions pattern |
 | 5 | Hangfire (recurring, queues, dashboard), MailKit, Distributed lock (Lua script), Cron |
-| 6 | Dapper, Complex aggregate SQL, Response caching, EF Core + Dapper hybrid |
-| 7 | HttpClient (Anthropic API), SSE streaming, IAsyncEnumerable, Content-based filtering |
 | 8 | (Dành cho Frontend Team / Repo riêng) |
 
 ---
@@ -1274,12 +1063,14 @@ Hoàn thành project này, CV có thể highlight:
 - **Authentication** — JWT Bearer, refresh token, role-based authorization policy
 - **FluentValidation** — MediatR pipeline behaviour, complex validation rules
 - **AutoMapper** — Projections, computed fields
-- **Payment Integration** — VNPAY, HMAC-SHA512, IPN idempotency
+- **Payment Integration** — Stripe, HMAC-SHA512, IPN idempotency
 - **Search** — Meilisearch .NET SDK
 - **File Storage** — AWSSDK.S3 multipart upload
 - **AI Integration** — Anthropic API qua HttpClient, SSE streaming với IAsyncEnumerable *(nếu làm)*
 - **Testing** — xUnit, Moq, FluentAssertions, Testcontainers (PostgreSQL + Redis in Docker)
 - **Docker** — Multi-stage Dockerfile, docker-compose với health checks
 - **Design Patterns** — Repository, Unit of Work, State Machine, Idempotency, Cache-aside
+
+
 
 

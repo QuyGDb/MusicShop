@@ -1,0 +1,154 @@
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { productService, ProductFilters } from '../services/productService';
+import { useProductFilters } from './useProductFilters';
+import { toast } from 'sonner';
+
+export function useProductsList() {
+  const { 
+    selectedFormat, 
+    selectedGenre, 
+    minPrice, 
+    maxPrice, 
+    page, 
+    searchQuery 
+  } = useProductFilters();
+
+  const filters: ProductFilters = {
+    format: selectedFormat || undefined,
+    genre: selectedGenre || undefined,
+    minPrice: minPrice ? parseFloat(minPrice) : undefined,
+    maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
+    page: page,
+    limit: 12,
+    searchQuery: searchQuery || undefined
+  };
+
+  const { data, isLoading: loading, error } = useQuery({
+    queryKey: ['products', filters],
+    queryFn: () => productService.getProducts(filters),
+  });
+
+  return {
+    products: data?.items || [],
+    loading,
+    error: error instanceof Error ? error.message : null,
+    totalItems: data?.meta?.total || 0,
+    totalPages: data?.meta ? Math.ceil(data.meta.total / 12) : 1,
+    currentPage: page
+  };
+}
+
+export function useProducts(filters: ProductFilters) {
+  return useQuery({
+    queryKey: ['products', filters],
+    queryFn: () => productService.getProducts(filters),
+  });
+}
+
+export function useProduct(slug: string) {
+  return useQuery({
+    queryKey: ['products', slug],
+    queryFn: () => productService.getProductBySlug(slug),
+    enabled: !!slug,
+  });
+}
+
+export function useAdminProduct(id: string) {
+  return useQuery({
+    queryKey: ['products', 'admin', id],
+    queryFn: () => productService.getProductById(id),
+    enabled: !!id,
+  });
+}
+
+export function useCreateProduct() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (data: any) => productService.createProduct(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success('Product created successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to create product');
+    }
+  });
+}
+
+export function useUpdateProduct() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string, data: any }) => 
+      productService.updateProduct(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success('Product updated successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to update product');
+    }
+  });
+}
+
+export function useDeleteProduct() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (id: string) => productService.deleteProduct(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success('Product deleted successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to delete product');
+    }
+  });
+}
+// Variant Hooks
+export function useCreateProductVariant(productId: string) {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (data: any) => productService.createVariant(productId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] }); 
+      toast.success('Variant created successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to create variant');
+    }
+  });
+}
+
+export function useUpdateProductVariant(productId: string) {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({ variantId, data }: { variantId: string, data: any }) => 
+      productService.updateVariant(productId, variantId, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success('Variant updated successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to update variant');
+    }
+  });
+}
+
+export function useDeleteProductVariant(productId: string) {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (variantId: string) => productService.deleteVariant(productId, variantId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+      toast.success('Variant deleted successfully');
+    },
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || 'Failed to delete variant');
+    }
+  });
+}

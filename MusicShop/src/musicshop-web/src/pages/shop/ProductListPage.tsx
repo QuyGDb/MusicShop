@@ -1,9 +1,9 @@
 import React from 'react';
-import { ProductCard } from '@/features/product';
-import { FilterBar } from '@/features/product';
+import { ProductCard } from '@/features/products';
+import { FilterBar } from '@/features/products';
 import { Loader2, Music2 } from 'lucide-react';
-import { useProducts } from '@/features/product';
-import { useProductFilters } from '@/features/product';
+import { useProducts } from '@/features/products';
+import { useProductFilters } from '@/features/products';
 
 export default function ProductListPage() {
   const {
@@ -13,7 +13,7 @@ export default function ProductListPage() {
     totalItems,
     totalPages,
     currentPage
-  } = useProducts();
+  } = useProductsList();
 
   const { setPage } = useProductFilters();
 

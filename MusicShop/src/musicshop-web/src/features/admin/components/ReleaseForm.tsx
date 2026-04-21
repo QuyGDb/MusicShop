@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   X,
   Plus,
@@ -11,84 +11,136 @@ import {
   ChevronRight,
   ChevronLeft,
   Trash2,
-  Clock
+  Clock,
+  Building,
+  Loader2,
+  Package
 } from 'lucide-react';
 import {
   Button,
   Card,
   CardHeader,
   CardTitle,
-  CardContent
+  CardContent,
+  Skeleton
 } from '@/shared/components';
 import { ImageUpload } from '@/shared/components/ui/ImageUpload';
 import { cn } from '@/shared/lib/utils';
-
-interface Track {
-  id: string;
-  position: number;
-  title: string;
-  duration: string;
-}
-
-interface ReleaseVersion {
-  id: string;
-  format: 'Vinyl' | 'CD' | 'Digital';
-  price: number;
-  stock: number;
-  labelId: string;
-  description: string;
-}
+import { useArtists } from '@/features/catalog/hooks/useArtists';
+import { useGenres } from '@/features/catalog/hooks/useGenres';
+import { useLabels } from '@/features/catalog/hooks/useLabels';
+import { 
+  useCreateRelease, 
+  useUpdateRelease,
+  useReleaseVersions,
+  useCreateReleaseVersion,
+  useDeleteReleaseVersion
+} from '@/features/catalog/hooks/useReleases';
+import { Release, Track, ReleaseVersion } from '@/features/catalog/types';
 
 interface ReleaseFormProps {
   onCancel: () => void;
-  initialData?: any;
+  initialData?: Release | null;
 }
 
 export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
-    title: initialData?.title || '',
-    artistId: initialData?.artistId || '',
-    labelId: initialData?.labelId || '',
-    year: initialData?.year || new Date().getFullYear(),
-    type: initialData?.type || 'Album',
-    description: initialData?.description || '',
-    coverUrl: initialData?.coverUrl || '',
-    genreIds: initialData?.genreIds || [] as string[],
-    tracks: initialData?.tracks || [] as Track[],
-    versions: initialData?.versions || [] as ReleaseVersion[]
+    title: '',
+    slug: '',
+    artistId: '',
+    year: new Date().getFullYear(),
+    type: 'Album',
+    description: '',
+    coverUrl: '',
+    genreIds: [] as string[],
+    tracks: [] as { position: number; title: string; durationSeconds: number }[]
   });
 
+  // Dependencies
+  const { data: artistsData, isLoading: loadingArtists } = useArtists(1, 100);
+  const { data: genresData, isLoading: loadingGenres } = useGenres(1, 100);
+  const { data: labelsData, isLoading: loadingLabels } = useLabels(1, 100);
+
+  // Mutations
+  const createReleaseMutation = useCreateRelease();
+  const updateReleaseMutation = useUpdateRelease();
+  
+  // Versions (managed separately if release exists)
+  const { data: versionsData, isLoading: loadingVersions } = useReleaseVersions(initialData?.id || '');
+  const addVersionMutation = useCreateReleaseVersion();
+  const deleteVersionMutation = useDeleteReleaseVersion();
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData({
+        title: initialData.title,
+        slug: initialData.slug,
+        artistId: initialData.artistId,
+        year: initialData.year,
+        type: initialData.type,
+        description: initialData.description || '',
+        coverUrl: initialData.coverUrl || '',
+        genreIds: [], // Need to fetch if not in the basic release object
+        tracks: [] // Tracks are usually fetched via detail or on edit
+      });
+    }
+  }, [initialData]);
+
   const handleAddTrack = () => {
-    const newTrack: Track = {
-      id: Math.random().toString(36).substr(2, 9),
-      position: formData.tracks.length + 1,
-      title: '',
-      duration: ''
-    };
-    setFormData({ ...formData, tracks: [...formData.tracks, newTrack] });
+    setFormData({
+      ...formData,
+      tracks: [...formData.tracks, { position: formData.tracks.length + 1, title: '', durationSeconds: 0 }]
+    });
   };
 
-  const handleRemoveTrack = (id: string) => {
-    setFormData({ ...formData, tracks: formData.tracks.filter(t => t.id !== id) });
-  };
-
-  const handleAddVersion = () => {
-    const newVersion: ReleaseVersion = {
-      id: Math.random().toString(36).substr(2, 9),
-      format: 'Vinyl',
-      price: 0,
-      stock: 0,
-      labelId: formData.labelId,
-      description: ''
-    };
-    setFormData({ ...formData, versions: [...formData.versions, newVersion] });
+  const handleRemoveTrack = (index: number) => {
+    const newTracks = formData.tracks.filter((_, i) => i !== index)
+      .map((t, i) => ({ ...t, position: i + 1 }));
+    setFormData({ ...formData, tracks: newTracks });
   };
 
   const handleSave = () => {
-    console.log('Saving Release:', formData);
-    onCancel();
+    if (!formData.title || !formData.artistId) return;
+
+    const payload = {
+      ...formData,
+      slug: formData.slug || formData.title.toLowerCase().replace(/\s+/g, '-')
+    };
+
+    if (initialData) {
+      updateReleaseMutation.mutate(
+        { id: initialData.id, data: payload },
+        { onSuccess: () => onCancel() }
+      );
+    } else {
+      createReleaseMutation.mutate(payload, {
+        onSuccess: () => onCancel()
+      });
+    }
   };
+
+  const handleAddVersion = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!initialData) return;
+    
+    const form = e.currentTarget;
+    const data = new FormData(form);
+    
+    addVersionMutation.mutate({
+      releaseId: initialData.id,
+      labelId: data.get('labelId'),
+      format: data.get('format'),
+      catalogNumber: data.get('catalogNumber'),
+      pressingCountry: data.get('pressingCountry'),
+      pressingYear: parseInt(data.get('pressingYear') as string),
+      notes: data.get('notes')
+    });
+    
+    form.reset();
+  };
+
+  const isPending = createReleaseMutation.isPending || updateReleaseMutation.isPending;
 
   return (
     <Card className="bg-surface border-primary/20 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-500">
@@ -99,7 +151,7 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
           </div>
           <div>
             <CardTitle className="text-2xl font-bold text-foreground">
-              {initialData ? 'Edit Release' : 'Create New Release'}
+              {initialData ? `Edit ${initialData.title}` : 'Create New Release'}
             </CardTitle>
             <div className="flex items-center gap-2 mt-1">
               <span className={cn("h-1.5 w-8 rounded-full", step >= 1 ? "bg-primary" : "bg-muted")} />
@@ -120,7 +172,7 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
             {[
               { id: 1, name: 'General Info', icon: Disc },
               { id: 2, name: 'Tracklist', icon: ListMusic },
-              { id: 3, name: 'Inventory & Versions', icon: Package }
+              { id: 3, name: 'Editions / Versions', icon: Package }
             ].map((s) => (
               <button
                 key={s.id}
@@ -170,17 +222,17 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
                             className="w-full h-14 bg-muted/20 border border-border rounded-2xl px-5 focus:outline-none focus:border-primary transition-all appearance-none"
                             value={formData.artistId}
                             onChange={(e) => setFormData({ ...formData, artistId: e.target.value })}
+                            disabled={loadingArtists}
                           >
                             <option value="">Select Artist</option>
-                            <option value="1">The Midnight</option>
-                            <option value="2">Gunship</option>
+                            {artistsData?.items.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                           </select>
                         </div>
                         <div className="space-y-2">
                           <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Year</label>
                           <input
                             type="number"
-                            className="w-full h-14 bg-muted/20 border border-border rounded-2xl px-5 focus:outline-none focus:border-primary transition-all"
+                            className="w-full h-14 bg-muted/20 border border-border rounded-2xl px-5 focus:outline-none focus:border-primary transition-all font-bold"
                             value={formData.year}
                             onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })}
                           />
@@ -188,10 +240,28 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
                       </div>
                     </div>
                     <div className="space-y-2">
+                      <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Type</label>
+                      <div className="flex gap-2">
+                        {['Album', 'EP', 'Single', 'Compilation'].map(t => (
+                          <button
+                            key={t}
+                            type="button"
+                            onClick={() => setFormData({ ...formData, type: t })}
+                            className={cn(
+                              "px-4 py-2 rounded-xl text-xs font-bold border transition-all",
+                              formData.type === t ? "bg-primary/10 border-primary text-primary" : "border-border hover:border-primary/50"
+                            )}
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="space-y-2">
                       <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Description / Liner Notes</label>
                       <textarea
-                        rows={6}
-                        className="w-full bg-muted/20 border border-border rounded-2xl p-5 focus:outline-none focus:border-primary transition-all resize-none"
+                        rows={4}
+                        className="w-full bg-muted/20 border border-border rounded-2xl p-5 focus:outline-none focus:border-primary transition-all resize-none text-sm"
                         placeholder="Tell the story of this release..."
                         value={formData.description}
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -222,14 +292,14 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
                     </div>
                   )}
                   {formData.tracks.map((track, index) => (
-                    <div key={track.id} className="flex items-center gap-4 bg-muted/10 p-3 rounded-2xl border border-border/50 group hover:border-primary/30 transition-all">
+                    <div key={index} className="flex items-center gap-4 bg-muted/10 p-3 rounded-2xl border border-border/50 group hover:border-primary/30 transition-all">
                       <span className="w-10 h-10 flex items-center justify-center bg-muted rounded-xl font-black text-xs text-subtle">
-                        {index + 1}
+                        {track.position}
                       </span>
                       <input
                         type="text"
                         placeholder="Track Title"
-                        className="flex-1 bg-transparent border-none focus:outline-none font-bold"
+                        className="flex-1 bg-transparent border-none focus:outline-none font-bold placeholder:font-normal"
                         value={track.title}
                         onChange={(e) => {
                           const newTracks = [...formData.tracks];
@@ -241,21 +311,22 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
                         <Clock className="h-3 w-3 text-subtle" />
                         <input
                           type="text"
-                          placeholder="3:45"
-                          className="w-12 bg-transparent border-none focus:outline-none text-xs font-mono"
-                          value={track.duration}
+                          placeholder="0"
+                          className="w-12 bg-transparent border-none focus:outline-none text-xs font-mono text-right"
+                          value={track.durationSeconds}
                           onChange={(e) => {
                             const newTracks = [...formData.tracks];
-                            newTracks[index].duration = e.target.value;
+                            newTracks[index].durationSeconds = parseInt(e.target.value) || 0;
                             setFormData({ ...formData, tracks: newTracks });
                           }}
                         />
+                        <span className="text-[10px] text-muted-foreground">sec</span>
                       </div>
                       <Button
                         variant="ghost"
                         size="icon"
-                        onClick={() => handleRemoveTrack(track.id)}
-                        className="opacity-0 group-hover:opacity-100 text-red-500 hover:bg-red-50 transition-all rounded-lg"
+                        onClick={() => handleRemoveTrack(index)}
+                        className="opacity-0 group-hover:opacity-100 text-red-500 hover:bg-red-50 transition-all rounded-lg h-10 w-10"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -266,87 +337,94 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
             )}
 
             {step === 3 && (
-              <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-xl font-bold flex items-center gap-2">
-                    <Package className="h-5 w-5 text-primary" />
-                    Inventory Versions
-                  </h3>
-                  <Button onClick={handleAddVersion} variant="outline" size="sm" className="rounded-xl flex gap-2">
-                    <Plus className="h-4 w-4" /> Add Format
-                  </Button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {formData.versions.map((version, index) => (
-                    <Card key={version.id} className="bg-surface border-border shadow-sm border-l-4 border-l-primary animate-in fade-in duration-300">
-                      <CardContent className="p-6 space-y-4">
-                        <div className="flex items-center justify-between">
-                          <select
-                            className="bg-transparent font-black text-lg focus:outline-none text-foreground"
-                            value={version.format}
-                            onChange={(e) => {
-                              const newVersions = [...formData.versions];
-                              newVersions[index].format = e.target.value as any;
-                              setFormData({ ...formData, versions: newVersions });
-                            }}
-                          >
-                            <option>Vinyl</option>
-                            <option>CD</option>
-                            <option>Digital</option>
-                          </select>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => setFormData({ ...formData, versions: formData.versions.filter(v => v.id !== version.id) })}
-                            className="text-red-500 h-8 w-8"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-8 animate-in slide-in-from-right-4 duration-500">
+                {!initialData ? (
+                  <div className="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-6 flex flex-col items-center text-center space-y-4">
+                     <Package className="h-10 w-10 text-amber-500" />
+                     <div className="space-y-1">
+                        <h4 className="font-bold text-amber-500">Save Release First</h4>
+                        <p className="text-sm text-muted-foreground">
+                          Please create the release before adding specific editions (Vinyl, CD, etc.).
+                        </p>
+                     </div>
+                  </div>
+                ) : (
+                  <>
+                    <Card className="border-border bg-muted/5">
+                      <CardHeader>
+                        <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Add New Edition</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <form onSubmit={handleAddVersion} className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                           <div className="space-y-1">
-                            <label className="text-[10px] font-black uppercase text-subtle">Price ($)</label>
-                            <input
-                              type="number"
-                              className="w-full bg-muted/20 border-b border-border py-1 focus:border-primary outline-none font-bold"
-                              value={version.price}
-                              onChange={(e) => {
-                                const newVersions = [...formData.versions];
-                                newVersions[index].price = parseFloat(e.target.value);
-                                setFormData({ ...formData, versions: newVersions });
-                              }}
-                            />
+                            <label className="text-[10px] font-black uppercase text-subtle">Label</label>
+                            <select name="labelId" className="w-full h-10 bg-surface border border-border rounded-lg px-3 text-sm focus:border-primary outline-none" required>
+                              <option value="">Select Label</option>
+                              {labelsData?.items.map(l => <option key={l.id} value={l.id}>{l.name}</option>)}
+                            </select>
                           </div>
                           <div className="space-y-1">
-                            <label className="text-[10px] font-black uppercase text-subtle">Stock</label>
-                            <input
-                              type="number"
-                              className="w-full bg-muted/20 border-b border-border py-1 focus:border-primary outline-none font-bold"
-                              value={version.stock}
-                              onChange={(e) => {
-                                const newVersions = [...formData.versions];
-                                newVersions[index].stock = parseInt(e.target.value);
-                                setFormData({ ...formData, versions: newVersions });
-                              }}
-                            />
+                            <label className="text-[10px] font-black uppercase text-subtle">Format</label>
+                            <select name="format" className="w-full h-10 bg-surface border border-border rounded-lg px-3 text-sm focus:border-primary outline-none" required>
+                              <option value="Vinyl">Vinyl</option>
+                              <option value="CD">CD</option>
+                              <option value="Cassette">Cassette</option>
+                              <option value="Digital">Digital</option>
+                            </select>
                           </div>
-                        </div>
-                        <input
-                          type="text"
-                          placeholder="Version description (e.g. 180g Red Marble)"
-                          className="w-full text-xs bg-transparent border-none outline-none text-muted-foreground italic"
-                          value={version.description}
-                          onChange={(e) => {
-                            const newVersions = [...formData.versions];
-                            newVersions[index].description = e.target.value;
-                            setFormData({ ...formData, versions: newVersions });
-                          }}
-                        />
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-black uppercase text-subtle">Cat Number</label>
+                            <input name="catalogNumber" type="text" className="w-full h-10 bg-surface border border-border rounded-lg px-3 text-sm focus:border-primary outline-none" placeholder="e.g. WARP123" required />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-black uppercase text-subtle">Country</label>
+                            <input name="pressingCountry" type="text" className="w-full h-10 bg-surface border border-border rounded-lg px-3 text-sm focus:border-primary outline-none" placeholder="e.g. EU" required />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] font-black uppercase text-subtle">Year</label>
+                            <input name="pressingYear" type="number" className="w-full h-10 bg-surface border border-border rounded-lg px-3 text-sm focus:border-primary outline-none" defaultValue={new Date().getFullYear()} required />
+                          </div>
+                          <div className="flex items-end">
+                            <Button type="submit" disabled={addVersionMutation.isPending} className="w-full h-10 rounded-lg bg-primary text-white">
+                              {addVersionMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4 mr-2" />}
+                              Add Edition
+                            </Button>
+                          </div>
+                        </form>
                       </CardContent>
                     </Card>
-                  ))}
-                </div>
+
+                    <div className="space-y-4">
+                      <h3 className="font-bold border-l-4 border-primary pl-3">Registered Editions</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {loadingVersions ? (
+                          <Skeleton className="h-32 w-full" />
+                        ) : versionsData?.map(v => (
+                          <Card key={v.id} className="bg-surface border-border group relative">
+                             <CardContent className="p-4 flex justify-between items-center">
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <span className="font-black text-foreground">{v.format}</span>
+                                    <span className="text-[10px] bg-muted px-1.5 py-0.5 rounded text-muted-foreground font-bold">{v.catalogNumber}</span>
+                                  </div>
+                                  <p className="text-xs text-muted-foreground mt-1">{v.labelName} • {v.pressingCountry} ({v.pressingYear})</p>
+                                </div>
+                                <Button 
+                                  variant="ghost" 
+                                  size="icon" 
+                                  className="text-muted-foreground hover:text-red-500 opacity-0 group-hover:opacity-100"
+                                  onClick={() => deleteVersionMutation.mutate({ id: v.id, releaseId: initialData.id })}
+                                  disabled={deleteVersionMutation.isPending}
+                                >
+                                  {deleteVersionMutation.isPending ? <Loader2 className="h-3 w-3 animate-spin"/> : <Trash2 className="h-4 w-4" />}
+                                </Button>
+                             </CardContent>
+                          </Card>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -354,25 +432,26 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
       </CardContent>
 
       <div className="border-t border-border p-6 bg-muted/10 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            className="h-12 rounded-xl px-6"
-            onClick={() => step > 1 ? setStep(step - 1) : onCancel()}
-          >
-            {step > 1 ? <ChevronLeft className="h-5 w-5 mr-2" /> : null}
-            {step > 1 ? 'Previous' : 'Cancel'}
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          className="h-12 rounded-xl px-6"
+          onClick={() => step > 1 ? setStep(step - 1) : onCancel()}
+          disabled={isPending}
+        >
+          {step > 1 ? <ChevronLeft className="h-5 w-5 mr-1" /> : null}
+          {step > 1 ? 'Previous' : 'Cancel'}
+        </Button>
+        
         <div className="flex items-center gap-3">
           {step < 3 ? (
             <Button className="h-12 rounded-xl px-10 bg-primary text-white" onClick={() => setStep(step + 1)}>
               Next Step
-              <ChevronRight className="h-5 w-5 ml-2" />
+              <ChevronRight className="h-5 w-5 ml-1" />
             </Button>
           ) : (
-            <Button className="h-12 rounded-xl px-12 bg-primary text-white shadow-xl shadow-primary/30" onClick={handleSave}>
-              Publish Release
+            <Button className="h-12 rounded-xl px-12 bg-primary text-white shadow-xl shadow-primary/30" onClick={handleSave} disabled={isPending}>
+              {isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              {initialData ? 'Save Changes' : 'Publish Release'}
             </Button>
           )}
         </div>

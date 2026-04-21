@@ -22,7 +22,7 @@ public sealed class GetOrderDetailQueryHandler(
 
         // Authorization check: User must be Admin or the owner of the order
         Guid userId = Guid.Parse(currentUserService.UserId!);
-        if (order.CustomerId != userId && !currentUserService.IsInRole("admin"))
+        if (order.UserId != userId && !currentUserService.IsInRole("admin"))
         {
             // We return NotFound to avoid leaking information about order existence
             return Result<OrderDetailDto>.Failure(OrderErrors.NotFound);
@@ -31,8 +31,8 @@ public sealed class GetOrderDetailQueryHandler(
         OrderDetailDto orderDetailDto = new OrderDetailDto(
             order.Id,
             order.Status,
-            order.ShippingName,
-            order.ShippingPhone,
+            order.RecipientName,
+            order.Phone,
             order.ShippingAddress,
             order.Note,
             order.TotalAmount,
@@ -54,10 +54,10 @@ public sealed class GetOrderDetailQueryHandler(
                 )
             )).ToList(),
             order.Payment != null ? new PaymentDetailDto(
-                order.Payment.Gateway,
+                order.Payment.Method,
                 order.Payment.Status,
                 order.Payment.PaidAt,
-                order.Payment.TransactionId
+                order.Payment.TransactionCode
             ) : null);
 
         return Result<OrderDetailDto>.Success(orderDetailDto);

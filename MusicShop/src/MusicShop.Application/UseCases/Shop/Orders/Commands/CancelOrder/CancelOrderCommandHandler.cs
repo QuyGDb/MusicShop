@@ -24,7 +24,7 @@ public sealed class CancelOrderCommandHandler(
 
         // Authorization: Only Owner can cancel (Admin usually uses update status endpoint)
         Guid userId = Guid.Parse(currentUserService.UserId!);
-        if (order.CustomerId != userId)
+        if (order.UserId != userId)
         {
             return Result.Failure(OrderErrors.NotFound);
         }

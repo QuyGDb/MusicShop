@@ -16,8 +16,8 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.Property(x => x.TotalAmount)
             .HasPrecision(18, 2);
 
-        builder.Property(x => x.ShippingName).IsRequired().HasMaxLength(200);
-        builder.Property(x => x.ShippingPhone).IsRequired().HasMaxLength(20);
+        builder.Property(x => x.RecipientName).IsRequired().HasMaxLength(200);
+        builder.Property(x => x.Phone).IsRequired().HasMaxLength(20);
         builder.Property(x => x.ShippingAddress).IsRequired().HasMaxLength(500);
 
         // 1 Order -> Many OrderItems
@@ -74,6 +74,6 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
             .HasPrecision(18, 2);
 
         builder.Property(x => x.Status).HasConversion<string>();
-        builder.Property(x => x.Gateway).HasConversion<string>();
+        builder.Property(x => x.Method).HasConversion<string>();
     }
 }

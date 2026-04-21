@@ -1,62 +1,104 @@
 import { useState } from 'react';
 import { 
-  Users, 
   Plus, 
   Search, 
   Filter, 
-  MoreVertical, 
   Edit2, 
   Trash2,
   Globe,
-  Music
+  Loader2,
+  X,
+  UserCircle
 } from 'lucide-react';
 import { 
   Button, 
   Card, 
   CardHeader, 
   CardTitle, 
-  CardContent 
+  CardContent,
+  Skeleton,
+  Badge
 } from '@/shared/components';
 import { ImageUpload } from '@/shared/components/ui/ImageUpload';
 import { cn } from '@/shared/lib/utils';
-
-interface Artist {
-  id: string;
-  name: string;
-  country: string;
-  imageUrl: string;
-  genre: string;
-}
-
-const MOCK_ARTISTS: Artist[] = [
-  { id: '1', name: 'The Midnight', country: 'USA', imageUrl: 'https://images.unsplash.com/photo-1514525253361-bee243870eb2?w=400&q=80', genre: 'Synthwave' },
-  { id: '2', name: 'Gunship', country: 'UK', imageUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=400&q=80', genre: 'Darksynth' },
-  { id: '3', name: 'Perturbator', country: 'France', imageUrl: 'https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=400&q=80', genre: 'Electro' },
-];
+import { 
+  useArtists, 
+  useCreateArtist, 
+  useUpdateArtist, 
+  useDeleteArtist 
+} from '@/features/catalog/hooks/useArtists';
+import { useGenres } from '@/features/catalog/hooks/useGenres';
+import { Artist } from '@/features/catalog/types';
 
 export default function ArtistManagementPage() {
   const [showForm, setShowForm] = useState(false);
-  const [artists, setArtists] = useState<Artist[]>(MOCK_ARTISTS);
+  const [editingArtist, setEditingArtist] = useState<Artist | null>(null);
   
   // Form State
-  const [newArtist, setNewArtist] = useState({
+  const [formData, setFormData] = useState({
     name: '',
     country: '',
-    genre: '',
-    imageUrl: ''
+    bio: '',
+    imageUrl: '',
+    genreIds: [] as string[]
   });
 
-  const handleAddArtist = () => {
-    if (!newArtist.name) return;
-    
-    const artist: Artist = {
-      id: Math.random().toString(36).substr(2, 9),
-      ...newArtist
-    };
-    
-    setArtists([artist, ...artists]);
-    setShowForm(false);
-    setNewArtist({ name: '', country: '', genre: '', imageUrl: '' });
+  const { data: artistsData, isLoading } = useArtists();
+  const { data: genresData } = useGenres(1, 100);
+  
+  const createArtistMutation = useCreateArtist();
+  const updateArtistMutation = useUpdateArtist();
+  const deleteArtistMutation = useDeleteArtist();
+
+  const handleOpenCreate = () => {
+    setEditingArtist(null);
+    setFormData({ name: '', country: '', bio: '', imageUrl: '', genreIds: [] });
+    setShowForm(true);
+  };
+
+  const handleOpenEdit = (artist: Artist) => {
+    setEditingArtist(artist);
+    setFormData({ 
+      name: artist.name, 
+      country: artist.country, 
+      bio: artist.bio,
+      imageUrl: artist.imageUrl || '',
+      genreIds: artist.genres.map(g => g.id)
+    });
+    setShowForm(true);
+  };
+
+  const handleSubmit = () => {
+    if (!formData.name) return;
+
+    if (editingArtist) {
+      updateArtistMutation.mutate(
+        { 
+          id: editingArtist.id, 
+          data: { ...formData, slug: editingArtist.slug } 
+        },
+        { onSuccess: () => setShowForm(false) }
+      );
+    } else {
+      createArtistMutation.mutate(formData, {
+        onSuccess: () => setShowForm(false)
+      });
+    }
+  };
+
+  const handleDelete = (id: string) => {
+    if (window.confirm('Are you sure you want to delete this artist profile? This will not delete their releases.')) {
+      deleteArtistMutation.mutate(id);
+    }
+  };
+
+  const toggleGenre = (genreId: string) => {
+    setFormData(prev => ({
+      ...prev,
+      genreIds: prev.genreIds.includes(genreId)
+        ? prev.genreIds.filter(id => id !== genreId)
+        : [...prev.genreIds, genreId]
+    }));
   };
 
   return (
@@ -67,7 +109,7 @@ export default function ArtistManagementPage() {
           <p className="text-muted-foreground">Manage the creators and musical icons of your collection.</p>
         </div>
         <Button 
-          onClick={() => setShowForm(true)} 
+          onClick={handleOpenCreate} 
           className="bg-primary hover:bg-primary-dark text-primary-foreground h-12 px-6 rounded-xl shadow-lg shadow-primary/20"
         >
           <Plus className="h-5 w-5 mr-2" />
@@ -78,7 +120,9 @@ export default function ArtistManagementPage() {
       {showForm && (
         <Card className="bg-surface border-primary/20 shadow-2xl animate-in zoom-in-95 duration-300">
           <CardHeader className="flex flex-row items-center justify-between border-b border-border bg-muted/20">
-            <CardTitle className="text-xl font-bold text-foreground">Register New Artist</CardTitle>
+            <CardTitle className="text-xl font-bold text-foreground">
+               {editingArtist ? `Update ${editingArtist.name}` : 'Register New Artist'}
+            </CardTitle>
             <Button variant="ghost" size="icon" onClick={() => setShowForm(false)}>
               <X className="h-5 w-5" />
             </Button>
@@ -86,12 +130,22 @@ export default function ArtistManagementPage() {
           <CardContent className="p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
             <div className="space-y-6">
               <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Artist Representative Photo</label>
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Artist Photo</label>
                 <ImageUpload 
-                  value={newArtist.imageUrl} 
-                  onChange={(url) => setNewArtist({ ...newArtist, imageUrl: url })}
-                  onRemove={() => setNewArtist({ ...newArtist, imageUrl: '' })}
+                  value={formData.imageUrl} 
+                  onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+                  onRemove={() => setFormData({ ...formData, imageUrl: '' })}
                   label="Drop artist photo here"
+                />
+              </div>
+              
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Biography</label>
+                <textarea 
+                  placeholder="Tell the artist's story..."
+                  className="w-full h-32 bg-muted/30 border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-colors text-foreground resize-none text-sm"
+                  value={formData.bio}
+                  onChange={(e) => setFormData({...formData, bio: e.target.value})}
                 />
               </div>
             </div>
@@ -104,95 +158,154 @@ export default function ArtistManagementPage() {
                     type="text" 
                     placeholder="e.g. Daft Punk"
                     className="w-full h-12 bg-muted/30 border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-colors text-foreground"
-                    value={newArtist.name}
-                    onChange={(e) => setNewArtist({...newArtist, name: e.target.value})}
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
                   />
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Country</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. France"
-                      className="w-full h-12 bg-muted/30 border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-colors text-foreground"
-                      value={newArtist.country}
-                      onChange={(e) => setNewArtist({...newArtist, country: e.target.value})}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Main Genre</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. Electronic"
-                      className="w-full h-12 bg-muted/30 border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-colors text-foreground"
-                      value={newArtist.genre}
-                      onChange={(e) => setNewArtist({...newArtist, genre: e.target.value})}
-                    />
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Origin Country</label>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. France"
+                    className="w-full h-12 bg-muted/30 border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-colors text-foreground"
+                    value={formData.country}
+                    onChange={(e) => setFormData({...formData, country: e.target.value})}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Genres</label>
+                  <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 border border-border rounded-xl bg-muted/10">
+                    {genresData?.items.map((genre) => (
+                      <button
+                        key={genre.id}
+                        type="button"
+                        onClick={() => toggleGenre(genre.id)}
+                        className={cn(
+                          "px-3 py-1.5 rounded-lg text-xs font-bold transition-all border",
+                          formData.genreIds.includes(genre.id)
+                            ? "bg-primary text-white border-primary shadow-sm"
+                            : "bg-surface text-muted-foreground border-border hover:border-primary/50"
+                        )}
+                      >
+                        {genre.name}
+                      </button>
+                    ))}
                   </div>
                 </div>
               </div>
 
               <div className="flex items-center gap-3 pt-6 border-t border-border">
-                <Button variant="outline" className="flex-1 h-12 rounded-xl" onClick={() => setShowForm(false)}>Cancel</Button>
-                <Button className="flex-[2] h-12 rounded-xl bg-primary text-white" onClick={handleAddArtist}>Save Artist Profile</Button>
+                <Button 
+                  variant="outline" 
+                  className="flex-1 h-12 rounded-xl" 
+                  onClick={() => setShowForm(false)}
+                  disabled={createArtistMutation.isPending || updateArtistMutation.isPending}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  className="flex-[2] h-12 rounded-xl bg-primary text-white" 
+                  onClick={handleSubmit}
+                  disabled={createArtistMutation.isPending || updateArtistMutation.isPending || !formData.name}
+                >
+                  {(createArtistMutation.isPending || updateArtistMutation.isPending) && (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  )}
+                  {editingArtist ? 'Save Profile' : 'Register Artist'}
+                </Button>
               </div>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Search & Filter */}
-      <div className="flex gap-4 items-center">
-        <div className="relative flex-1">
-          <Search className="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-subtle" />
-          <input 
-            type="text" 
-            placeholder="Search artists by name or country..."
-            className="w-full h-14 bg-surface border border-border rounded-2xl pl-12 pr-4 focus:outline-none focus:border-primary transition-all shadow-sm"
-          />
-        </div>
-        <Button variant="outline" size="icon" className="h-14 w-14 rounded-2xl bg-surface border-border">
-          <Filter className="h-5 w-5" />
-        </Button>
-      </div>
-
-      {/* Artist Grid */}
+      {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {artists.map((artist) => (
-          <Card key={artist.id} className="bg-surface border-border overflow-hidden hover:shadow-xl transition-all group">
-            <div className="aspect-[4/3] w-full relative overflow-hidden">
-               <img 
-                src={artist.imageUrl} 
-                alt={artist.name} 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-              />
-               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-               <div className="absolute bottom-4 left-4 right-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="px-2 py-0.5 bg-primary/20 backdrop-blur-md border border-primary/20 rounded text-[10px] font-black uppercase tracking-tighter text-primary">
-                      {artist.genre}
-                    </span>
+        {isLoading ? (
+          Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="aspect-[4/5] w-full rounded-2xl" />
+          ))
+        ) : (
+          artistsData?.items.map((artist) => (
+            <Card key={artist.id} className="bg-surface border-border overflow-hidden hover:shadow-xl transition-all group relative">
+              <div className="aspect-[4/3] w-full relative overflow-hidden">
+                {artist.imageUrl ? (
+                  <img 
+                    src={artist.imageUrl} 
+                    alt={artist.name} 
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+                  />
+                ) : (
+                  <div className="w-full h-full bg-muted flex items-center justify-center">
+                    <UserCircle className="h-20 w-20 text-muted-foreground/20" />
                   </div>
-                  <h3 className="text-xl font-bold text-white tracking-tight">{artist.name}</h3>
-               </div>
-            </div>
-            <CardContent className="p-4 flex items-center justify-between">
-              <div className="flex items-center gap-2 text-muted-foreground text-sm font-medium">
-                <Globe className="h-4 w-4" />
-                {artist.country}
+                )}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {artist.genres.slice(0, 2).map(genre => (
+                      <span key={genre.id} className="px-2 py-0.5 bg-primary/20 backdrop-blur-md border border-primary/20 rounded text-[9px] font-black uppercase tracking-tighter text-primary">
+                        {genre.name}
+                      </span>
+                    ))}
+                    {artist.genres.length > 2 && (
+                      <span className="px-2 py-0.5 bg-muted/20 backdrop-blur-md border border-border/20 rounded text-[9px] font-black uppercase tracking-tighter text-white">
+                        +{artist.genres.length - 2} More
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="text-xl font-bold text-white tracking-tight leading-tight">{artist.name}</h3>
+                  <div className="flex items-center gap-1.5 text-white/60 text-xs mt-1">
+                    <Globe className="h-3 w-3" />
+                    {artist.country}
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center gap-1">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-primary">
-                  <Edit2 className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-red-500">
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+              <CardContent className="p-4 flex items-center justify-between bg-surface">
+                <p className="text-xs text-muted-foreground line-clamp-1 flex-1 pr-4">
+                  {artist.bio || 'No biography available.'}
+                </p>
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 text-muted-foreground hover:text-primary"
+                    onClick={() => handleOpenEdit(artist)}
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 text-muted-foreground hover:text-red-500"
+                    onClick={() => handleDelete(artist.id)}
+                    disabled={deleteArtistMutation.isPending}
+                  >
+                    {deleteArtistMutation.isPending && deleteArtistMutation.variables === artist.id ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
+      
+      {!isLoading && artistsData?.items.length === 0 && (
+        <div className="text-center py-24 bg-muted/10 border-2 border-dashed border-border rounded-[2.5rem]">
+          <div className="p-6 bg-surface border border-border rounded-3xl w-fit mx-auto mb-6 shadow-sm">
+            <UserCircle className="h-12 w-12 text-muted-foreground/40" />
+          </div>
+          <h3 className="text-xl font-bold text-foreground mb-2">No artists found</h3>
+          <p className="text-muted-foreground max-w-sm mx-auto">
+            Your catalog is waiting for its first icon. Click "Add New Artist" to get started.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
