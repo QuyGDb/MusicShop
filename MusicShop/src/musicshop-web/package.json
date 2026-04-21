@@ -17,6 +17,7 @@
     "@tanstack/react-query": "^5.99.1",
     "@tanstack/zod-form-adapter": "^0.42.1",
     "axios": "^1.15.1",
+    "axios-auth-refresh": "^5.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "js-cookie": "^3.0.5",

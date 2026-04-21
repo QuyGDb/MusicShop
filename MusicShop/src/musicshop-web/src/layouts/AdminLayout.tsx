@@ -49,7 +49,9 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         <nav className="flex-1 px-4 py-4 space-y-1">
           {sidebarLinks.map((link) => {
             const Icon = link.icon;
-            const isActive = pathname === link.href;
+            const isActive = link.href === '/admin' 
+              ? pathname === '/admin' 
+              : pathname.startsWith(link.href);
             return (
               <Link
                 key={link.href}

@@ -1,19 +1,24 @@
-import axios, { AxiosError, InternalAxiosRequestConfig, AxiosRequestConfig } from 'axios';
+import axios, { InternalAxiosRequestConfig, AxiosRequestConfig, AxiosInstance, AxiosResponseHeaders, AxiosInterceptorManager, AxiosResponse } from 'axios';
+import createAuthRefresh from 'axios-auth-refresh';
 import { getAccessToken, setAccessToken } from './tokenStore';
 
 /**
- * Custom Axios instance type that reflects the behavior of our response interceptor
+ * Custom Axios instance type that reflects the behavior of the response interceptor
  * (it returns response.data directly) and adds the onUnauthorized hook.
  */
-export interface AppAxiosInstance {
+export interface AppAxiosInstance extends AxiosInstance {
   onUnauthorized?: () => void;
-  get<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>;
-  post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>;
-  put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>;
-  patch<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T>;
-  delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T>;
-  defaults: any;
-  interceptors: any;
+  // Overload methods to reflect that they return T instead of AxiosResponse<T>
+  get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T>;
+  post<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T>;
+  put<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T>;
+  patch<T = unknown>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T>;
+  delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T>;
+  defaults: AxiosInstance['defaults'];
+  interceptors: {
+    request: AxiosInterceptorManager<InternalAxiosRequestConfig>;
+    response: AxiosInterceptorManager<AxiosResponse>;
+  };
 }
 
 const axiosInstance = axios.create({
@@ -22,7 +27,7 @@ const axiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-});
+}) as AppAxiosInstance;
 
 /**
  * Request Interceptor: Attach the access token to the Authorization header.
@@ -39,84 +44,50 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-let isRefreshing = false;
-let refreshSubscribers: ((token: string) => void)[] = [];
+/**
+ * Refresh Token Logic for axios-auth-refresh
+ */
+const refreshAuthLogic = async (failedRequest: { response: AxiosResponse }) => {
+  // Skip refresh logic for auth endpoints to avoid infinite loops
+  if (failedRequest.response.config.url?.includes('/auth/login') || 
+      failedRequest.response.config.url?.includes('/auth/refresh')) {
+    return Promise.reject(failedRequest);
+  }
 
-const onTokenRefreshed = (token: string) => {
-  refreshSubscribers.map((callback) => callback(token));
-  refreshSubscribers = [];
+  try {
+    const response = await axios.post(
+      `${axiosInstance.defaults.baseURL}/auth/refresh`,
+      {},
+      { withCredentials: true }
+    );
+
+    const { accessToken } = response.data.data;
+    setAccessToken(accessToken);
+
+    // Update the header of the failed request and resume it
+    if (failedRequest.response.config.headers) {
+      failedRequest.response.config.headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+    
+    return Promise.resolve();
+  } catch (refreshError) {
+    // If refresh fails, clear auth state and notify UI
+    setAccessToken(null);
+    axiosInstance.onUnauthorized?.();
+    return Promise.reject(refreshError);
+  }
 };
 
-const addRefreshSubscriber = (callback: (token: string) => void) => {
-  refreshSubscribers.push(callback);
-};
+// Instantiate the interceptor
+createAuthRefresh(axiosInstance, refreshAuthLogic);
 
 /**
  * Response Interceptor: 
- * 1. Success: Return data directly (matching legacy HttpClient behavior).
- * 2. Error: Handle 401 Unauthorized with Refresh Token logic.
+ * Return data directly (matching legacy HttpClient behavior).
  */
 axiosInstance.interceptors.response.use(
-  (response) => response.data,
-  async (error: AxiosError) => {
-    const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
-
-    // Handle 401 and avoid infinite loops
-    if (
-      error.response?.status === 401 &&
-      originalRequest &&
-      !originalRequest._retry &&
-      !originalRequest.url?.includes('/auth/login') &&
-      !originalRequest.url?.includes('/auth/refresh')
-    ) {
-      if (isRefreshing) {
-        // Wait for the current refresh to finish
-        return new Promise((resolve) => {
-          addRefreshSubscriber((token: string) => {
-            if (originalRequest.headers) {
-              originalRequest.headers.Authorization = `Bearer ${token}`;
-            }
-            resolve(axiosInstance(originalRequest as any));
-          });
-        });
-      }
-
-      originalRequest._retry = true;
-      isRefreshing = true;
-
-      try {
-        // Attempt refresh using separate axios call to avoid interceptors or recursion
-        const response = await axios.post(
-          `${axiosInstance.defaults.baseURL}/auth/refresh`,
-          {},
-          { withCredentials: true }
-        );
-
-        const { accessToken } = response.data.data;
-        setAccessToken(accessToken);
-
-        isRefreshing = false;
-        onTokenRefreshed(accessToken);
-
-        // Update authorization header and retry original request
-        if (originalRequest.headers) {
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-        }
-        return axiosInstance(originalRequest as any);
-      } catch (refreshError) {
-        isRefreshing = false;
-        refreshSubscribers = []; // Clear queue on failure
-
-        // Refresh failed (e.g. 400 Bad Request or 401 Logout)
-        setAccessToken(null);
-        (axiosInstance as any).onUnauthorized?.();
-
-        return Promise.reject(refreshError);
-      }
-    }
-
-    return Promise.reject(error);
-  }
+  (response: AxiosResponse) => response.data,
+  (error) => Promise.reject(error)
 );
 
-export default axiosInstance as unknown as AppAxiosInstance;
+export default axiosInstance;

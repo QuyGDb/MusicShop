@@ -1,4 +1,5 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { ShopLayout } from '@/layouts/ShopLayout';
 import { AuthLayout } from '@/layouts/AuthLayout';
 import HomePage from '@/pages/shop/HomePage';
@@ -18,9 +19,24 @@ import OrderManagementPage from '@/pages/admin/OrderManagementPage';
 import CustomerManagementPage from '@/pages/admin/CustomerManagementPage';
 import CollectionManagementPage from '@/pages/admin/CollectionManagementPage';
 import { useAuthStore } from '@/store/useAuthStore';
+import axiosInstance from '@/shared/api/axiosInstance';
 
 export default function App() {
   const accessToken = useAuthStore((state) => state.accessToken);
+  const clearAuth = useAuthStore((state) => state.clearAuth);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Setup the listener for 401 Unauthorized errors from the network layer
+    axiosInstance.onUnauthorized = () => {
+      clearAuth();
+      navigate('/login', { replace: true });
+    };
+
+    return () => {
+      axiosInstance.onUnauthorized = undefined;
+    };
+  }, [clearAuth, navigate]);
 
   return (
     <Routes>
@@ -39,14 +55,7 @@ export default function App() {
       </Route>
 
       {/* Admin Routes */}
-      <Route
-        path="/admin"
-        element={
-          <AdminRoute>
-            <AdminLayout />
-          </AdminRoute>
-        }
-      >
+      <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
         <Route index element={<AdminDashboardPage />} />
         <Route path="artists" element={<ArtistManagementPage />} />
         <Route path="labels" element={<LabelManagementPage />} />
