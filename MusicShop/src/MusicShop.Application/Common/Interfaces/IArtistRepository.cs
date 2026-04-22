@@ -17,7 +17,7 @@ public interface IArtistRepository : IRepository<Artist>
 
     // Get a paged list of Artists with their Genres and filters
     Task<(IReadOnlyList<Artist> Items, int TotalCount)> GetPagedAsync(
-        GetArtistsQuery query, 
+        GetArtistsQuery query,
         CancellationToken ct = default);
 
     Task<List<Artist>> SearchByNameAsync(string searchTerm, int limit, CancellationToken ct = default);

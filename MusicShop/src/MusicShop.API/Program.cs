@@ -110,25 +110,25 @@ app.UseAuthorization();
 app.MapControllers();
 
 // 5. Initialize Database & Seed data
-using (IServiceScope scope = app.Services.CreateScope())
-{
-    IServiceProvider services = scope.ServiceProvider;
-    try
-    {
-        AppDbContext context = services.GetRequiredService<AppDbContext>();
-        IPasswordHasher passwordHasher = services.GetRequiredService<IPasswordHasher>();
-        ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
+// using (IServiceScope scope = app.Services.CreateScope())
+// {
+//     IServiceProvider services = scope.ServiceProvider;
+//     try
+//     {
+//         AppDbContext context = services.GetRequiredService<AppDbContext>();
+//         IPasswordHasher passwordHasher = services.GetRequiredService<IPasswordHasher>();
+//         ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
 
-        logger.LogInformation("Checking database for seeding...");
-        await DbInitializer.SeedAsync(context, passwordHasher);
-        logger.LogInformation("Database initialization complete.");
-    }
-    catch (Exception ex)
-    {
-        ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred during database initialization/seeding.");
-    }
-}
+//         logger.LogInformation("Checking database for seeding...");
+//         await DbInitializer.SeedAsync(context, passwordHasher);
+//         logger.LogInformation("Database initialization complete.");
+//     }
+//     catch (Exception ex)
+//     {
+//         ILogger<Program> logger = services.GetRequiredService<ILogger<Program>>();
+//         logger.LogError(ex, "An error occurred during database initialization/seeding.");
+//     }
+// }
 
 app.Run();
 

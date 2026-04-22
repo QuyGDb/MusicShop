@@ -21,6 +21,6 @@ public static class ArtistErrors
 
     public static readonly Error HasAssociations = new(
         "Artist.HasAssociations", 
-        "Cannot delete artist with existing releases.",
+        "Cannot delete artist with existing associations (releases or genres).",
         ErrorType.Conflict);
 }

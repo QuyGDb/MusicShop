@@ -32,7 +32,7 @@ public sealed class ArtistRepository : GenericRepository<Artist>, IArtistReposit
     {
         return await _context.Set<Artist>()
             .Include(artist => artist.Releases)
-            .AsNoTracking()
+            .Include(artist => artist.ArtistGenres)
             .FirstOrDefaultAsync(artist => artist.Id == id, cancellationToken);
     }
 
@@ -40,7 +40,6 @@ public sealed class ArtistRepository : GenericRepository<Artist>, IArtistReposit
     {
         return await _context.Set<Artist>()
             .Include(artist => artist.Releases)
-            .AsNoTracking()
             .FirstOrDefaultAsync(artist => artist.Slug == slug, cancellationToken);
     }
 

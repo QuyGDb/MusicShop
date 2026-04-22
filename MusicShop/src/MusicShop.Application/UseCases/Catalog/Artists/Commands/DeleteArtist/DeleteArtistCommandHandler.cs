@@ -13,7 +13,7 @@ public sealed class DeleteArtistCommandHandler(
     : IRequestHandler<DeleteArtistCommand, Result>
 {
     public async Task<Result> Handle(
-        DeleteArtistCommand request, 
+        DeleteArtistCommand request,
         CancellationToken cancellationToken)
     {
         Artist? artist = await artistRepository.GetWithReleasesAsync(request.Id, cancellationToken);

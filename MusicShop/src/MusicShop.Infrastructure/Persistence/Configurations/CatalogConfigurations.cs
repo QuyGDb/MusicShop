@@ -29,6 +29,12 @@ public class ArtistConfiguration : IEntityTypeConfiguration<Artist>
             .HasForeignKey(x => x.ArtistId)
             .IsRequired()
             .OnDelete(DeleteBehavior.Restrict);
+
+        // many-to-many via junction table
+        builder.HasMany(x => x.ArtistGenres)
+            .WithOne(x => x.Artist)
+            .HasForeignKey(x => x.ArtistId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }
 

@@ -87,7 +87,25 @@ createAuthRefresh(axiosInstance, refreshAuthLogic);
  */
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => response.data,
-  (error) => Promise.reject(error)
+  (error) => {
+    // 1. Try to extract from ProblemDetails (RFC 7807)
+    if (error.response?.data?.detail) {
+      error.message = error.response.data.detail;
+    } 
+    // 2. Handle standard HTTP status codes if no body is present
+    else if (error.response?.status === 403) {
+      error.message = "You do not have permission to perform this action.";
+    } 
+    else if (error.response?.status === 401) {
+      error.message = "Your session has expired. Please login again.";
+    }
+    // 3. Fallback to title
+    else if (error.response?.data?.title) {
+      error.message = error.response.data.title;
+    }
+    
+    return Promise.reject(error);
+  }
 );
 
 export default axiosInstance;
