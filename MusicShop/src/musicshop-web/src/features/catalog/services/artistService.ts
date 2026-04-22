@@ -4,6 +4,7 @@ import { Artist, Genre } from '../types';
 
 export interface CreateArtistRequest {
   name: string;
+  slug: string;
   bio: string;
   country: string;
   imageUrl?: string;

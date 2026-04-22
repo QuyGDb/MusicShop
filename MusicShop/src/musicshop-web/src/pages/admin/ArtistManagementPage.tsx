@@ -37,6 +37,7 @@ export default function ArtistManagementPage() {
   // Form State
   const [formData, setFormData] = useState({
     name: '',
+    slug: '',
     country: '',
     bio: '',
     imageUrl: '',
@@ -52,14 +53,22 @@ export default function ArtistManagementPage() {
 
   const handleOpenCreate = () => {
     setEditingArtist(null);
-    setFormData({ name: '', country: '', bio: '', imageUrl: '', genreIds: [] });
+    setFormData({ name: '', slug: '', country: '', bio: '', imageUrl: '', genreIds: [] });
     setShowForm(true);
+  };
+
+  const slugify = (text: string) => {
+    return text
+      .toLowerCase()
+      .replace(/[^\w ]+/g, '')
+      .replace(/ +/g, '-');
   };
 
   const handleOpenEdit = (artist: Artist) => {
     setEditingArtist(artist);
     setFormData({ 
       name: artist.name, 
+      slug: artist.slug,
       country: artist.country, 
       bio: artist.bio,
       imageUrl: artist.imageUrl || '',
@@ -69,13 +78,13 @@ export default function ArtistManagementPage() {
   };
 
   const handleSubmit = () => {
-    if (!formData.name) return;
+    if (!formData.name || !formData.slug) return;
 
     if (editingArtist) {
       updateArtistMutation.mutate(
         { 
           id: editingArtist.id, 
-          data: { ...formData, slug: editingArtist.slug } 
+          data: formData
         },
         { onSuccess: () => setShowForm(false) }
       );
@@ -136,6 +145,7 @@ export default function ArtistManagementPage() {
                   onChange={(url) => setFormData({ ...formData, imageUrl: url })}
                   onRemove={() => setFormData({ ...formData, imageUrl: '' })}
                   label="Drop artist photo here"
+                  folder="artists"
                 />
               </div>
               
@@ -151,7 +161,7 @@ export default function ArtistManagementPage() {
             </div>
 
             <div className="space-y-6 flex flex-col justify-between">
-              <div className="space-y-4">
+                <div className="space-y-4">
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Display Name</label>
                   <input 
@@ -159,8 +169,28 @@ export default function ArtistManagementPage() {
                     placeholder="e.g. Daft Punk"
                     className="w-full h-12 bg-muted/30 border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-colors text-foreground"
                     value={formData.name}
-                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    onChange={(e) => {
+                      const newName = e.target.value;
+                      setFormData(prev => ({
+                        ...prev,
+                        name: newName,
+                        slug: editingArtist ? prev.slug : slugify(newName)
+                      }));
+                    }}
                   />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Custom URL Slug</label>
+                  <div className="relative">
+                    <input 
+                      type="text" 
+                      placeholder="e.g. daft-punk"
+                      className="w-full h-12 bg-muted/30 border border-border rounded-xl pl-4 pr-12 focus:outline-none focus:border-primary transition-colors text-foreground font-mono text-xs"
+                      value={formData.slug}
+                      onChange={(e) => setFormData({...formData, slug: slugify(e.target.value)})}
+                    />
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground/50 uppercase">/artists/</div>
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Origin Country</label>
@@ -310,8 +340,3 @@ export default function ArtistManagementPage() {
   );
 }
 
-function X({ className }: { className?: string }) {
-  return (
-    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-  );
-}

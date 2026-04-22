@@ -9,6 +9,11 @@ using MusicShop.Infrastructure.Services;
 using MusicShop.Infrastructure.Cache;
 using MusicShop.Infrastructure.Payments;
 using MusicShop.Application.Common.Interfaces;
+using MusicShop.Infrastructure.Storage;
+using Amazon.S3;
+using Amazon.Runtime;
+using Amazon;
+using Amazon.Extensions.NETCore.Setup;
 
 namespace MusicShop.Infrastructure;
 
@@ -58,7 +63,7 @@ public static class DependencyInjection
         services.AddScoped<IStripeService, StripeService>();
 
         services.AddScoped<ITokenService, JwtTokenService>();
-        
+
         // 5. Register Redis & Caching
         services.AddStackExchangeRedisCache(options =>
         {
@@ -66,6 +71,21 @@ public static class DependencyInjection
             options.InstanceName = "MusicShop_";
         });
         services.AddSingleton<ICacheService, CacheService>();
+
+        // 6. Register AWS S3
+        services.AddOptions<S3Settings>()
+            .Bind(configuration.GetSection(S3Settings.SectionName))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
+
+        AWSOptions awsOptions = configuration.GetAWSOptions("AWS");
+        awsOptions.Credentials = new BasicAWSCredentials(
+            configuration["AWS:AccessKey"],
+            configuration["AWS:SecretKey"]);
+
+        services.AddDefaultAWSOptions(awsOptions);
+        services.AddAWSService<IAmazonS3>();
+        services.AddScoped<IImageService, S3ImageService>();
 
         return services;
     }

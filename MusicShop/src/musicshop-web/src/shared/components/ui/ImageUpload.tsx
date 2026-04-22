@@ -2,6 +2,7 @@ import { useState, useRef, ChangeEvent, DragEvent } from 'react';
 import { Upload, X, ImageIcon, Loader2 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/components';
+import { uploadService } from '@/shared/services/uploadService';
 
 interface ImageUploadProps {
   value?: string;
@@ -10,6 +11,7 @@ interface ImageUploadProps {
   className?: string;
   label?: string;
   aspectRatio?: 'square' | 'video' | 'portrait';
+  folder?: string;
 }
 
 /**
@@ -21,7 +23,8 @@ export function ImageUpload({
   onRemove, 
   className,
   label = "Upload Image",
-  aspectRatio = 'square'
+  aspectRatio = 'square',
+  folder = "general"
 }: ImageUploadProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
@@ -35,14 +38,12 @@ export function ImageUpload({
 
     setIsUploading(true);
     
-    // MOCK UPLOAD LOGIC
-    // In a real scenario, this would call our uploadService
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      const mockUrl = URL.createObjectURL(file); // Temporary mock URL
-      onChange(mockUrl);
+      const url = await uploadService.uploadImage(file, folder);
+      onChange(url);
     } catch (error) {
       console.error('Upload failed:', error);
+      alert('Upload failed. Please try again.');
     } finally {
       setIsUploading(false);
     }

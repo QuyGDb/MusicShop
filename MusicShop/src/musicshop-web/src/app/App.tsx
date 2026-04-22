@@ -20,6 +20,7 @@ import OrderManagementPage from '@/pages/admin/OrderManagementPage';
 import CustomerManagementPage from '@/pages/admin/CustomerManagementPage';
 import CollectionManagementPage from '@/pages/admin/CollectionManagementPage';
 import ProductAdminDetailsPage from '@/pages/admin/ProductAdminDetailsPage';
+import { Toaster } from 'sonner';
 import { useAuthStore } from '@/store/useAuthStore';
 import axiosInstance from '@/shared/api/axiosInstance';
 
@@ -41,38 +42,41 @@ export default function App() {
   }, [clearAuth, navigate]);
 
   return (
-    <Routes>
-      {/* Shop Routes */}
-      <Route element={<ShopLayout />}>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/products" element={<ProductListPage />} />
-        <Route path="/profile" element={accessToken ? <ProfilePage /> : <Navigate to="/login" />} />
-        <Route path="/terms" element={<TermsPage />} />
-      </Route>
+    <>
+      <Toaster position="top-right" richColors closeButton />
+      <Routes>
+        {/* Shop Routes */}
+        <Route element={<ShopLayout />}>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/products" element={<ProductListPage />} />
+          <Route path="/profile" element={accessToken ? <ProfilePage /> : <Navigate to="/login" />} />
+          <Route path="/terms" element={<TermsPage />} />
+        </Route>
 
-      {/* Auth Routes */}
-      <Route element={<AuthLayout />}>
-        <Route path="/login" element={accessToken ? <Navigate to="/" /> : <LoginPage />} />
-        <Route path="/register" element={accessToken ? <Navigate to="/" /> : <RegisterPage />} />
-      </Route>
+        {/* Auth Routes */}
+        <Route element={<AuthLayout />}>
+          <Route path="/login" element={accessToken ? <Navigate to="/" /> : <LoginPage />} />
+          <Route path="/register" element={accessToken ? <Navigate to="/" /> : <RegisterPage />} />
+        </Route>
 
-      {/* Admin Routes */}
-      <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
-        <Route index element={<AdminDashboardPage />} />
-        <Route path="artists" element={<ArtistManagementPage />} />
-        <Route path="labels" element={<LabelManagementPage />} />
-        <Route path="genres" element={<GenreManagementPage />} />
-        <Route path="releases" element={<ReleaseManagementPage />} />
-        <Route path="products" element={<ProductManagementPage />} />
-        <Route path="orders" element={<OrderManagementPage />} />
-        <Route path="customers" element={<CustomerManagementPage />} />
-        <Route path="collections" element={<CollectionManagementPage />} />
-        <Route path="products/:id" element={<ProductAdminDetailsPage />} />
-        {/* Future admin sub-routes will go here */}
-      </Route>
+        {/* Admin Routes */}
+        <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
+          <Route index element={<AdminDashboardPage />} />
+          <Route path="artists" element={<ArtistManagementPage />} />
+          <Route path="labels" element={<LabelManagementPage />} />
+          <Route path="genres" element={<GenreManagementPage />} />
+          <Route path="releases" element={<ReleaseManagementPage />} />
+          <Route path="products" element={<ProductManagementPage />} />
+          <Route path="orders" element={<OrderManagementPage />} />
+          <Route path="customers" element={<CustomerManagementPage />} />
+          <Route path="collections" element={<CollectionManagementPage />} />
+          <Route path="products/:id" element={<ProductAdminDetailsPage />} />
+          {/* Future admin sub-routes will go here */}
+        </Route>
 
-      {/* Fallback */}
-      <Route path="*" element={<div className="min-h-screen bg-background text-foreground flex items-center justify-center">404 - Page Not Found</div>} />
-    </Routes>
+        {/* Fallback */}
+        <Route path="*" element={<div className="min-h-screen bg-background text-foreground flex items-center justify-center">404 - Page Not Found</div>} />
+      </Routes>
+    </>
   );
 }

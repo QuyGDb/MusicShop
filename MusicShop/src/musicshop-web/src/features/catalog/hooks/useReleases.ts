@@ -27,7 +27,7 @@ export function useCreateRelease() {
       toast.success('Release created successfully');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to create release');
+      toast.error(error.message || 'Failed to create release');
     }
   });
 }
@@ -43,7 +43,7 @@ export function useUpdateRelease() {
       toast.success('Release updated successfully');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to update release');
+      toast.error(error.message || 'Failed to update release');
     }
   });
 }
@@ -58,7 +58,7 @@ export function useDeleteRelease() {
       toast.success('Release deleted successfully');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to delete release');
+      toast.error(error.message || 'Failed to delete release');
     }
   });
 }
@@ -89,7 +89,7 @@ export function useCreateReleaseVersion() {
       toast.success('Version added to release');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to add version');
+      toast.error(error.message || 'Failed to add version');
     }
   });
 }
@@ -104,7 +104,7 @@ export function useUpdateReleaseVersion() {
       toast.success('Version updated');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to update version');
+      toast.error(error.message || 'Failed to update version');
     }
   });
 }
@@ -119,7 +119,7 @@ export function useDeleteReleaseVersion() {
       toast.success('Version removed');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to remove version');
+      toast.error(error.message || 'Failed to remove version');
     }
   });
 }

@@ -19,7 +19,7 @@ export function useCreateLabel() {
       toast.success('Label created successfully');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to create label');
+      toast.error(error.message || 'Failed to create label');
     }
   });
 }
@@ -35,7 +35,7 @@ export function useUpdateLabel() {
       toast.success('Label updated successfully');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to update label');
+      toast.error(error.message || 'Failed to update label');
     }
   });
 }
@@ -50,7 +50,7 @@ export function useDeleteLabel() {
       toast.success('Label deleted successfully');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to delete label');
+      toast.error(error.message || 'Failed to delete label');
     }
   });
 }

@@ -27,7 +27,7 @@ export function useCreateArtist() {
       toast.success('Artist profile created successfully');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to create artist');
+      toast.error(error.message || 'Failed to create artist');
     }
   });
 }
@@ -43,7 +43,7 @@ export function useUpdateArtist() {
       toast.success('Artist profile updated successfully');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to update artist');
+      toast.error(error.message || 'Failed to update artist');
     }
   });
 }
@@ -58,7 +58,7 @@ export function useDeleteArtist() {
       toast.success('Artist deleted successfully');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to delete artist');
+      toast.error(error.message || 'Failed to delete artist');
     }
   });
 }

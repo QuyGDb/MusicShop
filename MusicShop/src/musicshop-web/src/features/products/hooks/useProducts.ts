@@ -71,7 +71,7 @@ export function useCreateProduct() {
       toast.success('Product created successfully');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to create product');
+      toast.error(error.message || 'Failed to create product');
     }
   });
 }
@@ -87,7 +87,7 @@ export function useUpdateProduct() {
       toast.success('Product updated successfully');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to update product');
+      toast.error(error.message || 'Failed to update product');
     }
   });
 }
@@ -102,10 +102,11 @@ export function useDeleteProduct() {
       toast.success('Product deleted successfully');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to delete product');
+      toast.error(error.message || 'Failed to delete product');
     }
   });
 }
+
 // Variant Hooks
 export function useCreateProductVariant(productId: string) {
   const queryClient = useQueryClient();
@@ -117,7 +118,7 @@ export function useCreateProductVariant(productId: string) {
       toast.success('Variant created successfully');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to create variant');
+      toast.error(error.message || 'Failed to create variant');
     }
   });
 }
@@ -133,7 +134,7 @@ export function useUpdateProductVariant(productId: string) {
       toast.success('Variant updated successfully');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to update variant');
+      toast.error(error.message || 'Failed to update variant');
     }
   });
 }
@@ -148,7 +149,7 @@ export function useDeleteProductVariant(productId: string) {
       toast.success('Variant deleted successfully');
     },
     onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Failed to delete variant');
+      toast.error(error.message || 'Failed to delete variant');
     }
   });
 }
