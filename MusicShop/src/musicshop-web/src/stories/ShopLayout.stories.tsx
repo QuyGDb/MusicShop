@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ShopLayout } from '@/layouts/ShopLayout';
-import { AuthProvider } from '@/app/providers/AuthContext';
 import React from 'react';
 
 const meta: Meta<typeof ShopLayout> = {
@@ -11,11 +10,9 @@ const meta: Meta<typeof ShopLayout> = {
   },
   decorators: [
     (Story) => (
-      <AuthProvider>
-        <div style={{ minHeight: '100vh' }}>
-          <Story />
-        </div>
-      </AuthProvider>
+      <div style={{ minHeight: '100vh' }}>
+        <Story />
+      </div>
     ),
   ],
 };

@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Navbar } from '@/widgets/navbar/ui/Navbar';
-import { AuthProvider } from '@/app/providers/AuthContext';
 import React from 'react';
 
 const meta: Meta<typeof Navbar> = {
@@ -10,11 +9,7 @@ const meta: Meta<typeof Navbar> = {
     layout: 'fullscreen',
   },
   decorators: [
-    (Story) => (
-      <AuthProvider>
-        <Story />
-      </AuthProvider>
-    ),
+    (Story) => <Story />,
   ],
 };
 
@@ -29,11 +24,7 @@ export const Authenticated: Story = {
       // We can manually populate localStorage to simulate auth state if the provider reads from it
       localStorage.setItem('accessToken', 'mock-token');
       localStorage.setItem('user', JSON.stringify({ fullName: 'John Doe', email: 'john@example.com' }));
-      return (
-        <AuthProvider>
-          <Story />
-        </AuthProvider>
-      );
+      return <Story />;
     },
   ],
 };

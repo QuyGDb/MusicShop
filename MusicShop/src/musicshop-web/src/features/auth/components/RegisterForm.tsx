@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Button, Input, Label, Alert, AlertDescription, AlertTitle } from '@/shared/components';
 import { AlertCircle, Loader2, UserPlus } from 'lucide-react';
-import { useRegisterForm, registerSchema } from '@/features/auth';
+import { useRegisterForm, registerSchema, registerBaseSchema } from '@/features/auth';
 
 export function RegisterForm() {
   const {
@@ -44,7 +44,7 @@ export function RegisterForm() {
           <form.Field
             name="fullName"
             validators={{
-              onChange: registerSchema.shape.fullName,
+              onChange: registerBaseSchema.shape.fullName,
             }}
           >
             {(field) => (
@@ -69,7 +69,7 @@ export function RegisterForm() {
           <form.Field
             name="email"
             validators={{
-              onChange: registerSchema.shape.email,
+              onChange: registerBaseSchema.shape.email,
             }}
           >
             {(field) => (
@@ -95,7 +95,7 @@ export function RegisterForm() {
           <form.Field
             name="password"
             validators={{
-              onChange: registerSchema.shape.password,
+              onChange: registerBaseSchema.shape.password,
             }}
           >
             {(field) => (

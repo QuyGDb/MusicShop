@@ -1,9 +1,6 @@
 import React from 'react';
-import { ProductCard } from '@/features/products';
-import { FilterBar } from '@/features/products';
+import { ProductCard, FilterBar, useProductsList, useProductFilters } from '@/features/products';
 import { Loader2, Music2 } from 'lucide-react';
-import { useProducts } from '@/features/products';
-import { useProductFilters } from '@/features/products';
 
 export default function ProductListPage() {
   const {
@@ -79,8 +76,8 @@ export default function ProductListPage() {
                           key={i}
                           onClick={() => setPage(pageNum)}
                           className={`px-4 py-2 rounded-lg border transition-all ${currentPage === pageNum
-                              ? 'bg-primary border-primary text-primary-foreground'
-                              : 'border-border bg-surface hover:border-primary text-muted-foreground'
+                            ? 'bg-primary border-primary text-primary-foreground'
+                            : 'border-border bg-surface hover:border-primary text-muted-foreground'
                             }`}
                         >
                           {pageNum}

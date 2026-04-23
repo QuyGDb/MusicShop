@@ -1,0 +1,253 @@
+2026-04-23 20:46:29.674 +07:00 [INF] User profile is available. Using 'C:\Users\usopp\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2026-04-23 20:46:29.814 +07:00 [INF] Now listening on: http://localhost:5000
+2026-04-23 20:46:29.816 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2026-04-23 20:46:29.817 +07:00 [INF] Hosting environment: Development
+2026-04-23 20:46:29.817 +07:00 [INF] Content root path: D:\Pine tree\MusicShop\src\MusicShop.API
+2026-04-23 20:46:44.405 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger - null null
+2026-04-23 20:46:46.788 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger - 301 0 null 2386.1562ms
+2026-04-23 20:46:46.795 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/index.html - null null
+2026-04-23 20:46:46.859 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/index.html - 200 null text/html;charset=utf-8 63.2339ms
+2026-04-23 20:46:46.903 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui.css - null null
+2026-04-23 20:46:46.904 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui-standalone-preset.js - null null
+2026-04-23 20:46:46.904 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui-bundle.js - null null
+2026-04-23 20:46:46.937 +07:00 [INF] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A'
+2026-04-23 20:46:46.937 +07:00 [INF] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A'
+2026-04-23 20:46:46.941 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui-standalone-preset.js - 200 312163 text/javascript 37.1033ms
+2026-04-23 20:46:46.941 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui.css - 200 144929 text/css 38.0983ms
+2026-04-23 20:46:46.944 +07:00 [INF] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A'
+2026-04-23 20:46:46.950 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/swagger-ui-bundle.js - 200 1061536 text/javascript 46.0579ms
+2026-04-23 20:46:47.152 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - null null
+2026-04-23 20:46:47.338 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 185.6863ms
+2026-04-23 20:54:10.097 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/auth/login - null null
+2026-04-23 20:54:10.105 +07:00 [WRN] Failed to determine the https port for redirect.
+2026-04-23 20:54:10.107 +07:00 [INF] CORS policy execution successful.
+2026-04-23 20:54:10.110 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/auth/login - 204 null null 12.2853ms
+2026-04-23 20:54:10.113 +07:00 [INF] Request starting HTTP/1.1 POST http://localhost:5000/api/v1/auth/login - application/json 54
+2026-04-23 20:54:10.119 +07:00 [INF] CORS policy execution successful.
+2026-04-23 20:54:11.207 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.AuthController.Login (MusicShop.API)'
+2026-04-23 20:54:11.229 +07:00 [INF] Route matched with {action = "Login", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[MusicShop.Application.DTOs.Auth.AuthResponse]]] Login(MusicShop.Application.UseCases.Auth.Queries.Login.LoginQuery) on controller MusicShop.API.Controllers.AuthController (MusicShop.API).
+2026-04-23 20:54:11.240 +07:00 [WRN] You do not have a valid license key for the Lucky Penny software MediatR. This is allowed for development and testing scenarios. If you are running in production you are required to have a licensed version. Please visit https://luckypennysoftware.com to obtain a valid license.
+2026-04-23 20:54:13.318 +07:00 [INF] Executed DbCommand (45ms) [Parameters=[@request_Email='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."CreatedAt", u."Email", u."ExternalId", u."FullName", u."IdentityProvider", u."PasswordHash", u."Role", u."UpdatedAt"
+FROM "Users" AS u
+WHERE u."Email" = @request_Email
+LIMIT 1
+2026-04-23 20:54:14.094 +07:00 [INF] Executed DbCommand (10ms) [Parameters=[@p0='?' (DbType = Guid), @p1='?' (DbType = DateTime), @p2='?' (DbType = DateTime), @p3='?', @p4='?' (DbType = DateTime), @p5='?', @p6='?' (DbType = DateTime), @p7='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+INSERT INTO "RefreshTokens" ("Id", "CreatedAt", "ExpiresAt", "ReplacedByTokenHash", "RevokedAt", "TokenHash", "UpdatedAt", "UserId")
+VALUES (@p0, @p1, @p2, @p3, @p4, @p5, @p6, @p7);
+2026-04-23 20:54:14.110 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[MusicShop.Application.DTOs.Auth.AuthResponse, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-04-23 20:54:14.135 +07:00 [INF] Executed action MusicShop.API.Controllers.AuthController.Login (MusicShop.API) in 2898.4296ms
+2026-04-23 20:54:14.137 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.AuthController.Login (MusicShop.API)'
+2026-04-23 20:54:14.144 +07:00 [INF] Request finished HTTP/1.1 POST http://localhost:5000/api/v1/auth/login - 200 null application/json; charset=utf-8 4031.5671ms
+2026-04-23 20:54:17.258 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Artists?PageNumber=1&PageSize=12 - null null
+2026-04-23 20:54:17.262 +07:00 [INF] CORS policy execution successful.
+2026-04-23 20:54:17.263 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Artists?PageNumber=1&PageSize=12 - 204 null null 4.1385ms
+2026-04-23 20:54:17.264 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/api/v1/Artists?PageNumber=1&PageSize=12 - null null
+2026-04-23 20:54:17.267 +07:00 [INF] CORS policy execution successful.
+2026-04-23 20:54:17.306 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.ArtistsController.GetArtists (MusicShop.API)'
+2026-04-23 20:54:17.317 +07:00 [INF] Route matched with {action = "GetArtists", controller = "Artists"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[System.Collections.Generic.IReadOnlyList`1[MusicShop.Application.DTOs.Catalog.ArtistResponse]]]] GetArtists(MusicShop.Application.UseCases.Catalog.Artists.Queries.GetArtists.GetArtistsQuery) on controller MusicShop.API.Controllers.ArtistsController (MusicShop.API).
+2026-04-23 20:54:17.491 +07:00 [INF] Executed DbCommand (7ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Artists" AS a
+2026-04-23 20:54:17.583 +07:00 [INF] Executed DbCommand (9ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT a1."Id", a1."Bio", a1."Country", a1."CreatedAt", a1."ImageUrl", a1."Name", a1."Slug", a1."UpdatedAt", s."ArtistId", s."GenreId", s."Id", s."CreatedAt", s."Name", s."Slug", s."UpdatedAt"
+FROM (
+    SELECT a."Id", a."Bio", a."Country", a."CreatedAt", a."ImageUrl", a."Name", a."Slug", a."UpdatedAt"
+    FROM "Artists" AS a
+    ORDER BY a."Name"
+    LIMIT @p1 OFFSET @p
+) AS a1
+LEFT JOIN (
+    SELECT a0."ArtistId", a0."GenreId", g."Id", g."CreatedAt", g."Name", g."Slug", g."UpdatedAt"
+    FROM "ArtistGenres" AS a0
+    INNER JOIN "Genres" AS g ON a0."GenreId" = g."Id"
+) AS s ON a1."Id" = s."ArtistId"
+ORDER BY a1."Name", a1."Id", s."ArtistId", s."GenreId"
+2026-04-23 20:54:17.595 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[System.Collections.Generic.IReadOnlyList`1[[MusicShop.Application.DTOs.Catalog.ArtistResponse, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-04-23 20:54:17.600 +07:00 [INF] Executed action MusicShop.API.Controllers.ArtistsController.GetArtists (MusicShop.API) in 281.4577ms
+2026-04-23 20:54:17.601 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.ArtistsController.GetArtists (MusicShop.API)'
+2026-04-23 20:54:17.605 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/api/v1/Artists?PageNumber=1&PageSize=12 - 200 null application/json; charset=utf-8 340.6251ms
+2026-04-23 20:54:21.397 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Artists/1ce68670-7ffa-40c2-9ff5-f6777734405b - null null
+2026-04-23 20:54:21.399 +07:00 [INF] CORS policy execution successful.
+2026-04-23 20:54:21.400 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Artists/1ce68670-7ffa-40c2-9ff5-f6777734405b - 204 null null 2.82ms
+2026-04-23 20:54:21.401 +07:00 [INF] Request starting HTTP/1.1 DELETE http://localhost:5000/api/v1/Artists/1ce68670-7ffa-40c2-9ff5-f6777734405b - null null
+2026-04-23 20:54:21.404 +07:00 [INF] CORS policy execution successful.
+2026-04-23 20:54:21.413 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.ArtistsController.DeleteArtist (MusicShop.API)'
+2026-04-23 20:54:21.421 +07:00 [INF] Route matched with {action = "DeleteArtist", controller = "Artists"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] DeleteArtist(System.Guid) on controller MusicShop.API.Controllers.ArtistsController (MusicShop.API).
+2026-04-23 20:54:21.457 +07:00 [WRN] Compiling a query which loads related collections for more than one collection navigation, either via 'Include' or through projection, but no 'QuerySplittingBehavior' has been configured. By default, Entity Framework will use 'QuerySplittingBehavior.SingleQuery', which can potentially result in slow query performance. See https://go.microsoft.com/fwlink/?linkid=2134277 for more information. To identify the query that's triggering this warning call 'ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning))'.
+2026-04-23 20:54:21.481 +07:00 [INF] Executed DbCommand (7ms) [Parameters=[@id='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT a1."Id", a1."Bio", a1."Country", a1."CreatedAt", a1."ImageUrl", a1."Name", a1."Slug", a1."UpdatedAt", r."Id", r."ArtistId", r."CoverUrl", r."CreatedAt", r."Description", r."Slug", r."Title", r."Type", r."UpdatedAt", r."Year", a0."ArtistId", a0."GenreId"
+FROM (
+    SELECT a."Id", a."Bio", a."Country", a."CreatedAt", a."ImageUrl", a."Name", a."Slug", a."UpdatedAt"
+    FROM "Artists" AS a
+    WHERE a."Id" = @id
+    LIMIT 1
+) AS a1
+LEFT JOIN "Releases" AS r ON a1."Id" = r."ArtistId"
+LEFT JOIN "ArtistGenres" AS a0 ON a1."Id" = a0."ArtistId"
+ORDER BY a1."Id", r."Id", a0."ArtistId"
+2026-04-23 20:54:21.533 +07:00 [INF] Executing ObjectResult, writing value of type 'Microsoft.AspNetCore.Mvc.ProblemDetails'.
+2026-04-23 20:54:21.540 +07:00 [INF] Executed action MusicShop.API.Controllers.ArtistsController.DeleteArtist (MusicShop.API) in 117.5705ms
+2026-04-23 20:54:21.541 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.ArtistsController.DeleteArtist (MusicShop.API)'
+2026-04-23 20:54:21.542 +07:00 [INF] Request finished HTTP/1.1 DELETE http://localhost:5000/api/v1/Artists/1ce68670-7ffa-40c2-9ff5-f6777734405b - 409 null application/problem+json; charset=utf-8 140.7215ms
+2026-04-23 20:56:02.676 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Artists?PageNumber=1&PageSize=12 - null null
+2026-04-23 20:56:02.679 +07:00 [INF] CORS policy execution successful.
+2026-04-23 20:56:02.680 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Artists?PageNumber=1&PageSize=12 - 204 null null 3.7757ms
+2026-04-23 20:56:02.682 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/api/v1/Artists?PageNumber=1&PageSize=12 - null null
+2026-04-23 20:56:02.686 +07:00 [INF] CORS policy execution successful.
+2026-04-23 20:56:02.687 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.ArtistsController.GetArtists (MusicShop.API)'
+2026-04-23 20:56:02.689 +07:00 [INF] Route matched with {action = "GetArtists", controller = "Artists"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[System.Collections.Generic.IReadOnlyList`1[MusicShop.Application.DTOs.Catalog.ArtistResponse]]]] GetArtists(MusicShop.Application.UseCases.Catalog.Artists.Queries.GetArtists.GetArtistsQuery) on controller MusicShop.API.Controllers.ArtistsController (MusicShop.API).
+2026-04-23 20:56:02.696 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Artists" AS a
+2026-04-23 20:56:02.702 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT a1."Id", a1."Bio", a1."Country", a1."CreatedAt", a1."ImageUrl", a1."Name", a1."Slug", a1."UpdatedAt", s."ArtistId", s."GenreId", s."Id", s."CreatedAt", s."Name", s."Slug", s."UpdatedAt"
+FROM (
+    SELECT a."Id", a."Bio", a."Country", a."CreatedAt", a."ImageUrl", a."Name", a."Slug", a."UpdatedAt"
+    FROM "Artists" AS a
+    ORDER BY a."Name"
+    LIMIT @p1 OFFSET @p
+) AS a1
+LEFT JOIN (
+    SELECT a0."ArtistId", a0."GenreId", g."Id", g."CreatedAt", g."Name", g."Slug", g."UpdatedAt"
+    FROM "ArtistGenres" AS a0
+    INNER JOIN "Genres" AS g ON a0."GenreId" = g."Id"
+) AS s ON a1."Id" = s."ArtistId"
+ORDER BY a1."Name", a1."Id", s."ArtistId", s."GenreId"
+2026-04-23 20:56:02.704 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[System.Collections.Generic.IReadOnlyList`1[[MusicShop.Application.DTOs.Catalog.ArtistResponse, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-04-23 20:56:02.706 +07:00 [INF] Executed action MusicShop.API.Controllers.ArtistsController.GetArtists (MusicShop.API) in 15.4565ms
+2026-04-23 20:56:02.707 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.ArtistsController.GetArtists (MusicShop.API)'
+2026-04-23 20:56:02.708 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/api/v1/Artists?PageNumber=1&PageSize=12 - 200 null application/json; charset=utf-8 25.9986ms
+2026-04-23 20:59:14.809 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Artists?PageNumber=1&PageSize=12 - null null
+2026-04-23 20:59:14.812 +07:00 [INF] CORS policy execution successful.
+2026-04-23 20:59:14.813 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Artists?PageNumber=1&PageSize=12 - 204 null null 4.5782ms
+2026-04-23 20:59:14.817 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/api/v1/Artists?PageNumber=1&PageSize=12 - null null
+2026-04-23 20:59:14.820 +07:00 [INF] CORS policy execution successful.
+2026-04-23 20:59:14.822 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.ArtistsController.GetArtists (MusicShop.API)'
+2026-04-23 20:59:14.823 +07:00 [INF] Route matched with {action = "GetArtists", controller = "Artists"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[System.Collections.Generic.IReadOnlyList`1[MusicShop.Application.DTOs.Catalog.ArtistResponse]]]] GetArtists(MusicShop.Application.UseCases.Catalog.Artists.Queries.GetArtists.GetArtistsQuery) on controller MusicShop.API.Controllers.ArtistsController (MusicShop.API).
+2026-04-23 20:59:14.903 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Artists" AS a
+2026-04-23 20:59:14.908 +07:00 [INF] Executed DbCommand (3ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT a1."Id", a1."Bio", a1."Country", a1."CreatedAt", a1."ImageUrl", a1."Name", a1."Slug", a1."UpdatedAt", s."ArtistId", s."GenreId", s."Id", s."CreatedAt", s."Name", s."Slug", s."UpdatedAt"
+FROM (
+    SELECT a."Id", a."Bio", a."Country", a."CreatedAt", a."ImageUrl", a."Name", a."Slug", a."UpdatedAt"
+    FROM "Artists" AS a
+    ORDER BY a."Name"
+    LIMIT @p1 OFFSET @p
+) AS a1
+LEFT JOIN (
+    SELECT a0."ArtistId", a0."GenreId", g."Id", g."CreatedAt", g."Name", g."Slug", g."UpdatedAt"
+    FROM "ArtistGenres" AS a0
+    INNER JOIN "Genres" AS g ON a0."GenreId" = g."Id"
+) AS s ON a1."Id" = s."ArtistId"
+ORDER BY a1."Name", a1."Id", s."ArtistId", s."GenreId"
+2026-04-23 20:59:14.911 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[System.Collections.Generic.IReadOnlyList`1[[MusicShop.Application.DTOs.Catalog.ArtistResponse, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-04-23 20:59:14.912 +07:00 [INF] Executed action MusicShop.API.Controllers.ArtistsController.GetArtists (MusicShop.API) in 86.7432ms
+2026-04-23 20:59:14.913 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.ArtistsController.GetArtists (MusicShop.API)'
+2026-04-23 20:59:14.914 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/api/v1/Artists?PageNumber=1&PageSize=12 - 200 null application/json; charset=utf-8 96.9583ms
+2026-04-23 21:12:27.202 +07:00 [INF] Request starting HTTP/1.1 POST http://localhost:5000/api/v1/auth/refresh - null 0
+2026-04-23 21:12:27.202 +07:00 [INF] Request starting HTTP/1.1 POST http://localhost:5000/api/v1/auth/refresh - null 0
+2026-04-23 21:12:27.204 +07:00 [INF] CORS policy execution successful.
+2026-04-23 21:12:27.206 +07:00 [INF] CORS policy execution successful.
+2026-04-23 21:12:27.206 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.AuthController.RefreshToken (MusicShop.API)'
+2026-04-23 21:12:27.207 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.AuthController.RefreshToken (MusicShop.API)'
+2026-04-23 21:12:27.214 +07:00 [INF] Route matched with {action = "RefreshToken", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[MusicShop.Application.DTOs.Auth.AuthResponse]]] RefreshToken() on controller MusicShop.API.Controllers.AuthController (MusicShop.API).
+2026-04-23 21:12:27.214 +07:00 [INF] Route matched with {action = "RefreshToken", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[MusicShop.Application.DTOs.Auth.AuthResponse]]] RefreshToken() on controller MusicShop.API.Controllers.AuthController (MusicShop.API).
+2026-04-23 21:12:27.311 +07:00 [INF] Executed DbCommand (6ms) [Parameters=[@currentRefreshTokenHash='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT r."Id", r."CreatedAt", r."ExpiresAt", r."ReplacedByTokenHash", r."RevokedAt", r."TokenHash", r."UpdatedAt", r."UserId"
+FROM "RefreshTokens" AS r
+WHERE r."TokenHash" = @currentRefreshTokenHash
+LIMIT 1
+2026-04-23 21:12:27.311 +07:00 [INF] Executed DbCommand (13ms) [Parameters=[@currentRefreshTokenHash='?'], CommandType='"Text"', CommandTimeout='30']
+SELECT r."Id", r."CreatedAt", r."ExpiresAt", r."ReplacedByTokenHash", r."RevokedAt", r."TokenHash", r."UpdatedAt", r."UserId"
+FROM "RefreshTokens" AS r
+WHERE r."TokenHash" = @currentRefreshTokenHash
+LIMIT 1
+2026-04-23 21:12:27.334 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@p='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."CreatedAt", u."Email", u."ExternalId", u."FullName", u."IdentityProvider", u."PasswordHash", u."Role", u."UpdatedAt"
+FROM "Users" AS u
+WHERE u."Id" = @p
+LIMIT 1
+2026-04-23 21:12:27.334 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@p='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+SELECT u."Id", u."CreatedAt", u."Email", u."ExternalId", u."FullName", u."IdentityProvider", u."PasswordHash", u."Role", u."UpdatedAt"
+FROM "Users" AS u
+WHERE u."Id" = @p
+LIMIT 1
+2026-04-23 21:12:27.360 +07:00 [INF] Executed DbCommand (4ms) [Parameters=[@p7='?' (DbType = Guid), @p0='?' (DbType = DateTime), @p1='?' (DbType = DateTime), @p2='?', @p3='?' (DbType = DateTime), @p4='?', @p5='?' (DbType = DateTime), @p6='?' (DbType = Guid), @p8='?' (DbType = Guid), @p9='?' (DbType = DateTime), @p10='?' (DbType = DateTime), @p11='?', @p12='?' (DbType = DateTime), @p13='?', @p14='?' (DbType = DateTime), @p15='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+UPDATE "RefreshTokens" SET "CreatedAt" = @p0, "ExpiresAt" = @p1, "ReplacedByTokenHash" = @p2, "RevokedAt" = @p3, "TokenHash" = @p4, "UpdatedAt" = @p5, "UserId" = @p6
+WHERE "Id" = @p7;
+INSERT INTO "RefreshTokens" ("Id", "CreatedAt", "ExpiresAt", "ReplacedByTokenHash", "RevokedAt", "TokenHash", "UpdatedAt", "UserId")
+VALUES (@p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15);
+2026-04-23 21:12:27.369 +07:00 [INF] Executed DbCommand (13ms) [Parameters=[@p7='?' (DbType = Guid), @p0='?' (DbType = DateTime), @p1='?' (DbType = DateTime), @p2='?', @p3='?' (DbType = DateTime), @p4='?', @p5='?' (DbType = DateTime), @p6='?' (DbType = Guid), @p8='?' (DbType = Guid), @p9='?' (DbType = DateTime), @p10='?' (DbType = DateTime), @p11='?', @p12='?' (DbType = DateTime), @p13='?', @p14='?' (DbType = DateTime), @p15='?' (DbType = Guid)], CommandType='"Text"', CommandTimeout='30']
+UPDATE "RefreshTokens" SET "CreatedAt" = @p0, "ExpiresAt" = @p1, "ReplacedByTokenHash" = @p2, "RevokedAt" = @p3, "TokenHash" = @p4, "UpdatedAt" = @p5, "UserId" = @p6
+WHERE "Id" = @p7;
+INSERT INTO "RefreshTokens" ("Id", "CreatedAt", "ExpiresAt", "ReplacedByTokenHash", "RevokedAt", "TokenHash", "UpdatedAt", "UserId")
+VALUES (@p8, @p9, @p10, @p11, @p12, @p13, @p14, @p15);
+2026-04-23 21:12:27.376 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[MusicShop.Application.DTOs.Auth.AuthResponse, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-04-23 21:12:27.376 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[MusicShop.Application.DTOs.Auth.AuthResponse, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]'.
+2026-04-23 21:12:27.377 +07:00 [INF] Executed action MusicShop.API.Controllers.AuthController.RefreshToken (MusicShop.API) in 161.127ms
+2026-04-23 21:12:27.378 +07:00 [INF] Executed action MusicShop.API.Controllers.AuthController.RefreshToken (MusicShop.API) in 160.1625ms
+2026-04-23 21:12:27.380 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.AuthController.RefreshToken (MusicShop.API)'
+2026-04-23 21:12:27.381 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.AuthController.RefreshToken (MusicShop.API)'
+2026-04-23 21:12:27.382 +07:00 [INF] Request finished HTTP/1.1 POST http://localhost:5000/api/v1/auth/refresh - 200 null application/json; charset=utf-8 179.7471ms
+2026-04-23 21:12:27.382 +07:00 [INF] Request finished HTTP/1.1 POST http://localhost:5000/api/v1/auth/refresh - 200 null application/json; charset=utf-8 179.8749ms
+2026-04-23 21:12:27.414 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Artists?PageNumber=1&PageSize=12 - null null
+2026-04-23 21:12:27.416 +07:00 [INF] CORS policy execution successful.
+2026-04-23 21:12:27.417 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Artists?PageNumber=1&PageSize=12 - 204 null null 2.7881ms
+2026-04-23 21:12:27.419 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/api/v1/Artists?PageNumber=1&PageSize=12 - null null
+2026-04-23 21:12:27.421 +07:00 [INF] CORS policy execution successful.
+2026-04-23 21:12:27.422 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.ArtistsController.GetArtists (MusicShop.API)'
+2026-04-23 21:12:27.423 +07:00 [INF] Route matched with {action = "GetArtists", controller = "Artists"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[System.Collections.Generic.IReadOnlyList`1[MusicShop.Application.DTOs.Catalog.ArtistResponse]]]] GetArtists(MusicShop.Application.UseCases.Catalog.Artists.Queries.GetArtists.GetArtistsQuery) on controller MusicShop.API.Controllers.ArtistsController (MusicShop.API).
+2026-04-23 21:12:27.428 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Artists" AS a
+2026-04-23 21:12:27.433 +07:00 [INF] Executed DbCommand (3ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT a1."Id", a1."Bio", a1."Country", a1."CreatedAt", a1."ImageUrl", a1."Name", a1."Slug", a1."UpdatedAt", s."ArtistId", s."GenreId", s."Id", s."CreatedAt", s."Name", s."Slug", s."UpdatedAt"
+FROM (
+    SELECT a."Id", a."Bio", a."Country", a."CreatedAt", a."ImageUrl", a."Name", a."Slug", a."UpdatedAt"
+    FROM "Artists" AS a
+    ORDER BY a."Name"
+    LIMIT @p1 OFFSET @p
+) AS a1
+LEFT JOIN (
+    SELECT a0."ArtistId", a0."GenreId", g."Id", g."CreatedAt", g."Name", g."Slug", g."UpdatedAt"
+    FROM "ArtistGenres" AS a0
+    INNER JOIN "Genres" AS g ON a0."GenreId" = g."Id"
+) AS s ON a1."Id" = s."ArtistId"
+ORDER BY a1."Name", a1."Id", s."ArtistId", s."GenreId"
+2026-04-23 21:12:27.437 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[System.Collections.Generic.IReadOnlyList`1[[MusicShop.Application.DTOs.Catalog.ArtistResponse, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-04-23 21:12:27.438 +07:00 [INF] Executed action MusicShop.API.Controllers.ArtistsController.GetArtists (MusicShop.API) in 13.6315ms
+2026-04-23 21:12:27.440 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.ArtistsController.GetArtists (MusicShop.API)'
+2026-04-23 21:12:27.440 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/api/v1/Artists?PageNumber=1&PageSize=12 - 200 null application/json; charset=utf-8 21.7756ms
+2026-04-23 21:12:29.991 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Genres?PageNumber=1&PageSize=100 - null null
+2026-04-23 21:12:29.993 +07:00 [INF] CORS policy execution successful.
+2026-04-23 21:12:29.994 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/Genres?PageNumber=1&PageSize=100 - 204 null null 2.4368ms
+2026-04-23 21:12:29.996 +07:00 [INF] Request starting HTTP/1.1 GET http://localhost:5000/api/v1/Genres?PageNumber=1&PageSize=100 - null null
+2026-04-23 21:12:29.998 +07:00 [INF] CORS policy execution successful.
+2026-04-23 21:12:30.000 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.GenresController.GetGenres (MusicShop.API)'
+2026-04-23 21:12:30.009 +07:00 [INF] Route matched with {action = "GetGenres", controller = "Genres"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[System.Collections.Generic.IReadOnlyList`1[MusicShop.Application.DTOs.Catalog.GenreResponse]]]] GetGenres(MusicShop.Application.UseCases.Catalog.Genres.Queries.GetGenres.GetGenresQuery) on controller MusicShop.API.Controllers.GenresController (MusicShop.API).
+2026-04-23 21:12:30.021 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[], CommandType='"Text"', CommandTimeout='30']
+SELECT count(*)::int
+FROM "Genres" AS g
+2026-04-23 21:12:30.030 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[@p1='?' (DbType = Int32), @p='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT g."Id", g."CreatedAt", g."Name", g."Slug", g."UpdatedAt"
+FROM "Genres" AS g
+ORDER BY g."Name"
+LIMIT @p1 OFFSET @p
+2026-04-23 21:12:30.035 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[System.Collections.Generic.IReadOnlyList`1[[MusicShop.Application.DTOs.Catalog.GenreResponse, MusicShop.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]], System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-04-23 21:12:30.040 +07:00 [INF] Executed action MusicShop.API.Controllers.GenresController.GetGenres (MusicShop.API) in 29.6237ms
+2026-04-23 21:12:30.041 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.GenresController.GetGenres (MusicShop.API)'
+2026-04-23 21:12:30.043 +07:00 [INF] Request finished HTTP/1.1 GET http://localhost:5000/api/v1/Genres?PageNumber=1&PageSize=100 - 200 null application/json; charset=utf-8 46.5296ms
+2026-04-23 21:12:34.135 +07:00 [INF] Request starting HTTP/1.1 OPTIONS http://localhost:5000/api/v1/uploads/image?folder=artists - null null
+2026-04-23 21:12:34.139 +07:00 [INF] CORS policy execution successful.
+2026-04-23 21:12:34.139 +07:00 [INF] Request finished HTTP/1.1 OPTIONS http://localhost:5000/api/v1/uploads/image?folder=artists - 204 null null 4.0514ms
+2026-04-23 21:12:34.142 +07:00 [INF] Request starting HTTP/1.1 POST http://localhost:5000/api/v1/uploads/image?folder=artists - multipart/form-data; boundary=----WebKitFormBoundaryBixJNqePFr69jpk7 326243
+2026-04-23 21:12:34.146 +07:00 [INF] CORS policy execution successful.
+2026-04-23 21:12:34.150 +07:00 [INF] Executing endpoint 'MusicShop.API.Controllers.UploadsController.UploadImage (MusicShop.API)'
+2026-04-23 21:12:34.156 +07:00 [INF] Route matched with {action = "UploadImage", controller = "Uploads"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.ActionResult`1[MusicShop.API.Infrastructure.ApiResponse`1[System.String]]] UploadImage(Microsoft.AspNetCore.Http.IFormFile, System.String, System.Threading.CancellationToken) on controller MusicShop.API.Controllers.UploadsController (MusicShop.API).
+2026-04-23 21:12:34.192 +07:00 [INF] Using AWS credentials specified with the AWSOptions.Credentials property
+2026-04-23 21:12:36.606 +07:00 [INF] Executing OkObjectResult, writing value of type 'MusicShop.API.Infrastructure.ApiResponse`1[[System.String, System.Private.CoreLib, Version=10.0.0.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e]]'.
+2026-04-23 21:12:36.608 +07:00 [INF] Executed action MusicShop.API.Controllers.UploadsController.UploadImage (MusicShop.API) in 2450.2673ms
+2026-04-23 21:12:36.609 +07:00 [INF] Executed endpoint 'MusicShop.API.Controllers.UploadsController.UploadImage (MusicShop.API)'
+2026-04-23 21:12:36.610 +07:00 [INF] Request finished HTTP/1.1 POST http://localhost:5000/api/v1/uploads/image?folder=artists - 200 null application/json; charset=utf-8 2468.1176ms

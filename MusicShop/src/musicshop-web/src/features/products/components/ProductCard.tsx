@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter, Badge, Button } from '@/shared/component
 import { ShoppingCart, Disc, Music } from 'lucide-react';
 
 interface ProductCardProps {
-  product: ProductListItem;
+  product: Product;
 }
 
 export function ProductCard({ product }: ProductCardProps) {

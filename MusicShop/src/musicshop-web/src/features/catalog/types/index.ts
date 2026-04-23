@@ -1,4 +1,4 @@
-import { ReleaseFormat } from '@/features/product/types';
+import { ReleaseFormat } from '@/features/products/types';
 
 export interface Genre {
   id: string;
@@ -19,7 +19,7 @@ export interface Artist {
   id: string;
   name: string;
   slug: string;
-  bio: string;
+  bio?: string;
   country: string;
   imageUrl?: string;
   genres: Genre[];

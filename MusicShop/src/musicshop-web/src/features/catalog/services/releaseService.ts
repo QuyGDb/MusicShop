@@ -1,6 +1,6 @@
 import http from '@/shared/api/axiosInstance';
 import { ApiResponse, PaginatedResponse } from '@/shared/types/api';
-import { Release, Track } from '../types';
+import { Release, Track, ReleaseVersion } from '../types';
 
 export interface CreateReleaseRequest {
   title: string;
