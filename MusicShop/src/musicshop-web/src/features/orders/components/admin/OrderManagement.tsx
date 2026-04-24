@@ -1,30 +1,21 @@
-import { useState } from 'react';
-import { ShoppingBag, Search, Filter, Eye, CheckCircle2, Clock, Truck, AlertCircle, MoreVertical, Calendar, X } from 'lucide-react';
+import { Search, Filter, Eye, MoreVertical, Calendar } from 'lucide-react';
 import { Button, Card, CardHeader, CardTitle, CardContent } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
 import { OrderDetailsModal } from './OrderDetailsModal';
+import { useOrderManagement } from '../../hooks/useOrderManagement';
 
-import { Order, OrderStatus } from '../../types';
-
-const MOCK_ORDERS: Order[] = [
-  { id: 'ORD-7721', customerName: 'John Doe', email: 'john@example.com', date: '2026-04-18', total: 125.50, status: 'Processing', itemsCount: 3 },
-  { id: 'ORD-7722', customerName: 'Jane Smith', email: 'jane@example.com', date: '2026-04-19', total: 45.00, status: 'Pending', itemsCount: 1 },
-  { id: 'ORD-7723', customerName: 'Mike Johnson', email: 'mike@example.com', date: '2026-04-19', total: 89.99, status: 'Shipped', itemsCount: 2 },
-  { id: 'ORD-7724', customerName: 'Sarah Williams', email: 'sarah@example.com', date: '2026-04-20', total: 210.00, status: 'Delivered', itemsCount: 5 },
-  { id: 'ORD-7725', customerName: 'David Brown', email: 'david@example.com', date: '2026-04-20', total: 60.00, status: 'Cancelled', itemsCount: 2 },
-];
-
-const statusStyles: Record<OrderStatus, { color: string, icon: any }> = {
-  Pending: { color: 'bg-amber-100 text-amber-700 border-amber-200', icon: Clock },
-  Processing: { color: 'bg-blue-100 text-blue-700 border-blue-200', icon: AlertCircle },
-  Shipped: { color: 'bg-purple-100 text-purple-700 border-purple-200', icon: Truck },
-  Delivered: { color: 'bg-emerald-100 text-emerald-700 border-emerald-200', icon: CheckCircle2 },
-  Cancelled: { color: 'bg-muted text-subtle border-border', icon: X }
-};
-
+/**
+ * Presentational component for order and fulfillment management.
+ * Logic is delegated to useOrderManagement hook.
+ */
 export function OrderManagement() {
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [orders, setOrders] = useState<Order[]>(MOCK_ORDERS);
+  const {
+    orders,
+    stats,
+    statusStyles,
+    selectedOrderId,
+    actions
+  } = useOrderManagement();
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -35,12 +26,7 @@ export function OrderManagement() {
 
       {/* Summary Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {[
-          { label: 'Pending Orders', value: '12', icon: Clock, color: 'text-amber-500', bg: 'bg-amber-50' },
-          { label: 'To Ship', value: '08', icon: Truck, color: 'text-purple-500', bg: 'bg-purple-50' },
-          { label: 'Processing', value: '04', icon: AlertCircle, color: 'text-blue-500', bg: 'bg-blue-50' },
-          { label: 'Today Revenue', value: '$1,250', icon: ShoppingBag, color: 'text-primary', bg: 'bg-primary/10' },
-        ].map((stat, i) => (
+        {stats.map((stat, i) => (
           <Card key={i} className="bg-surface border-border">
             <CardContent className="p-6 flex items-center gap-4">
                <div className={cn("p-3 rounded-2xl", stat.bg)}>
@@ -93,7 +79,8 @@ export function OrderManagement() {
             </thead>
             <tbody>
               {orders.map((order) => {
-                const StatusIcon = statusStyles[order.status].icon;
+                const style = statusStyles[order.status];
+                const StatusIcon = style.icon;
                 return (
                   <tr key={order.id} className="border-b border-border/50 hover:bg-muted/10 transition-colors group">
                     <td className="p-5">
@@ -114,7 +101,7 @@ export function OrderManagement() {
                     <td className="p-5">
                        <div className={cn(
                          "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border",
-                         statusStyles[order.status].color
+                         style.color
                        )}>
                           <StatusIcon className="h-3 w-3" />
                           {order.status}
@@ -126,7 +113,7 @@ export function OrderManagement() {
                             variant="ghost" 
                             size="icon" 
                             className="h-9 w-9 text-muted-foreground hover:text-primary rounded-xl"
-                            onClick={() => setSelectedOrder(order)}
+                            onClick={() => actions.openDetails(order)}
                           >
                              <Eye className="h-4 w-4" />
                           </Button>
@@ -144,10 +131,10 @@ export function OrderManagement() {
       </Card>
 
       {/* Detail Modal */}
-      {selectedOrder && (
+      {selectedOrderId && (
         <OrderDetailsModal 
-          orderId={selectedOrder.id} 
-          onClose={() => setSelectedOrder(null)} 
+          orderId={selectedOrderId} 
+          onClose={actions.closeDetails} 
         />
       )}
     </div>

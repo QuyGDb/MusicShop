@@ -1,33 +1,26 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Package, Plus, Settings, Tag, ShieldCheck, AlertCircle, Loader2, Trash2, Edit3, Layers, ExternalLink } from 'lucide-react';
 import { Button, Card, CardHeader, CardTitle, CardContent, Skeleton } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
-import { useAdminProduct, useDeleteProductVariant } from '../../hooks/useProducts';
-import { Product, ProductVariant, ReleaseFormat } from '../../types';
+import { ReleaseFormat } from '../../types';
 import { VariantFormModal } from './VariantFormModal';
+import { useProductAdminDetails } from '../../hooks/useProductAdminDetails';
 
 interface ProductAdminDetailsProps {
   productId: string;
 }
 
+/**
+ * Presentational component for product administration details.
+ * Logic is delegated to useProductAdminDetails hook.
+ */
 export function ProductAdminDetails({ productId }: ProductAdminDetailsProps) {
-  const navigate = useNavigate();
-  const [showVariantModal, setShowVariantModal] = useState(false);
-  const [editingVariant, setEditingVariant] = useState<ProductVariant | null>(null);
-
-  const { data: product, isLoading, error } = useAdminProduct(productId);
-  const deleteVariantMutation = useDeleteProductVariant(productId);
-
-  const handleOpenAddVariant = () => {
-    setEditingVariant(null);
-    setShowVariantModal(true);
-  };
-
-  const handleOpenEditVariant = (variant: ProductVariant) => {
-    setEditingVariant(variant);
-    setShowVariantModal(true);
-  };
+  const {
+    product,
+    isLoading,
+    error,
+    variantModal,
+    actions
+  } = useProductAdminDetails({ productId });
 
   if (isLoading) {
     return (
@@ -46,7 +39,7 @@ export function ProductAdminDetails({ productId }: ProductAdminDetailsProps) {
       <div className="flex flex-col items-center justify-center py-20 space-y-4">
         <AlertCircle className="h-12 w-12 text-red-500" />
         <p className="text-xl font-bold">Product not found</p>
-        <Button onClick={() => navigate('/admin/products')}>Back to Inventory</Button>
+        <Button onClick={actions.back}>Back to Inventory</Button>
       </div>
     );
   }
@@ -57,7 +50,7 @@ export function ProductAdminDetails({ productId }: ProductAdminDetailsProps) {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex flex-col gap-2">
            <button 
-             onClick={() => navigate('/admin/products')}
+             onClick={actions.back}
              className="flex items-center gap-2 text-xs font-bold text-muted-foreground hover:text-primary transition-colors group w-fit"
            >
               <ArrowLeft className="h-3 w-3 group-hover:-translate-x-1 transition-transform" />
@@ -72,7 +65,7 @@ export function ProductAdminDetails({ productId }: ProductAdminDetailsProps) {
         </div>
         
         <div className="flex gap-3">
-          <Button className="h-12 px-6 rounded-xl bg-surface border border-border text-foreground hover:bg-muted flex gap-2" onClick={() => window.open(`/products/${product.id}`, '_blank')}>
+          <Button className="h-12 px-6 rounded-xl bg-surface border border-border text-foreground hover:bg-muted flex gap-2" onClick={actions.viewStore}>
             <ExternalLink className="h-4 w-4" />
             View Store
           </Button>
@@ -94,7 +87,7 @@ export function ProductAdminDetails({ productId }: ProductAdminDetailsProps) {
                     </div>
                  </div>
                  <Button 
-                   onClick={handleOpenAddVariant}
+                   onClick={variantModal.openAdd}
                    className="bg-primary hover:bg-primary-dark text-primary-foreground h-10 px-4 rounded-xl shadow-lg shadow-primary/20 flex gap-2"
                  >
                     <Plus className="h-4 w-4" />
@@ -148,7 +141,7 @@ export function ProductAdminDetails({ productId }: ProductAdminDetailsProps) {
                                      variant="ghost" 
                                      size="icon" 
                                      className="h-9 w-9 rounded-lg"
-                                     onClick={() => handleOpenEditVariant(variant)}
+                                     onClick={() => variantModal.openEdit(variant)}
                                    >
                                       <Edit3 className="h-4 w-4" />
                                    </Button>
@@ -156,13 +149,10 @@ export function ProductAdminDetails({ productId }: ProductAdminDetailsProps) {
                                      variant="ghost" 
                                      size="icon" 
                                      className="h-9 w-9 rounded-lg text-red-500 hover:bg-red-50"
-                                     onClick={() => {
-                                        if(window.confirm('Delete this variant?'))
-                                          deleteVariantMutation.mutate(variant.id);
-                                     }}
-                                     disabled={deleteVariantMutation.isPending}
+                                     onClick={() => actions.deleteVariant(variant.id)}
+                                     disabled={actions.isDeletingVariant}
                                    >
-                                      {deleteVariantMutation.isPending && deleteVariantMutation.variables === variant.id ? (
+                                      {actions.isDeletingVariant && actions.deletingVariantId === variant.id ? (
                                         <Loader2 className="h-4 w-4 animate-spin" />
                                       ) : (
                                         <Trash2 className="h-4 w-4" />
@@ -239,12 +229,12 @@ export function ProductAdminDetails({ productId }: ProductAdminDetailsProps) {
         </div>
       </div>
 
-      {showVariantModal && (
+      {variantModal.isOpen && (
         <VariantFormModal 
           productId={product.id}
           format={product.format}
-          editingVariant={editingVariant}
-          onClose={() => setShowVariantModal(false)} 
+          editingVariant={variantModal.editingVariant}
+          onClose={variantModal.close} 
         />
       )}
     </div>

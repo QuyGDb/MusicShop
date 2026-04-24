@@ -1,4 +1,4 @@
-import { ImageUpload } from '@/shared/components/ui/ImageUpload';
+import { ImageUpload } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
 import { ReleaseFormValues } from '../../../types/release';
 

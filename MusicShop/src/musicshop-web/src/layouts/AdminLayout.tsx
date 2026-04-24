@@ -1,11 +1,11 @@
 import { ReactNode } from 'react';
 import { Link, useLocation, Outlet } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Package, 
-  Users, 
-  ShoppingBag, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Package,
+  Users,
+  ShoppingBag,
+  Settings,
   ArrowLeft,
   Music,
   UserCircle,
@@ -71,8 +71,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               <div className="space-y-1">
                 {group.links.map((link) => {
                   const Icon = link.icon;
-                  const isActive = link.href === '/admin' 
-                    ? pathname === '/admin' 
+                  const isActive = link.href === '/admin'
+                    ? pathname === '/admin'
                     : pathname.startsWith(link.href);
                   return (
                     <Link
@@ -80,8 +80,8 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                       to={link.href}
                       className={cn(
                         "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all group",
-                        isActive 
-                          ? "bg-primary/10 text-primary border-l-2 border-primary rounded-l-none" 
+                        isActive
+                          ? "bg-primary/10 text-primary border-l-2 border-primary rounded-l-none"
                           : "text-muted-foreground hover:bg-muted hover:text-foreground border-l-2 border-transparent"
                       )}
                     >
@@ -96,14 +96,14 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         </nav>
 
         <div className="p-4 border-t border-border">
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition-all"
           >
             <ArrowLeft className="h-5 w-5" />
             Back to Shop
           </Link>
-          
+
           <div className="mt-4 px-4 py-2 flex items-center gap-3 bg-muted/50 rounded-2xl">
             <div className="h-8 w-8 rounded-full bg-primary/20 flex items-center justify-center border border-primary/10 text-xs font-bold text-primary uppercase">
               {user?.fullName?.charAt(0) || 'A'}

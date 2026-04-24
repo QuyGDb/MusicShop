@@ -1,8 +1,7 @@
-import { useState, useRef, ChangeEvent, DragEvent } from 'react';
 import { Upload, X, ImageIcon, Loader2 } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { Button } from '@/shared/components';
-import { uploadService } from '@/shared/services/uploadService';
+import { useImageUpload } from '@/shared/hooks/useImageUpload';
 
 interface ImageUploadProps {
   value?: string;
@@ -16,6 +15,7 @@ interface ImageUploadProps {
 
 /**
  * A premium image upload component with drag & drop, preview, and progress states.
+ * Logic is separated into useImageUpload hook.
  */
 export function ImageUpload({ 
   value, 
@@ -26,51 +26,16 @@ export function ImageUpload({
   aspectRatio = 'square',
   folder = "general"
 }: ImageUploadProps) {
-  const [isDragging, setIsDragging] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const handleFile = async (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      alert('Please upload an image file.');
-      return;
-    }
-
-    setIsUploading(true);
-    
-    try {
-      const url = await uploadService.uploadImage(file, folder);
-      onChange(url);
-    } catch (error) {
-      console.error('Upload failed:', error);
-      alert('Upload failed. Please try again.');
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const onFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      handleFile(e.target.files[0]);
-    }
-  };
-
-  const handleDragOver = (e: DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = () => {
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      handleFile(e.dataTransfer.files[0]);
-    }
-  };
+  const {
+    isDragging,
+    isUploading,
+    fileInputRef,
+    onFileChange,
+    handleDragOver,
+    handleDragLeave,
+    handleDrop,
+    onBrowse
+  } = useImageUpload({ onChange, folder });
 
   const aspectClasses = {
     square: 'aspect-square',
@@ -122,7 +87,7 @@ export function ImageUpload({
         ) : (
           <div 
             className="w-full h-full flex flex-col items-center justify-center p-6 text-center cursor-pointer"
-            onClick={() => fileInputRef.current?.click()}
+            onClick={onBrowse}
           >
             {isUploading ? (
               <div className="space-y-4 flex flex-col items-center">

@@ -1,44 +1,29 @@
-import { useState } from 'react';
 import { 
   Plus, 
   Search, 
   MapPin, 
   Music, 
-  Edit2, 
-  Trash2, 
   Users,
-  Loader2,
   AlertCircle
 } from 'lucide-react';
-import { Button, Card, CardContent, Skeleton } from '@/shared/components';
-import { useArtists, useDeleteArtist } from '../../hooks/useArtists';
-import { Artist } from '../../types';
+import { Button, CardContent, Skeleton } from '@/shared/components';
 import { ArtistForm } from './ArtistForm';
 import { ArtistCard } from './ArtistCard';
+import { useArtistManagement } from '../../../hooks/useArtistManagement';
 
+/**
+ * Presentational component for catalog artist management.
+ * Logic is delegated to useArtistManagement hook.
+ */
 export function ArtistManagement() {
-  const [showForm, setShowForm] = useState(false);
-  const [editingArtist, setEditingArtist] = useState<Artist | null>(null);
-  const [page, setPage] = useState(1);
-
-  const { data: artistsData, isLoading, error } = useArtists(page, 12);
-  const deleteArtistMutation = useDeleteArtist();
-
-  const handleOpenCreate = () => {
-    setEditingArtist(null);
-    setShowForm(true);
-  };
-
-  const handleOpenEdit = (artist: Artist) => {
-    setEditingArtist(artist);
-    setShowForm(true);
-  };
-
-  const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this artist? This will remove them from the catalog.')) {
-      deleteArtistMutation.mutate(id);
-    }
-  };
+  const {
+    artists,
+    isLoading,
+    error,
+    isEmpty,
+    form,
+    actions
+  } = useArtistManagement();
 
   if (error) {
     return (
@@ -58,7 +43,7 @@ export function ArtistManagement() {
           <p className="text-muted-foreground">Manage the creators behind your music collection.</p>
         </div>
         <Button 
-          onClick={handleOpenCreate} 
+          onClick={form.openCreate} 
           className="bg-primary hover:bg-primary-dark text-primary-foreground h-12 px-6 rounded-xl shadow-lg shadow-primary/20"
         >
           <Plus className="h-5 w-5 mr-2" />
@@ -66,14 +51,14 @@ export function ArtistManagement() {
         </Button>
       </div>
 
-      {showForm && (
+      {form.isOpen && (
         <ArtistForm 
-          editingArtist={editingArtist} 
-          onClose={() => setShowForm(false)} 
+          editingArtist={form.editingArtist} 
+          onClose={form.close} 
         />
       )}
 
-      {!showForm && (
+      {!form.isOpen && (
         <>
           {/* Filters Bar */}
           <div className="flex flex-wrap gap-4 items-center">
@@ -104,19 +89,19 @@ export function ArtistManagement() {
                 <Skeleton key={i} className="h-80 w-full rounded-3xl bg-muted/50" />
               ))
             ) : (
-              artistsData?.items.map((artist) => (
+              artists.map((artist) => (
                 <ArtistCard 
                   key={artist.id} 
                   artist={artist} 
-                  onEdit={handleOpenEdit}
-                  onDelete={handleDelete}
-                  isDeleting={deleteArtistMutation.isPending && deleteArtistMutation.variables === artist.id}
+                  onEdit={form.openEdit}
+                  onDelete={actions.delete}
+                  isDeleting={actions.isDeleting && actions.deletingId === artist.id}
                 />
               ))
             )}
           </div>
 
-          {!isLoading && artistsData?.items.length === 0 && (
+          {isEmpty && (
             <div className="text-center py-20 bg-muted/20 border-2 border-dashed border-border rounded-3xl">
               <Users className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
               <p className="text-muted-foreground font-medium">No artists found. Time to discover some talent!</p>

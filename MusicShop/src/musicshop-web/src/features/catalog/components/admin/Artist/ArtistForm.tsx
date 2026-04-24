@@ -4,12 +4,12 @@ import {
   Card, 
   CardHeader, 
   CardTitle, 
-  CardContent 
+  CardContent,
+  ImageUpload
 } from '@/shared/components';
-import { ImageUpload } from '@/shared/components/ui/ImageUpload';
 import { cn } from '@/shared/lib/utils';
 import { Artist } from '@/features/catalog/types';
-import { useArtistForm } from '../../hooks/useArtistForm';
+import { useArtistForm } from '../../../hooks/useArtistForm';
 import { useGenres } from '@/features/catalog/hooks/useGenres';
 
 interface ArtistFormProps {

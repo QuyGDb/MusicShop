@@ -1,33 +1,28 @@
-import { useState } from 'react';
-import { Plus, Search, Filter, Edit2, Trash2, Package, ArrowRight, Loader2, Tag, AlertCircle } from 'lucide-react';
+import { Plus, Search, Filter, Edit2, Trash2, Package, Loader2, Tag, AlertCircle } from 'lucide-react';
 import { Button, Card, CardContent, Skeleton } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
-import { useProducts, useDeleteProduct } from '../../hooks/useProducts';
 import { Product } from '../../types';
 import { ProductCreateModal } from './ProductCreateModal';
-import { useNavigate } from 'react-router-dom';
+import { useProductManagement } from '../../hooks/useProductManagement';
 
+/**
+ * Presentational component for store inventory management.
+ * Logic is delegated to useProductManagement hook.
+ */
 export function ProductManagement() {
-  const [showForm, setShowForm] = useState(false);
-  const [page, setPage] = useState(1);
-  const navigate = useNavigate();
-
-  const { data: productsData, isLoading, error } = useProducts({ page, limit: 10 });
-  const deleteProductMutation = useDeleteProduct();
-
-  const handleOpenCreate = () => {
-    setShowForm(true);
-  };
-
-  const handleOpenEdit = (id: string) => {
-    navigate(`/admin/products/${id}`);
-  };
-
-  const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this product? This will unlist it from the store.')) {
-      deleteProductMutation.mutate(id);
-    }
-  };
+  const {
+    products,
+    isLoading,
+    error,
+    isEmpty,
+    showForm,
+    openCreate,
+    closeForm,
+    openEdit,
+    delete: handleDelete,
+    isDeleting,
+    deletingId
+  } = useProductManagement();
 
   if (error) {
     return (
@@ -47,7 +42,7 @@ export function ProductManagement() {
           <p className="text-muted-foreground">Manage products, stock levels, and store pricing.</p>
         </div>
         <Button 
-          onClick={handleOpenCreate} 
+          onClick={openCreate} 
           className="bg-primary hover:bg-primary-dark text-primary-foreground h-12 px-6 rounded-xl shadow-lg shadow-primary/20"
         >
           <Plus className="h-5 w-5 mr-2" />
@@ -56,7 +51,7 @@ export function ProductManagement() {
       </div>
 
       {showForm && (
-        <ProductCreateModal onClose={() => setShowForm(false)} />
+        <ProductCreateModal onClose={closeForm} />
       )}
 
       {!showForm && (
@@ -90,7 +85,7 @@ export function ProductManagement() {
                 <Skeleton key={i} className="h-32 w-full rounded-2xl bg-muted/50" />
               ))
             ) : (
-              productsData?.items.map((product: Product) => (
+              products.map((product: Product) => (
                 <Card key={product.id} className="bg-surface border-border overflow-hidden hover:shadow-md transition-all group p-0">
                   <CardContent className="p-0 flex flex-col md:flex-row items-stretch">
                      {/* Product Visual */}
@@ -140,21 +135,21 @@ export function ProductManagement() {
                            {/* Actions */}
                            <div className="flex items-center gap-2">
                               <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                className="h-10 w-10 text-muted-foreground hover:text-primary rounded-xl"
-                                onClick={() => handleOpenEdit(product.id)}
+                                 variant="ghost" 
+                                 size="icon" 
+                                 className="h-10 w-10 text-muted-foreground hover:text-primary rounded-xl"
+                                 onClick={() => openEdit(product.id)}
                               >
                                  <Edit2 className="h-4 w-4" />
                               </Button>
                               <Button 
-                                variant="ghost" 
-                                size="icon" 
-                                className="h-10 w-10 text-muted-foreground hover:text-red-500 rounded-xl"
-                                onClick={() => handleDelete(product.id)}
-                                disabled={deleteProductMutation.isPending}
+                                 variant="ghost" 
+                                 size="icon" 
+                                 className="h-10 w-10 text-muted-foreground hover:text-red-500 rounded-xl"
+                                 onClick={() => handleDelete(product.id)}
+                                 disabled={isDeleting}
                               >
-                                 {deleteProductMutation.isPending && deleteProductMutation.variables === product.id ? (
+                                 {isDeleting && deletingId === product.id ? (
                                    <Loader2 className="h-4 w-4 animate-spin" />
                                  ) : (
                                    <Trash2 className="h-4 w-4" />
@@ -169,7 +164,7 @@ export function ProductManagement() {
             )}
           </div>
           
-          {!isLoading && (productsData?.items.length ?? 0) === 0 && (
+          {isEmpty && (
             <div className="text-center py-20 bg-muted/10 border-2 border-dashed border-border rounded-3xl">
               <Package className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
               <p className="text-muted-foreground font-medium">Your store is empty. Time to list some music!</p>

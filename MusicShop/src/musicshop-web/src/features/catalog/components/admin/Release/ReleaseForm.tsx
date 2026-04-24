@@ -8,10 +8,10 @@ import { useReleaseVersions, useDeleteReleaseVersion } from '@/features/catalog/
 import { Release } from '@/features/catalog/types';
 
 // New specialized components and hooks
-import { useReleaseForm } from '../../hooks/useReleaseForm';
-import { GeneralInfoStep } from './ReleaseForm/GeneralInfoStep';
-import { TracklistStep } from './ReleaseForm/TracklistStep';
-import { VersionsStep } from './ReleaseForm/VersionsStep';
+import { useReleaseForm } from '../../../hooks/useReleaseForm';
+import { GeneralInfoStep } from './GeneralInfoStep';
+import { TracklistStep } from './TracklistStep';
+import { VersionsStep } from './VersionsStep';
 
 interface ReleaseFormProps {
   onCancel: () => void;
@@ -29,9 +29,9 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
     handleRemoveTrack,
     isPending,
     addVersionMutation,
-  } = useReleaseForm({ 
-    initialData, 
-    onSuccess: onCancel 
+  } = useReleaseForm({
+    initialData,
+    onSuccess: onCancel
   });
 
   // Dependencies (Data fetching still in container/page level component is acceptable)
@@ -104,23 +104,23 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
                   }}
                 >
                   {step === 1 && (
-                    <GeneralInfoStep 
-                      form={form} 
-                      artistsData={artistsData} 
-                      loadingArtists={loadingArtists} 
+                    <GeneralInfoStep
+                      form={form}
+                      artistsData={artistsData}
+                      loadingArtists={loadingArtists}
                     />
                   )}
 
                   {step === 2 && (
-                    <TracklistStep 
-                      form={form} 
-                      onAddTrack={handleAddTrack} 
-                      onRemoveTrack={handleRemoveTrack} 
+                    <TracklistStep
+                      form={form}
+                      onAddTrack={handleAddTrack}
+                      onRemoveTrack={handleRemoveTrack}
                     />
                   )}
 
                   {step === 3 && (
-                    <VersionsStep 
+                    <VersionsStep
                       initialData={initialData}
                       labelsData={labelsData}
                       versionsData={versionsData}
@@ -146,7 +146,7 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
           {step > 1 ? <ChevronLeft className="h-5 w-5 mr-1" /> : null}
           {step > 1 ? 'Previous' : 'Cancel'}
         </Button>
-        
+
         <div className="flex items-center gap-3">
           {step < 3 ? (
             <Button className="h-12 rounded-xl px-10 bg-primary text-white" onClick={nextStep}>
@@ -154,9 +154,9 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
               <ChevronRight className="h-5 w-5 ml-1" />
             </Button>
           ) : (
-            <Button 
-              className="h-12 rounded-xl px-12 bg-primary text-white shadow-xl shadow-primary/30" 
-              onClick={() => form.handleSubmit()} 
+            <Button
+              className="h-12 rounded-xl px-12 bg-primary text-white shadow-xl shadow-primary/30"
+              onClick={() => form.handleSubmit()}
               disabled={isPending}
             >
               {isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}

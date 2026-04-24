@@ -1,63 +1,21 @@
-import { useState } from 'react';
 import { Users, Search, Filter, Edit2, Trash2, Shield, User as UserIcon, Clock, DollarSign, ShieldAlert, ShieldCheck } from 'lucide-react';
 import { Button, Card, CardContent } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
 import { UserEditModal } from './UserEditModal';
+import { useCustomerManagement } from '../../hooks/useCustomerManagement';
 
-import { UserProfile } from '../../types';
-
-const MOCK_USERS: UserProfile[] = [
-  { 
-    id: '1', 
-    name: 'Admin User', 
-    email: 'admin@musicshop.com', 
-    role: 'Admin', 
-    status: 'Active', 
-    joinDate: '2026-01-01', 
-    lastLogin: '2026-04-20 10:30', 
-    totalSpent: 0 
-  },
-  { 
-    id: '2', 
-    name: 'John Doe', 
-    email: 'john@example.com', 
-    role: 'Customer', 
-    status: 'Active', 
-    joinDate: '2026-03-15', 
-    lastLogin: '2026-04-18 15:45', 
-    totalSpent: 450.25 
-  },
-  { 
-    id: '3', 
-    name: 'Sarah Connor', 
-    email: 'sarah@terminator.com', 
-    role: 'Customer', 
-    status: 'Locked', 
-    joinDate: '2026-02-20', 
-    lastLogin: '2026-03-10 09:00', 
-    totalSpent: 1250.00 
-  },
-  { 
-    id: '4', 
-    name: 'Thomas Anderson', 
-    email: 'neo@matrix.io', 
-    role: 'Customer', 
-    status: 'Active', 
-    joinDate: '2026-04-01', 
-    lastLogin: '2026-04-20 08:20', 
-    totalSpent: 89.99 
-  },
-];
-
+/**
+ * Presentational component for community and CRM management.
+ * Logic is delegated to useCustomerManagement hook.
+ */
 export function CustomerManagement() {
-  const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
-  const [users, setUsers] = useState<UserProfile[]>(MOCK_USERS);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState<string | null>(null);
-
-  const handleDeleteUser = (id: string) => {
-    setUsers(users.filter(u => u.id !== id));
-    setShowDeleteConfirm(null);
-  };
+  const {
+    users,
+    stats,
+    selectedUser,
+    deletingUserId,
+    actions
+  } = useCustomerManagement();
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -75,7 +33,7 @@ export function CustomerManagement() {
              </div>
              <div>
                 <p className="text-xs font-black uppercase tracking-widest text-subtle">Total Members</p>
-                <p className="text-2xl font-black text-foreground">{users.length}</p>
+                <p className="text-2xl font-black text-foreground">{stats.total}</p>
              </div>
           </CardContent>
         </Card>
@@ -86,9 +44,7 @@ export function CustomerManagement() {
              </div>
              <div>
                 <p className="text-xs font-black uppercase tracking-widest text-subtle">Active Customers</p>
-                <p className="text-2xl font-black text-foreground">
-                  {users.filter(u => u.status === 'Active' && u.role === 'Customer').length}
-                </p>
+                <p className="text-2xl font-black text-foreground">{stats.active}</p>
              </div>
           </CardContent>
         </Card>
@@ -99,9 +55,7 @@ export function CustomerManagement() {
              </div>
              <div>
                 <p className="text-xs font-black uppercase tracking-widest text-subtle">Administrators</p>
-                <p className="text-2xl font-black text-foreground">
-                  {users.filter(u => u.role === 'Admin').length}
-                </p>
+                <p className="text-2xl font-black text-foreground">{stats.admins}</p>
              </div>
           </CardContent>
         </Card>
@@ -195,7 +149,7 @@ export function CustomerManagement() {
                           variant="ghost" 
                           size="icon" 
                           className="h-9 w-9 text-muted-foreground hover:text-primary rounded-xl"
-                          onClick={() => setSelectedUser(user)}
+                          onClick={() => actions.openEdit(user)}
                         >
                            <Edit2 className="h-4 w-4" />
                         </Button>
@@ -203,7 +157,7 @@ export function CustomerManagement() {
                           variant="ghost" 
                           size="icon" 
                           className="h-9 w-9 text-muted-foreground hover:text-red-500 rounded-xl"
-                          onClick={() => setShowDeleteConfirm(user.id)}
+                          onClick={() => actions.confirmDelete(user.id)}
                         >
                            <Trash2 className="h-4 w-4" />
                         </Button>
@@ -211,7 +165,7 @@ export function CustomerManagement() {
                   </td>
 
                   {/* Inline Delete Confirmation */}
-                  {showDeleteConfirm === user.id && (
+                  {deletingUserId === user.id && (
                     <div className="absolute inset-0 bg-red-600/95 backdrop-blur-sm z-10 flex items-center justify-between px-8 animate-in fade-in slide-in-from-right-4">
                        <div className="flex items-center gap-4 text-white">
                           <Trash2 className="h-6 w-6" />
@@ -224,13 +178,13 @@ export function CustomerManagement() {
                           <Button 
                             variant="ghost" 
                             className="text-white hover:bg-white/10"
-                            onClick={() => setShowDeleteConfirm(null)}
+                            onClick={actions.cancelDelete}
                           >
                             Cancel
                           </Button>
                           <Button 
                             className="bg-white text-red-600 hover:bg-red-50 font-bold"
-                            onClick={() => handleDeleteUser(user.id)}
+                            onClick={() => actions.executeDelete(user.id)}
                           >
                             Yes, Delete Forever
                           </Button>
@@ -248,7 +202,7 @@ export function CustomerManagement() {
       {selectedUser && (
         <UserEditModal 
           user={selectedUser} 
-          onClose={() => setSelectedUser(null)} 
+          onClose={actions.closeEdit} 
         />
       )}
     </div>

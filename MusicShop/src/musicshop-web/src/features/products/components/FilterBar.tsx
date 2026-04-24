@@ -74,7 +74,7 @@ export function FilterBar() {
           defaultValue={[parseInt(minPrice), parseInt(maxPrice)]}
           max={500}
           step={10}
-          onValueCommit={(values) => {
+          onValueCommitted={(values: number[]) => {
             updateFilters('minPrice', values[0].toString());
             updateFilters('maxPrice', values[1].toString());
           }}
