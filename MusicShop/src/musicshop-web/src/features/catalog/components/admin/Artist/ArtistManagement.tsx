@@ -1,20 +1,9 @@
-import { 
-  Plus, 
-  Search, 
-  MapPin, 
-  Music, 
-  Users,
-  AlertCircle
-} from 'lucide-react';
-import { Button, CardContent, Skeleton } from '@/shared/components';
+import { Plus, Search, MapPin, Music, Users, AlertCircle } from 'lucide-react';
+import { Button, Skeleton } from '@/shared/components';
 import { ArtistForm } from './ArtistForm';
 import { ArtistCard } from './ArtistCard';
 import { useArtistManagement } from '../../../hooks/useArtistManagement';
 
-/**
- * Presentational component for catalog artist management.
- * Logic is delegated to useArtistManagement hook.
- */
 export function ArtistManagement() {
   const {
     artists,
@@ -42,8 +31,8 @@ export function ArtistManagement() {
           <h1 className="text-4xl font-extrabold tracking-tight text-foreground">Catalog Artists</h1>
           <p className="text-muted-foreground">Manage the creators behind your music collection.</p>
         </div>
-        <Button 
-          onClick={form.openCreate} 
+        <Button
+          onClick={form.openCreate}
           className="bg-primary hover:bg-primary-dark text-primary-foreground h-12 px-6 rounded-xl shadow-lg shadow-primary/20"
         >
           <Plus className="h-5 w-5 mr-2" />
@@ -52,9 +41,9 @@ export function ArtistManagement() {
       </div>
 
       {form.isOpen && (
-        <ArtistForm 
-          editingArtist={form.editingArtist} 
-          onClose={form.close} 
+        <ArtistForm
+          editingArtist={form.editingArtist}
+          onClose={form.close}
         />
       )}
 
@@ -64,8 +53,8 @@ export function ArtistManagement() {
           <div className="flex flex-wrap gap-4 items-center">
             <div className="relative flex-1 min-w-[300px]">
               <Search className="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-subtle" />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="Search artists by name, country, or genre..."
                 className="w-full h-14 bg-surface border border-border rounded-2xl pl-12 pr-4 focus:outline-none focus:border-primary transition-all shadow-sm"
               />
@@ -90,9 +79,9 @@ export function ArtistManagement() {
               ))
             ) : (
               artists.map((artist) => (
-                <ArtistCard 
-                  key={artist.id} 
-                  artist={artist} 
+                <ArtistCard
+                  key={artist.id}
+                  artist={artist}
                   onEdit={form.openEdit}
                   onDelete={actions.delete}
                   isDeleting={actions.isDeleting && actions.deletingId === artist.id}

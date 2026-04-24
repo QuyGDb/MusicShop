@@ -1,9 +1,9 @@
 import { X, Loader2 } from 'lucide-react';
-import { 
-  Button, 
-  Card, 
-  CardHeader, 
-  CardTitle, 
+import {
+  Button,
+  Card,
+  CardHeader,
+  CardTitle,
   CardContent,
   ImageUpload
 } from '@/shared/components';
@@ -19,21 +19,21 @@ interface ArtistFormProps {
 
 export function ArtistForm({ editingArtist, onClose }: ArtistFormProps) {
   const { data: genresData } = useGenres(1, 100);
-  const { 
-    form, 
-    handleNameChange, 
-    toggleGenre, 
-    isPending 
-  } = useArtistForm({ 
-    editingArtist, 
-    onSuccess: onClose 
+  const {
+    form,
+    handleNameChange,
+    toggleGenre,
+    isPending
+  } = useArtistForm({
+    editingArtist,
+    onSuccess: onClose
   });
 
   return (
     <Card className="bg-surface border-primary/20 shadow-2xl animate-in zoom-in-95 duration-300">
       <CardHeader className="flex flex-row items-center justify-between border-b border-border bg-muted/20">
         <CardTitle className="text-xl font-bold text-foreground">
-           {editingArtist ? `Update ${editingArtist.name}` : 'Register New Artist'}
+          {editingArtist ? `Update ${editingArtist.name}` : 'Register New Artist'}
         </CardTitle>
         <Button variant="ghost" size="icon" onClick={onClose}>
           <X className="h-5 w-5" />
@@ -46,8 +46,8 @@ export function ArtistForm({ editingArtist, onClose }: ArtistFormProps) {
             children={(field: any) => (
               <div className="space-y-2">
                 <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Artist Photo</label>
-                <ImageUpload 
-                  value={field.state.value} 
+                <ImageUpload
+                  value={field.state.value}
                   onChange={(url) => field.handleChange(url)}
                   onRemove={() => field.handleChange('')}
                   label="Drop artist photo here"
@@ -56,13 +56,13 @@ export function ArtistForm({ editingArtist, onClose }: ArtistFormProps) {
               </div>
             )}
           />
-          
+
           <form.Field
             name="bio"
             children={(field: any) => (
               <div className="space-y-2">
                 <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Biography</label>
-                <textarea 
+                <textarea
                   placeholder="Tell the artist's story..."
                   className="w-full h-32 bg-muted/30 border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-colors text-foreground resize-none text-sm"
                   value={field.state.value}
@@ -80,8 +80,8 @@ export function ArtistForm({ editingArtist, onClose }: ArtistFormProps) {
               children={(field: any) => (
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Display Name</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="e.g. Daft Punk"
                     className="w-full h-12 bg-muted/30 border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-colors text-foreground"
                     value={field.state.value}
@@ -100,8 +100,8 @@ export function ArtistForm({ editingArtist, onClose }: ArtistFormProps) {
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Custom URL Slug</label>
                   <div className="relative">
-                    <input 
-                      type="text" 
+                    <input
+                      type="text"
                       placeholder="e.g. daft-punk"
                       className="w-full h-12 bg-muted/30 border border-border rounded-xl pl-4 pr-12 focus:outline-none focus:border-primary transition-colors text-foreground font-mono text-xs"
                       value={field.state.value}
@@ -118,8 +118,8 @@ export function ArtistForm({ editingArtist, onClose }: ArtistFormProps) {
               children={(field: any) => (
                 <div className="space-y-2">
                   <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Origin Country</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="e.g. France"
                     className="w-full h-12 bg-muted/30 border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-colors text-foreground"
                     value={field.state.value}
@@ -128,7 +128,7 @@ export function ArtistForm({ editingArtist, onClose }: ArtistFormProps) {
                 </div>
               )}
             />
-            
+
             <form.Field
               name="genreIds"
               children={(field: any) => (
@@ -157,16 +157,16 @@ export function ArtistForm({ editingArtist, onClose }: ArtistFormProps) {
           </div>
 
           <div className="flex items-center gap-3 pt-6 border-t border-border">
-            <Button 
-              variant="outline" 
-              className="flex-1 h-12 rounded-xl" 
+            <Button
+              variant="outline"
+              className="flex-1 h-12 rounded-xl"
               onClick={onClose}
               disabled={isPending}
             >
               Cancel
             </Button>
-            <Button 
-              className="flex-[2] h-12 rounded-xl bg-primary text-white" 
+            <Button
+              className="flex-[2] h-12 rounded-xl bg-primary text-white"
               onClick={() => form.handleSubmit()}
               disabled={isPending}
             >

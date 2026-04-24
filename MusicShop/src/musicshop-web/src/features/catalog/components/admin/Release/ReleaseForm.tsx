@@ -1,17 +1,14 @@
-import { X, Disc, ListMusic, Package, ChevronRight, ChevronLeft, Loader2 } from 'lucide-react';
+import { X, Disc, ListMusic, ChevronRight, ChevronLeft, Loader2 } from 'lucide-react';
 import { Button, Card, CardHeader, CardTitle, CardContent } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
 import { useArtists } from '@/features/catalog/hooks/useArtists';
 import { useGenres } from '@/features/catalog/hooks/useGenres';
-import { useLabels } from '@/features/catalog/hooks/useLabels';
-import { useReleaseVersions, useDeleteReleaseVersion } from '@/features/catalog/hooks/useReleases';
 import { Release } from '@/features/catalog/types';
 
 // New specialized components and hooks
 import { useReleaseForm } from '../../../hooks/useReleaseForm';
 import { GeneralInfoStep } from './GeneralInfoStep';
 import { TracklistStep } from './TracklistStep';
-import { VersionsStep } from './VersionsStep';
 
 interface ReleaseFormProps {
   onCancel: () => void;
@@ -28,7 +25,6 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
     handleAddTrack,
     handleRemoveTrack,
     isPending,
-    addVersionMutation,
   } = useReleaseForm({
     initialData,
     onSuccess: onCancel
@@ -37,11 +33,6 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
   // Dependencies (Data fetching still in container/page level component is acceptable)
   const { data: artistsData, isLoading: loadingArtists } = useArtists(1, 100);
   const { data: genresData } = useGenres(1, 100);
-  const { data: labelsData } = useLabels(1, 100);
-
-  // Versions (managed separately if release exists)
-  const { data: versionsData, isLoading: loadingVersions } = useReleaseVersions(initialData?.id || '');
-  const deleteVersionMutation = useDeleteReleaseVersion();
 
   return (
     <Card className="bg-surface border-primary/20 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-500">
@@ -57,7 +48,6 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
             <div className="flex items-center gap-2 mt-1">
               <span className={cn("h-1.5 w-8 rounded-full", step >= 1 ? "bg-primary" : "bg-muted")} />
               <span className={cn("h-1.5 w-8 rounded-full", step >= 2 ? "bg-primary" : "bg-muted")} />
-              <span className={cn("h-1.5 w-8 rounded-full", step >= 3 ? "bg-primary" : "bg-muted")} />
             </div>
           </div>
         </div>
@@ -72,8 +62,7 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
           <div className="w-full md:w-64 bg-muted/10 border-r border-border p-6 space-y-2">
             {[
               { id: 1, name: 'General Info', icon: Disc },
-              { id: 2, name: 'Tracklist', icon: ListMusic },
-              { id: 3, name: 'Editions / Versions', icon: Package }
+              { id: 2, name: 'Tracklist', icon: ListMusic }
             ].map((s) => (
               <button
                 key={s.id}
@@ -118,17 +107,6 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
                       onRemoveTrack={handleRemoveTrack}
                     />
                   )}
-
-                  {step === 3 && (
-                    <VersionsStep
-                      initialData={initialData}
-                      labelsData={labelsData}
-                      versionsData={versionsData}
-                      loadingVersions={loadingVersions}
-                      addVersionMutation={addVersionMutation}
-                      deleteVersionMutation={deleteVersionMutation}
-                    />
-                  )}
                 </form>
               )}
             />
@@ -148,7 +126,7 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
         </Button>
 
         <div className="flex items-center gap-3">
-          {step < 3 ? (
+          {step < 2 ? (
             <Button className="h-12 rounded-xl px-10 bg-primary text-white" onClick={nextStep}>
               Next Step
               <ChevronRight className="h-5 w-5 ml-1" />

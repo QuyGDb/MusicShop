@@ -21,4 +21,11 @@ public interface IImageService
         string contentType, 
         string folder = "general",
         CancellationToken ct = default);
+
+    /// <summary>
+    /// Deletes an image from cloud storage given its public URL.
+    /// </summary>
+    /// <param name="imageUrl">The full public URL of the image.</param>
+    /// <param name="ct">Cancellation token.</param>
+    Task DeleteImageAsync(string imageUrl, CancellationToken ct = default);
 }

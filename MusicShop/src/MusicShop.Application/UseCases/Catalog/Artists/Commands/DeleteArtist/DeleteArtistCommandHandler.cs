@@ -9,6 +9,7 @@ namespace MusicShop.Application.UseCases.Catalog.Artists.Commands.DeleteArtist;
 
 public sealed class DeleteArtistCommandHandler(
     IArtistRepository artistRepository,
+    IImageService imageService,
     IUnitOfWork unitOfWork)
     : IRequestHandler<DeleteArtistCommand, Result>
 {
@@ -26,6 +27,11 @@ public sealed class DeleteArtistCommandHandler(
         if (artist.Releases.Count > 0)
         {
             return Result.Failure(ArtistErrors.HasAssociations);
+        }
+
+        if (!string.IsNullOrWhiteSpace(artist.ImageUrl))
+        {
+            await imageService.DeleteImageAsync(artist.ImageUrl, cancellationToken);
         }
 
         artistRepository.Delete(artist);

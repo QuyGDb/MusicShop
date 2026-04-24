@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { Plus, Search, Filter, Edit2, Trash2, Disc, Calendar, Loader2 } from 'lucide-react';
+import { Plus, Search, Filter, Edit2, Trash2, Disc, Calendar, Loader2, Package } from 'lucide-react';
 import { Button, Card, CardContent, Skeleton } from '@/shared/components';
 import { useReleases, useDeleteRelease } from '../../../hooks/useReleases';
 import { Release } from '../../../types';
 import { ReleaseForm } from './ReleaseForm';
+import { ReleaseVersionsModal } from './ReleaseVersionsModal';
 
 export function ReleaseManagement() {
   const [showForm, setShowForm] = useState(false);
   const [editingRelease, setEditingRelease] = useState<Release | null>(null);
+  const [managingVersionsFor, setManagingVersionsFor] = useState<Release | null>(null);
   const [page, setPage] = useState(1);
 
   const { data: releasesData, isLoading } = useReleases(page, 10);
@@ -124,6 +126,15 @@ export function ReleaseManagement() {
                           <Button
                             variant="ghost"
                             size="icon"
+                            title="Manage Editions"
+                            className="h-10 w-10 text-muted-foreground hover:text-amber-500 rounded-xl"
+                            onClick={() => setManagingVersionsFor(release)}
+                          >
+                            <Package className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             className="h-10 w-10 text-muted-foreground hover:text-primary rounded-xl"
                             onClick={() => handleOpenEdit(release)}
                           >
@@ -158,6 +169,13 @@ export function ReleaseManagement() {
             </div>
           )}
         </>
+      )}
+
+      {managingVersionsFor && (
+        <ReleaseVersionsModal
+          release={managingVersionsFor}
+          onClose={() => setManagingVersionsFor(null)}
+        />
       )}
     </div>
   );

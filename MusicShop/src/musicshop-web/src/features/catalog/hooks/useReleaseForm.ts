@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from '@tanstack/react-form';
 import {
   useCreateRelease,
-  useUpdateRelease,
-  useCreateReleaseVersion
+  useUpdateRelease
 } from '@/features/catalog/hooks/useReleases';
 import { Release } from '@/features/catalog/types';
 import { releaseSchema, ReleaseFormValues } from '../types/release';
@@ -18,7 +17,6 @@ export function useReleaseForm({ initialData, onSuccess }: UseReleaseFormProps) 
 
   const createReleaseMutation = useCreateRelease();
   const updateReleaseMutation = useUpdateRelease();
-  const addVersionMutation = useCreateReleaseVersion();
 
   const form: any = useForm({
     defaultValues: {
@@ -65,7 +63,7 @@ export function useReleaseForm({ initialData, onSuccess }: UseReleaseFormProps) 
     }
   }, [initialData, form]);
 
-  const nextStep = () => setStep((prev) => Math.min(prev + 1, 3));
+  const nextStep = () => setStep((prev) => Math.min(prev + 1, 2));
   const prevStep = () => setStep((prev) => Math.max(prev - 1, 1));
 
   const handleAddTrack = () => {
@@ -95,6 +93,5 @@ export function useReleaseForm({ initialData, onSuccess }: UseReleaseFormProps) 
     handleAddTrack,
     handleRemoveTrack,
     isPending,
-    addVersionMutation,
   };
 }

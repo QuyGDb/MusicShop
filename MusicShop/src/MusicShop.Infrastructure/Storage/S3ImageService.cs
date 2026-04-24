@@ -34,4 +34,29 @@ public sealed class S3ImageService(
 
         return $"{settings.Value.CdnBaseUrl.TrimEnd('/')}/{key}";
     }
+
+    public async Task DeleteImageAsync(string imageUrl, CancellationToken ct = default)
+    {
+        if (string.IsNullOrWhiteSpace(imageUrl))
+        {
+            return;
+        }
+
+        string cdnUrl = settings.Value.CdnBaseUrl.TrimEnd('/');
+
+        if (!imageUrl.StartsWith(cdnUrl, StringComparison.OrdinalIgnoreCase))
+        {
+            return;
+        }
+
+        string key = imageUrl[cdnUrl.Length..].TrimStart('/');
+
+        DeleteObjectRequest request = new()
+        {
+            BucketName = settings.Value.BucketName,
+            Key = key
+        };
+
+        await s3Client.DeleteObjectAsync(request, ct);
+    }
 }
