@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useForm } from '@tanstack/react-form';
+import { useForm, standardSchemaValidators } from '@tanstack/react-form';
 import {
   useCreateRelease,
   useUpdateRelease
 } from '@/features/catalog/hooks/useReleases';
 import { Release } from '@/features/catalog/types';
 import { releaseSchema, ReleaseFormValues } from '../types/release';
+import { uploadService } from '@/shared/services/uploadService';
+import { toast } from 'sonner';
 
 interface UseReleaseFormProps {
   initialData?: Release | null;
@@ -29,23 +31,39 @@ export function useReleaseForm({ initialData, onSuccess }: UseReleaseFormProps) 
       coverUrl: initialData?.coverUrl ?? '',
       genreIds: [],
       tracks: []
+    } as ReleaseFormValues,
+    validatorAdapter: standardSchemaValidators(),
+    validators: {
+      onSubmit: releaseSchema
     },
     
     onSubmit: async ({ value }) => {
-      const payload = {
-        ...value,
-        slug: value.slug || value.title.toLowerCase().replace(/\s+/g, '-')
-      };
+      try {
+        let finalCoverUrl = value.coverUrl;
 
-      if (initialData) {
-        updateReleaseMutation.mutate(
-          { id: initialData.id, data: payload as any },
-          { onSuccess }
-        );
-      } else {
-        createReleaseMutation.mutate(payload as any, {
-          onSuccess
-        });
+        if (value.coverUrl instanceof File) {
+          finalCoverUrl = await uploadService.uploadImage(value.coverUrl, 'releases');
+        }
+
+        const payload = {
+          ...value,
+          coverUrl: finalCoverUrl as string,
+          slug: value.slug || value.title.toLowerCase().replace(/\s+/g, '-')
+        };
+
+        if (initialData) {
+          await updateReleaseMutation.mutateAsync(
+            { id: initialData.id, data: payload as any }
+          );
+          toast.success('Release updated successfully');
+        } else {
+          await createReleaseMutation.mutateAsync(payload as any);
+          toast.success('Release created successfully');
+        }
+        onSuccess();
+      } catch (error: any) {
+        console.error('Release submission failed:', error);
+        toast.error(error.response?.data?.message || 'Failed to save release. Please try again.');
       }
     },
   });

@@ -13,7 +13,7 @@ export const releaseSchema = z.object({
   year: z.number().int().min(1900).max(new Date().getFullYear() + 5),
   type: z.enum(['Album', 'EP', 'Single', 'Compilation']),
   description: z.string().optional(),
-  coverUrl: z.string().optional(),
+  coverUrl: z.union([z.string(), z.instanceof(File)]).optional(),
   genreIds: z.array(z.string()).default([]),
   tracks: z.array(trackSchema).default([]),
 });

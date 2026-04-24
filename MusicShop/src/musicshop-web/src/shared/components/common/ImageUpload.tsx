@@ -4,13 +4,14 @@ import { Button } from '@/shared/components';
 import { useImageUpload } from '@/shared/hooks/useImageUpload';
 
 interface ImageUploadProps {
-  value?: string;
-  onChange: (url: string) => void;
+  value?: string | File;
+  onChange: (value: string | File) => void;
   onRemove: () => void;
   className?: string;
   label?: string;
   aspectRatio?: 'square' | 'video' | 'portrait';
   folder?: string;
+  immediate?: boolean;
 }
 
 /**
@@ -24,9 +25,11 @@ export function ImageUpload({
   className,
   label = "Upload Image",
   aspectRatio = 'square',
-  folder = "general"
+  folder = "general",
+  immediate = true
 }: ImageUploadProps) {
   const {
+    preview,
     isDragging,
     isUploading,
     fileInputRef,
@@ -35,7 +38,7 @@ export function ImageUpload({
     handleDragLeave,
     handleDrop,
     onBrowse
-  } = useImageUpload({ onChange, folder });
+  } = useImageUpload({ value, onChange, folder, immediate });
 
   const aspectClasses = {
     square: 'aspect-square',
@@ -56,10 +59,10 @@ export function ImageUpload({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        {value ? (
+        {preview ? (
           <>
             <img 
-              src={value} 
+              src={preview} 
               alt="Preview" 
               className="w-full h-full object-cover animate-in fade-in zoom-in duration-500" 
             />

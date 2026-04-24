@@ -1,18 +1,16 @@
-import { useForm } from '@tanstack/react-form';
-import { zodValidator } from '@tanstack/zod-form-adapter';
+import { useForm, standardSchemaValidators } from '@tanstack/react-form';
 import { z } from 'zod';
-import { 
-  useCreateArtist, 
-  useUpdateArtist 
-} from '@/features/catalog/hooks/useArtists';
+import { useCreateArtist, useUpdateArtist } from '@/features/catalog/hooks/useArtists';
 import { Artist } from '@/features/catalog/types';
+import { uploadService } from '@/shared/services/uploadService';
+import { toast } from 'sonner';
 
 const artistSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   slug: z.string().min(1, 'Slug is required'),
   country: z.string().min(1, 'Country is required'),
   bio: z.string().optional(),
-  imageUrl: z.string().optional(),
+  imageUrl: z.union([z.string(), z.instanceof(File)]).optional(),
   genreIds: z.array(z.string()),
 });
 
@@ -36,16 +34,39 @@ export function useArtistForm({ editingArtist, onSuccess }: UseArtistFormProps) 
       imageUrl: editingArtist?.imageUrl ?? '',
       genreIds: editingArtist?.genres.map((genre: any) => genre.id) ?? [],
     } as ArtistFormValues,
+    validatorAdapter: standardSchemaValidators(),
+    validators: {
+      onChange: artistSchema,
+      onSubmit: artistSchema,
+    },
     onSubmit: async ({ value }) => {
-      if (editingArtist) {
-        await updateMutation.mutateAsync({
-          id: editingArtist.id,
-          data: value,
-        });
-      } else {
-        await createMutation.mutateAsync(value);
+      try {
+        let finalImageUrl = value.imageUrl;
+
+        if (value.imageUrl instanceof File) {
+          finalImageUrl = await uploadService.uploadImage(value.imageUrl, 'artists');
+        }
+
+        const payload = {
+          ...value,
+          imageUrl: finalImageUrl as string
+        };
+
+        if (editingArtist) {
+          await updateMutation.mutateAsync({
+            id: editingArtist.id,
+            data: payload,
+          });
+          toast.success('Artist profile updated successfully');
+        } else {
+          await createMutation.mutateAsync(payload);
+          toast.success('Artist registered successfully');
+        }
+        onSuccess();
+      } catch (error: any) {
+        console.error('Artist submission failed:', error);
+        toast.error(error.response?.data?.message || 'Failed to save artist. Please try again.');
       }
-      onSuccess();
     },
   });
 
@@ -64,7 +85,7 @@ export function useArtistForm({ editingArtist, onSuccess }: UseArtistFormProps) 
   };
 
   const toggleGenre = (genreId: string) => {
-    const currentGenres = form.getFieldValue('genreIds');
+    const currentGenres = form.getFieldValue('genreIds') || [];
     const nextGenres = currentGenres.includes(genreId)
       ? currentGenres.filter((id: string) => id !== genreId)
       : [...currentGenres, genreId];

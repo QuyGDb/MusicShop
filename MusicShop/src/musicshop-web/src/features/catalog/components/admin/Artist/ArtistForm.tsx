@@ -52,6 +52,7 @@ export function ArtistForm({ editingArtist, onClose }: ArtistFormProps) {
                   onRemove={() => field.handleChange('')}
                   label="Drop artist photo here"
                   folder="artists"
+                  immediate={false}
                 />
               </div>
             )}

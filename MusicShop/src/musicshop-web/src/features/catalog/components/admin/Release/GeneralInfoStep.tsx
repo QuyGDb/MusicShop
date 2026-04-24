@@ -22,6 +22,7 @@ export function GeneralInfoStep({ form, artistsData, loadingArtists }: GeneralIn
                 onChange={(url) => field.handleChange(url)}
                 onRemove={() => field.handleChange('')}
                 folder="releases"
+                immediate={false}
               />
             )}
           />
