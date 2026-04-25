@@ -26,7 +26,9 @@ public static class MappingExtensions
         {
             Id = label.Id,
             Name = label.Name,
+            Slug = label.Slug,
             Country = label.Country,
+            FoundedYear = label.FoundedYear,
             Website = label.Website
         };
     }
@@ -38,6 +40,7 @@ public static class MappingExtensions
         {
             Id = artist.Id,
             Name = artist.Name,
+            Slug = artist.Slug,
             Bio = artist.Bio,
             Country = artist.Country,
             ImageUrl = artist.ImageUrl,
@@ -52,6 +55,7 @@ public static class MappingExtensions
         {
             Id = release.Id,
             Title = release.Title,
+            Slug = release.Slug,
             Year = release.Year,
             CoverUrl = release.CoverUrl,
             Description = release.Description,
@@ -67,6 +71,7 @@ public static class MappingExtensions
         {
             Id = release.Id,
             Title = release.Title,
+            Slug = release.Slug,
             Year = release.Year,
             CoverUrl = release.CoverUrl,
             Description = release.Description,
@@ -125,9 +130,9 @@ public static class MappingExtensions
     }
 
     public static AuthResponse ToAuthResponse(
-        this User user, 
-        string accessToken, 
-        string refreshToken, 
+        this User user,
+        string accessToken,
+        string refreshToken,
         DateTime accessTokenExpiresAtUtc)
     {
         return new AuthResponse

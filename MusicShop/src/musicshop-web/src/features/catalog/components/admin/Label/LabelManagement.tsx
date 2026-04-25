@@ -1,5 +1,6 @@
-import { Plus, X, Edit2, Trash2, Globe, ExternalLink, Building, Loader2 } from 'lucide-react';
-import { Button, Card, CardHeader, CardTitle, CardContent, Skeleton } from '@/shared/components';
+import { Plus, Edit2, Trash2, Globe, ExternalLink, Building, Loader2, AlertCircle } from 'lucide-react';
+import { Button, Card, Skeleton } from '@/shared/components';
+import { LabelForm } from './LabelForm';
 import { useLabelManagement } from '../../../hooks/useLabelManagement';
 
 /**
@@ -11,9 +12,20 @@ export function LabelManagement() {
     labels,
     isLoading,
     isEmpty,
+    error,
     form,
     actions
   } = useLabelManagement();
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 space-y-4">
+        <AlertCircle className="h-12 w-12 text-red-500" />
+        <p className="text-xl font-bold">Failed to load labels</p>
+        <Button onClick={() => window.location.reload()}>Retry</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -32,85 +44,10 @@ export function LabelManagement() {
       </div>
 
       {form.isOpen && (
-        <Card className="bg-surface border-primary/20 shadow-2xl animate-in zoom-in-95 duration-300">
-          <CardHeader className="flex flex-row items-center justify-between border-b border-border bg-muted/20">
-            <CardTitle className="text-xl font-bold flex items-center gap-2">
-              <Building className="h-5 w-5 text-primary" />
-              {form.editingLabel ? `Edit ${form.editingLabel.name}` : 'Register New Label'}
-            </CardTitle>
-            <Button variant="ghost" size="icon" onClick={form.close}>
-              <X className="h-5 w-5" />
-            </Button>
-          </CardHeader>
-          <CardContent className="p-8 space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Label Name</label>
-                <input 
-                  type="text" 
-                  placeholder="e.g. Warp Records"
-                  className="w-full h-12 bg-muted/30 border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-colors text-foreground"
-                  value={form.formData.name}
-                  onChange={(e) => form.updateField('name', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Country</label>
-                <input 
-                  type="text" 
-                  placeholder="e.g. United Kingdom"
-                  className="w-full h-12 bg-muted/30 border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-colors text-foreground"
-                  value={form.formData.country}
-                  onChange={(e) => form.updateField('country', e.target.value)}
-                />
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Website URL</label>
-                <input 
-                  type="url" 
-                  placeholder="https://example.com"
-                  className="w-full h-12 bg-muted/30 border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-colors text-foreground"
-                  value={form.formData.website}
-                  onChange={(e) => form.updateField('website', e.target.value)}
-                />
-              </div>
-              <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Founded Year</label>
-                <input 
-                  type="number" 
-                  placeholder="e.g. 1989"
-                  className="w-full h-12 bg-muted/30 border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-colors text-foreground"
-                  value={form.formData.foundedYear}
-                  onChange={(e) => form.updateField('foundedYear', e.target.value)}
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3 pt-6 border-t border-border">
-              <Button 
-                variant="outline" 
-                className="flex-1 h-12 rounded-xl" 
-                onClick={form.close}
-                disabled={form.isPending}
-              >
-                Cancel
-              </Button>
-              <Button 
-                className="flex-[2] h-12 rounded-xl bg-primary text-white" 
-                onClick={form.submit}
-                disabled={form.isPending || !form.isValid}
-              >
-                {form.isPending && (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                )}
-                {form.editingLabel ? 'Save Changes' : 'Register Label'}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <LabelForm 
+          editingLabel={form.editingLabel} 
+          onClose={form.close} 
+        />
       )}
 
       {/* Labels List */}
