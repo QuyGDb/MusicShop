@@ -48,17 +48,12 @@ export function useLabelForm({ editingLabel, onSuccess }: UseLabelFormProps): Us
           id: editingLabel.id, 
           data: values 
         });
-        toast.success('Label updated successfully');
       } else {
         await createMutation.mutateAsync(values);
-        toast.success('Label registered successfully');
       }
       onSuccess();
     } catch (error) {
-      const message = error instanceof Error
-        ? error.message
-        : 'Failed to save label. Please try again.';
-      toast.error(message);
+      // Errors are handled by mutation hooks
     }
   };
 

@@ -1,44 +1,32 @@
 import { Type, Sparkles, Search } from 'lucide-react';
 
 interface CurationSettingsProps {
-  form: any;
+  register: any;
 }
 
-export function CurationSettings({ form }: CurationSettingsProps) {
+export function CurationSettings({ register }: CurationSettingsProps) {
   return (
     <div className="w-full md:w-80 border-r border-border p-8 space-y-8 bg-muted/5">
       <div className="space-y-6">
-        <form.Field
-          name="title"
-          children={(field: any) => (
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-subtle flex items-center gap-2">
-                <Type className="h-3 w-3" /> Collection Name
-              </label>
-              <input 
-                type="text" 
-                className="w-full h-12 bg-surface border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-all font-bold"
-                value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value)}
-              />
-            </div>
-          )}
-        />
+        <div className="space-y-2">
+          <label className="text-[10px] font-black uppercase tracking-widest text-subtle flex items-center gap-2">
+            <Type className="h-3 w-3" /> Collection Name
+          </label>
+          <input 
+            type="text" 
+            {...register('title')}
+            className="w-full h-12 bg-surface border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-all font-bold"
+          />
+        </div>
         
-        <form.Field
-          name="description"
-          children={(field: any) => (
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-subtle">Display Description</label>
-              <textarea 
-                rows={4}
-                className="w-full bg-surface border border-border rounded-xl p-4 focus:outline-none focus:border-primary transition-all text-sm resize-none"
-                value={field.state.value}
-                onChange={(e) => field.handleChange(e.target.value)}
-              />
-            </div>
-          )}
-        />
+        <div className="space-y-2">
+          <label className="text-[10px] font-black uppercase tracking-widest text-subtle">Display Description</label>
+          <textarea 
+            rows={4}
+            {...register('description')}
+            className="w-full bg-surface border border-border rounded-xl p-4 focus:outline-none focus:border-primary transition-all text-sm resize-none"
+          />
+        </div>
       </div>
 
       <div className="space-y-4 pt-6 border-t border-border">
@@ -60,3 +48,4 @@ export function CurationSettings({ form }: CurationSettingsProps) {
     </div>
   );
 }
+

@@ -9,9 +9,23 @@ interface GeneralInfoStepProps {
   errors: FieldErrors<ReleaseFormValues>;
   artistsData: any;
   loadingArtists: boolean;
+  genresData: any;
+  loadingGenres: boolean;
+  onTitleChange: (title: string) => void;
+  onToggleGenre: (genreId: string) => void;
 }
 
-export function GeneralInfoStep({ register, control, errors, artistsData, loadingArtists }: GeneralInfoStepProps) {
+export function GeneralInfoStep({ 
+  register, 
+  control, 
+  errors, 
+  artistsData, 
+  loadingArtists, 
+  genresData,
+  loadingGenres,
+  onTitleChange,
+  onToggleGenre
+}: GeneralInfoStepProps) {
   return (
     <div className="space-y-8 animate-in slide-in-from-right-4 duration-500">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
@@ -37,17 +51,33 @@ export function GeneralInfoStep({ register, control, errors, artistsData, loadin
         
         <div className="lg:col-span-2 space-y-6">
           <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Album Title</label>
-              <input
-                type="text"
-                {...register('title')}
-                className="w-full h-14 bg-muted/20 border border-border rounded-2xl px-5 focus:outline-none focus:border-primary transition-all text-lg font-bold"
-                placeholder="e.g. Random Access Memories"
-              />
-              {errors.title && (
-                <p className="text-xs text-red-500 mt-1">{errors.title.message}</p>
-              )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Album Title</label>
+                <input
+                  type="text"
+                  {...register('title')}
+                  onChange={(e) => onTitleChange(e.target.value)}
+                  className="w-full h-14 bg-muted/20 border border-border rounded-2xl px-5 focus:outline-none focus:border-primary transition-all text-lg font-bold"
+                  placeholder="e.g. Random Access Memories"
+                />
+                {errors.title && (
+                  <p className="text-xs text-red-500 mt-1">{errors.title.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">URL Slug</label>
+                <input
+                  type="text"
+                  {...register('slug')}
+                  className="w-full h-14 bg-muted/20 border border-border rounded-2xl px-5 focus:outline-none focus:border-primary transition-all font-mono text-sm"
+                  placeholder="album-title-slug"
+                />
+                {errors.slug && (
+                  <p className="text-xs text-red-500 mt-1">{errors.slug.message}</p>
+                )}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
@@ -107,6 +137,40 @@ export function GeneralInfoStep({ register, control, errors, artistsData, loadin
             />
             {errors.type && (
               <p className="text-xs text-red-500 mt-1">{errors.type.message}</p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Genres</label>
+            <Controller
+              name="genreIds"
+              control={control}
+              render={({ field }) => (
+                <div className="flex flex-wrap gap-2">
+                  {loadingGenres ? (
+                    <p className="text-xs text-muted-foreground">Loading genres...</p>
+                  ) : (
+                    genresData?.items.map((genre: any) => (
+                      <button
+                        key={genre.id}
+                        type="button"
+                        onClick={() => onToggleGenre(genre.id)}
+                        className={cn(
+                          "px-3 py-1.5 rounded-full text-[10px] font-bold border transition-all uppercase tracking-wider",
+                          field.value?.includes(genre.id)
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-muted/10 border-border hover:border-primary/50"
+                        )}
+                      >
+                        {genre.name}
+                      </button>
+                    ))
+                  )}
+                </div>
+              )}
+            />
+            {errors.genreIds && (
+              <p className="text-xs text-red-500 mt-1">{errors.genreIds.message}</p>
             )}
           </div>
 

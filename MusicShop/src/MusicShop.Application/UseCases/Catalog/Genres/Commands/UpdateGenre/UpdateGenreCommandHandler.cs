@@ -16,7 +16,7 @@ public sealed class UpdateGenreCommandHandler(
     public async Task<Result<GenreResponse>> Handle(UpdateGenreCommand request, CancellationToken cancellationToken)
     {
         Genre? genre = await genreRepository.GetByIdAsync(request.Id, cancellationToken);
-        
+
         if (genre == null)
         {
             return Result<GenreResponse>.Failure(GenreErrors.NotFound);
@@ -42,7 +42,6 @@ public sealed class UpdateGenreCommandHandler(
         genre.Slug = request.Slug;
         genre.UpdatedAt = DateTime.UtcNow;
 
-        genreRepository.Update(genre);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<GenreResponse>.Success(genre.ToResponse());

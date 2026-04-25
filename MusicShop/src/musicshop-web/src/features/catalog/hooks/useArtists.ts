@@ -24,6 +24,7 @@ export function useCreateArtist() {
     mutationFn: (data: CreateArtistRequest) => artistService.createArtist(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['artists'] });
+      toast.success('Artist created successfully');
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to create artist');
@@ -39,6 +40,7 @@ export function useUpdateArtist() {
       artistService.updateArtist(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['artists'] });
+      toast.success('Artist updated successfully');
     },
     onError: (error: any) => {
       toast.error(error.message || 'Failed to update artist');

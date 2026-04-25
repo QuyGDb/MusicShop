@@ -43,17 +43,12 @@ export function useGenreForm({ editingGenre, onSuccess }: UseGenreFormProps): Us
           id: editingGenre.id, 
           data: values 
         });
-        toast.success('Genre updated successfully');
       } else {
         await createMutation.mutateAsync(values);
-        toast.success('Genre created successfully');
       }
       onSuccess();
     } catch (error) {
-      const message = error instanceof Error
-        ? error.message
-        : 'Failed to save genre. Please try again.';
-      toast.error(message);
+      // Errors are handled by mutation hooks
     }
   };
 

@@ -14,7 +14,13 @@ interface UserEditModalProps {
 }
 
 export function UserEditModal({ user, onClose }: UserEditModalProps) {
-  const { form, toggleStatus, setRole } = useUserForm({
+  const { 
+    handleSubmit, 
+    control, 
+    isSubmitting, 
+    toggleStatus, 
+    setRole 
+  } = useUserForm({
     initialValues: {
       role: user.role,
       status: user.status,
@@ -44,9 +50,9 @@ export function UserEditModal({ user, onClose }: UserEditModalProps) {
             <UserProfileHeader user={user} />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t border-border">
-               <RoleSelection form={form} onSetRole={setRole} />
+               <RoleSelection control={control} onSetRole={setRole} />
                <AccountSecurity 
-                 form={form} 
+                 control={control} 
                  onToggleStatus={toggleStatus} 
                  totalSpent={user.totalSpent} 
                />
@@ -54,21 +60,17 @@ export function UserEditModal({ user, onClose }: UserEditModalProps) {
 
             <div className="flex items-center gap-3 pt-6 border-t border-border">
                <Button variant="outline" className="flex-1 h-12 rounded-xl" onClick={onClose}>Discard Changes</Button>
-               <form.Subscribe
-                 selector={(state: any) => state.isSubmitting}
-                 children={(isSubmitting: boolean) => (
-                   <Button 
-                     className="flex-[2] h-12 rounded-xl bg-primary text-white shadow-lg shadow-primary/20" 
-                     onClick={() => form.handleSubmit()} 
-                     disabled={isSubmitting}
-                   >
-                     {isSubmitting ? "Syncing Identity..." : "Apply Account Updates"}
-                   </Button>
-                 )}
-               />
+               <Button 
+                 className="flex-[2] h-12 rounded-xl bg-primary text-white shadow-lg shadow-primary/20" 
+                 onClick={handleSubmit} 
+                 disabled={isSubmitting}
+               >
+                 {isSubmitting ? "Syncing Identity..." : "Apply Account Updates"}
+               </Button>
             </div>
          </CardContent>
        </Card>
     </div>
   );
 }
+

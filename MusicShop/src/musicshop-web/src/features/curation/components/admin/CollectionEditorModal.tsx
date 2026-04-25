@@ -1,5 +1,6 @@
 import { X, Layout } from 'lucide-react';
 import { Button, Card, CardHeader, CardTitle, CardContent } from '@/shared/components';
+import { useWatch } from 'react-hook-form';
 
 // New specialized components and hooks
 import { useCurationForm } from '../../hooks/useCurationForm';
@@ -19,10 +20,22 @@ const MOCK_PRODUCTS = [
 ];
 
 export function CollectionEditorModal({ collectionId, onClose }: CollectionEditorModalProps) {
-  const { form, handleRemoveItem } = useCurationForm({
+  const { 
+    register, 
+    control, 
+    handleSubmit, 
+    items, 
+    removeItem, 
+    isSubmitting 
+  } = useCurationForm({
     collectionId,
     initialItems: MOCK_PRODUCTS,
     onSuccess: onClose,
+  });
+
+  const title = useWatch({
+    control,
+    name: 'title',
   });
 
   return (
@@ -34,14 +47,9 @@ export function CollectionEditorModal({ collectionId, onClose }: CollectionEdito
                   <Layout className="h-6 w-6 text-primary" />
                </div>
                <div>
-                  <form.Subscribe
-                    selector={(state: any) => state.values.title}
-                    children={(title: string) => (
-                      <CardTitle className="text-xl font-bold text-foreground">
-                        {collectionId ? 'Editor: ' + title : 'Create Curation'}
-                      </CardTitle>
-                    )}
-                  />
+                  <CardTitle className="text-xl font-bold text-foreground">
+                    {collectionId ? 'Editor: ' + title : 'Create Curation'}
+                  </CardTitle>
                   <p className="text-xs text-muted-foreground uppercase tracking-widest font-black">Merchandising Studio</p>
                </div>
             </div>
@@ -51,26 +59,25 @@ export function CollectionEditorModal({ collectionId, onClose }: CollectionEdito
          </CardHeader>
 
          <CardContent className="flex-1 overflow-hidden p-0 flex flex-col md:flex-row">
-            <CurationSettings form={form} />
-            <CurationDeck form={form} onRemoveItem={handleRemoveItem} />
+            <CurationSettings register={register} />
+            <CurationDeck items={items} onRemoveItem={(id) => {
+              const index = items.findIndex(item => item.id === id);
+              if (index !== -1) removeItem(index);
+            }} />
          </CardContent>
 
          <div className="border-t border-border p-6 bg-muted/10 flex items-center justify-between">
             <Button variant="outline" className="h-12 rounded-xl px-6" onClick={onClose}>Discard</Button>
-            <form.Subscribe
-              selector={(state: any) => state.isSubmitting}
-              children={(isSubmitting: boolean) => (
-                <Button 
-                  className="h-12 rounded-xl px-12 bg-primary text-white shadow-xl shadow-primary/30" 
-                  onClick={() => form.handleSubmit()} 
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? "Publishing Curation..." : "Update Storefront"}
-                </Button>
-              )}
-            />
+            <Button 
+              className="h-12 rounded-xl px-12 bg-primary text-white shadow-xl shadow-primary/30" 
+              onClick={handleSubmit} 
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Publishing Curation..." : "Update Storefront"}
+            </Button>
          </div>
        </Card>
     </div>
   );
 }
+

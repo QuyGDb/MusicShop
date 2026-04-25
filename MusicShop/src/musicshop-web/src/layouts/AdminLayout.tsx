@@ -1,18 +1,6 @@
 import { ReactNode } from 'react';
 import { Link, useLocation, Outlet } from 'react-router-dom';
-import {
-  LayoutDashboard,
-  Package,
-  Users,
-  ShoppingBag,
-  Settings,
-  ArrowLeft,
-  Music,
-  UserCircle,
-  Hash,
-  Tag,
-  Layers
-} from 'lucide-react';
+import { LayoutDashboard, Package, Users, ShoppingBag, Settings, ArrowLeft, Music, UserCircle, Hash, Tag, Layers } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useAuthStore } from '@/store/useAuthStore';
 

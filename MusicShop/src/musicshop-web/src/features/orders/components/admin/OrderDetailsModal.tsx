@@ -41,7 +41,13 @@ export function OrderDetailsModal({ orderId, onClose }: OrderDetailsModalProps) 
     currentStatus: 'Processing' as OrderStatus
   };
 
-  const { form } = useOrderForm({
+  const { 
+    register, 
+    handleSubmit, 
+    errors, 
+    control, 
+    isSubmitting 
+  } = useOrderForm({
     initialStatus: orderData.currentStatus,
     onSuccess: onClose,
   });
@@ -77,7 +83,12 @@ export function OrderDetailsModal({ orderId, onClose }: OrderDetailsModalProps) 
 
              {/* Right Column: Customer & Status */}
              <div className="bg-muted/20 p-8 space-y-10">
-                <OrderFulfillment form={form} />
+                <OrderFulfillment 
+                  register={register} 
+                  control={control} 
+                  handleSubmit={handleSubmit}
+                  isSubmitting={isSubmitting}
+                />
                 <CustomerDetails 
                   customer={orderData.customer} 
                   payment={orderData.payment} 
@@ -89,3 +100,4 @@ export function OrderDetailsModal({ orderId, onClose }: OrderDetailsModalProps) 
     </div>
   );
 }
+

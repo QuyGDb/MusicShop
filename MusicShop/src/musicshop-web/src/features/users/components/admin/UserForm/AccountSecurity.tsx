@@ -1,40 +1,42 @@
 import { Unlock, Lock, CreditCard, History } from 'lucide-react';
 import { Button } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
+import { Control, useWatch } from 'react-hook-form';
 
 interface AccountSecurityProps {
-  form: any;
+  control: Control<{ role: 'Customer' | 'Admin'; status: 'Active' | 'Locked' }>;
   onToggleStatus: () => void;
   totalSpent: number;
 }
 
-export function AccountSecurity({ form, onToggleStatus, totalSpent }: AccountSecurityProps) {
+export function AccountSecurity({ control, onToggleStatus, totalSpent }: any) {
+
+  const status = useWatch({
+    control,
+    name: 'status',
+  });
+
   return (
     <div className="space-y-6">
       <div className="space-y-4">
         <label className="text-[10px] font-black uppercase tracking-[0.2em] text-subtle">Security Controls</label>
-        <form.Subscribe
-          selector={(state: any) => state.values.status}
-          children={(status: string) => (
-            <div className="flex items-center justify-between p-4 bg-muted/20 rounded-2xl border border-border">
-              <div className="flex items-center gap-3">
-                {status === 'Active' ? <Unlock className="h-5 w-5 text-emerald-500" /> : <Lock className="h-5 w-5 text-red-500" />}
-                <div>
-                  <p className="text-sm font-bold text-foreground">Account Status</p>
-                  <p className="text-[10px] text-muted-foreground">Current: <span className="font-bold">{status}</span></p>
-                </div>
-              </div>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className={cn("rounded-xl text-xs", status === 'Active' ? "border-red-200 text-red-500 hover:bg-red-50" : "border-emerald-200 text-emerald-500 hover:bg-emerald-50")}
-                onClick={onToggleStatus}
-              >
-                {status === 'Active' ? 'Lock Account' : 'Unlock Account'}
-              </Button>
+        <div className="flex items-center justify-between p-4 bg-muted/20 rounded-2xl border border-border">
+          <div className="flex items-center gap-3">
+            {status === 'Active' ? <Unlock className="h-5 w-5 text-emerald-500" /> : <Lock className="h-5 w-5 text-red-500" />}
+            <div>
+              <p className="text-sm font-bold text-foreground">Account Status</p>
+              <p className="text-[10px] text-muted-foreground">Current: <span className="font-bold">{status}</span></p>
             </div>
-          )}
-        />
+          </div>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className={cn("rounded-xl text-xs", status === 'Active' ? "border-red-200 text-red-500 hover:bg-red-50" : "border-emerald-200 text-emerald-500 hover:bg-emerald-50")}
+            onClick={onToggleStatus}
+          >
+            {status === 'Active' ? 'Lock Account' : 'Unlock Account'}
+          </Button>
+        </div>
       </div>
 
       <div className="space-y-3">
@@ -59,3 +61,4 @@ export function AccountSecurity({ form, onToggleStatus, totalSpent }: AccountSec
     </div>
   );
 }
+

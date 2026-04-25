@@ -1,35 +1,27 @@
-import { useState } from 'react';
 import { Plus, Search, Filter, Edit2, Trash2, Disc, Calendar, Loader2, Package } from 'lucide-react';
 import { Button, Card, CardContent, Skeleton } from '@/shared/components';
-import { useReleases, useDeleteRelease } from '../../../hooks/useReleases';
-import { Release } from '../../../types';
+import { useReleaseManagement } from '../../../hooks/useReleaseManagement';
 import { ReleaseForm } from './ReleaseForm';
 import { ReleaseVersionsModal } from './ReleaseVersionsModal';
 
 export function ReleaseManagement() {
-  const [showForm, setShowForm] = useState(false);
-  const [editingRelease, setEditingRelease] = useState<Release | null>(null);
-  const [managingVersionsFor, setManagingVersionsFor] = useState<Release | null>(null);
-  const [page, setPage] = useState(1);
-
-  const { data: releasesData, isLoading } = useReleases(page, 10);
-  const deleteReleaseMutation = useDeleteRelease();
-
-  const handleOpenCreate = () => {
-    setEditingRelease(null);
-    setShowForm(true);
-  };
-
-  const handleOpenEdit = (release: Release) => {
-    setEditingRelease(release);
-    setShowForm(true);
-  };
-
-  const handleDelete = (id: string) => {
-    if (window.confirm('Are you sure you want to delete this release? This will remove all associated versions and tracks.')) {
-      deleteReleaseMutation.mutate(id);
-    }
-  };
+  const {
+    showForm,
+    editingRelease,
+    managingVersionsFor,
+    releasesData,
+    isLoading,
+    page,
+    setPage,
+    handleOpenCreate,
+    handleOpenEdit,
+    handleDelete,
+    closeForm,
+    setManagingVersionsFor,
+    closeVersionsModal,
+    isDeleting,
+    deletingId
+  } = useReleaseManagement();
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -51,7 +43,7 @@ export function ReleaseManagement() {
         <div className="animate-in zoom-in-95 duration-300">
           <ReleaseForm
             initialData={editingRelease}
-            onCancel={() => setShowForm(false)}
+            onCancel={closeForm}
           />
         </div>
       ) : (
@@ -145,9 +137,9 @@ export function ReleaseManagement() {
                             size="icon"
                             className="h-10 w-10 text-muted-foreground hover:text-red-500 rounded-xl"
                             onClick={() => handleDelete(release.id)}
-                            disabled={deleteReleaseMutation.isPending}
+                            disabled={isDeleting}
                           >
-                            {deleteReleaseMutation.isPending && deleteReleaseMutation.variables === release.id ? (
+                            {isDeleting && deletingId === release.id ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
                               <Trash2 className="h-4 w-4" />
@@ -174,7 +166,7 @@ export function ReleaseManagement() {
       {managingVersionsFor && (
         <ReleaseVersionsModal
           release={managingVersionsFor}
-          onClose={() => setManagingVersionsFor(null)}
+          onClose={closeVersionsModal}
         />
       )}
     </div>

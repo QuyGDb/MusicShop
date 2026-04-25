@@ -1,10 +1,27 @@
 import { useMutation } from '@tanstack/react-query';
-import { useForm } from '@tanstack/react-form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { CredentialResponse } from '@react-oauth/google';
 import { authService } from '@/features/auth/services/authService';
 import { useAuthRedirect } from '@/shared/hooks/useAuthRedirect';
 
-export function useLoginForm() {
+import { loginSchema, LoginFormValues } from '../schemas';
+
+
+import { UseFormRegister, FieldErrors } from 'react-hook-form';
+
+interface UseLoginFormReturn {
+  register: UseFormRegister<LoginFormValues>;
+  handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
+  errors: FieldErrors<LoginFormValues>;
+  isSubmitting: boolean;
+  serverError: string | null;
+  handleGoogleSuccess: (credentialResponse: CredentialResponse) => void;
+}
+
+
+export function useLoginForm(): UseLoginFormReturn {
+
   const { redirectAfterAuth } = useAuthRedirect();
 
   // Standard Login Mutation
@@ -23,15 +40,22 @@ export function useLoginForm() {
     },
   });
 
-  const form = useForm({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting }
+  } = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema) as any,
+
     defaultValues: {
       email: '',
       password: '',
     },
-    onSubmit: async ({ value }) => {
-      loginMutation.mutate(value);
-    },
   });
+
+  const onSubmit = async (value: LoginFormValues) => {
+    loginMutation.mutate(value);
+  };
 
   const handleGoogleSuccess = (credentialResponse: CredentialResponse) => {
     const idToken = credentialResponse.credential;
@@ -44,14 +68,16 @@ export function useLoginForm() {
   };
 
   // Combine loading and error states for the UI
-  const isSubmitting = loginMutation.isPending || googleLoginMutation.isPending;
   const error = loginMutation.error || googleLoginMutation.error;
   const serverError = error instanceof Error ? error.message : null;
 
   return {
-    form,
-    isSubmitting,
+    register,
+    handleSubmit: handleSubmit(onSubmit) as any,
+    errors,
+    isSubmitting: isSubmitting || loginMutation.isPending || googleLoginMutation.isPending,
     serverError,
     handleGoogleSuccess
   };
 }
+

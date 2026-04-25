@@ -64,23 +64,52 @@ public sealed class UpdateReleaseCommandHandler(
             }
         }
 
-        // 5. Update Tracks (Sync)
+        // 5. Update Tracks (Sync logic: Update existing by ID, Add new, Remove old)
         if (request.Tracks != null)
         {
-            release.Tracks.Clear();
-            foreach (TrackCreateDto trackDto in request.Tracks)
+            var requestIds = request.Tracks
+                .Where(t => t.Id.HasValue)
+                .Select(t => t.Id!.Value)
+                .ToList();
+
+            // 1. Remove tracks that are not in the request
+            var tracksToRemove = release.Tracks
+                .Where(t => !requestIds.Contains(t.Id))
+                .ToList();
+            
+            foreach (var track in tracksToRemove)
             {
-                release.Tracks.Add(new Track
+                release.Tracks.Remove(track);
+            }
+
+            // 2. Update or Add
+            foreach (var trackDto in request.Tracks)
+            {
+                var existingTrack = trackDto.Id.HasValue 
+                    ? release.Tracks.FirstOrDefault(t => t.Id == trackDto.Id.Value) 
+                    : null;
+
+                if (existingTrack != null)
                 {
-                    Title = trackDto.Title,
-                    Position = trackDto.Position,
-                    DurationSeconds = trackDto.DurationSeconds,
-                    Side = trackDto.Side
-                });
+                    existingTrack.Title = trackDto.Title;
+                    existingTrack.Position = trackDto.Position;
+                    existingTrack.DurationSeconds = trackDto.DurationSeconds;
+                    existingTrack.Side = trackDto.Side;
+                }
+                else
+                {
+                    release.Tracks.Add(new Track
+                    {
+                        ReleaseId = release.Id,
+                        Title = trackDto.Title,
+                        Position = trackDto.Position,
+                        DurationSeconds = trackDto.DurationSeconds,
+                        Side = trackDto.Side
+                    });
+                }
             }
         }
 
-        releaseRepository.Update(release);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<Guid>.Success(release.Id);

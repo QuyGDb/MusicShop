@@ -20,6 +20,8 @@ export function LabelForm({ editingLabel, onClose }: LabelFormProps) {
     onSuccess: onClose
   });
 
+  const { onChange: nameOnChange, ...nameRegister } = register('name');
+
   return (
     <Card className="bg-surface border-primary/20 shadow-2xl animate-in zoom-in-95 duration-300">
       <CardHeader className="flex flex-row items-center justify-between border-b border-border bg-muted/20">
@@ -41,10 +43,13 @@ export function LabelForm({ editingLabel, onClose }: LabelFormProps) {
               </label>
               <input
                 type="text"
-                {...register('name')}
+                {...nameRegister}
                 placeholder="e.g. Blue Note Records"
                 className="w-full h-12 bg-muted/30 border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-colors text-foreground"
-                onChange={(e) => handleNameChange(e.target.value)}
+                onChange={(e) => {
+                  nameOnChange(e);
+                  handleNameChange(e.target.value);
+                }}
               />
               {errors.name && (
                 <p className="text-[10px] text-red-500 font-bold uppercase tracking-tight">{errors.name.message}</p>

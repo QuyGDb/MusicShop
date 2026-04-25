@@ -1,11 +1,13 @@
-import { Button, Input, Label, Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/components';
+import { Button, Input, Label } from '@/shared/components';
 import { Link } from 'react-router-dom';
 import { GoogleLogin } from '@react-oauth/google';
-import { useLoginForm, loginSchema } from '@/features/auth';
+import { useLoginForm } from '@/features/auth';
 
 export function LoginForm() {
   const {
-    form,
+    register,
+    handleSubmit,
+    errors,
     isSubmitting,
     serverError,
     handleGoogleSuccess
@@ -22,68 +24,40 @@ export function LoginForm() {
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl group-hover:bg-blue-600/20 transition-colors duration-500" />
 
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            form.handleSubmit();
-          }}
+          onSubmit={handleSubmit}
           className="space-y-5 relative z-10"
         >
-          <form.Field
-            name="email"
-            validators={{
-              onChange: loginSchema.shape.email,
-            }}
-          >
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name} className="text-sm font-medium text-neutral-300">Email</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="email"
-                  placeholder="name@example.com"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  className={`bg-neutral-950/50 border-neutral-800 focus:border-blue-500 h-11 transition-all ${field.state.meta.errors && field.state.meta.errors.length > 0 ? 'border-red-500/50' : ''}`}
-                />
-                {field.state.meta.errors && (
-                  <p className="text-xs text-red-500 mt-1">{field.state.meta.errors.join(', ')}</p>
-                )}
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium text-neutral-300">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="name@example.com"
+              {...register('email')}
+              className={`bg-neutral-950/50 border-neutral-800 focus:border-blue-500 h-11 transition-all ${errors.email ? 'border-red-500/50' : ''}`}
+            />
+            {errors.email && (
+              <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>
             )}
-          </form.Field>
+          </div>
 
-          <form.Field
-            name="password"
-            validators={{
-              onChange: loginSchema.shape.password,
-            }}
-          >
-            {(field) => (
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <Label htmlFor={field.name} className="text-sm font-medium text-neutral-300">Password</Label>
-                  <Button type="button" variant="link" className="p-0 h-auto text-xs text-neutral-400">
-                    Forgot password?
-                  </Button>
-                </div>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="password"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  className={`bg-neutral-950/50 border-neutral-800 focus:border-blue-500 h-11 transition-all ${field.state.meta.errors && field.state.meta.errors.length > 0 ? 'border-red-500/50' : ''}`}
-                />
-                {field.state.meta.errors && (
-                  <p className="text-xs text-red-500 mt-1">{field.state.meta.errors.join(', ')}</p>
-                )}
-              </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password" className="text-sm font-medium text-neutral-300">Password</Label>
+              <Button type="button" variant="link" className="p-0 h-auto text-xs text-neutral-400">
+                Forgot password?
+              </Button>
+            </div>
+            <Input
+              id="password"
+              type="password"
+              {...register('password')}
+              className={`bg-neutral-950/50 border-neutral-800 focus:border-blue-500 h-11 transition-all ${errors.password ? 'border-red-500/50' : ''}`}
+            />
+            {errors.password && (
+              <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>
             )}
-          </form.Field>
+          </div>
 
           {serverError && (
             <div className="p-3 text-sm bg-red-900/20 border border-red-900/50 text-red-400 rounded-md">
@@ -130,3 +104,4 @@ export function LoginForm() {
     </div>
   );
 }
+

@@ -47,7 +47,6 @@ public sealed class UpdateProductCommandHandler(
         if (request.PreorderReleaseDate.HasValue) product.PreorderReleaseDate = request.PreorderReleaseDate;
         if (request.LimitedQty.HasValue) product.LimitedQty = request.LimitedQty;
 
-        productRepository.Update(product);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();

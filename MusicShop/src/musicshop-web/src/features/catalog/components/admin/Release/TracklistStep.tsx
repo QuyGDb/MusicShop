@@ -36,7 +36,18 @@ export function TracklistStep({ register, fields, onAddTrack, onRemoveTrack }: T
             <div key={field.id} className="flex items-center gap-4 bg-muted/10 p-3 rounded-2xl border border-border/50 group hover:border-primary/30 transition-all">
               <span className="w-10 h-10 flex items-center justify-center bg-muted rounded-xl font-black text-xs text-subtle">
                 {index + 1}
+                <input type="hidden" {...register(`tracks.${index}.position` as const, { valueAsNumber: true })} />
               </span>
+
+              <div className="flex items-center gap-2 bg-muted/30 px-3 py-2 rounded-lg w-16">
+                <input
+                  type="text"
+                  placeholder="Side"
+                  {...register(`tracks.${index}.side` as const)}
+                  className="w-full bg-transparent border-none focus:outline-none text-xs font-bold text-center uppercase"
+                  maxLength={2}
+                />
+              </div>
               
               <input
                 type="text"

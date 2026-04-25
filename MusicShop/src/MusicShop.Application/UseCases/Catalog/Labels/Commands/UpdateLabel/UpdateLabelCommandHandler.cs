@@ -12,7 +12,7 @@ public sealed class UpdateLabelCommandHandler(
     : IRequestHandler<UpdateLabelCommand, Result<string>>
 {
     public async Task<Result<string>> Handle(
-        UpdateLabelCommand request, 
+        UpdateLabelCommand request,
         CancellationToken cancellationToken)
     {
         // 1. Find by Id
@@ -44,7 +44,6 @@ public sealed class UpdateLabelCommandHandler(
         label.FoundedYear = request.FoundedYear;
         label.Website = request.Website;
 
-        labelRepository.Update(label);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<string>.Success(label.Slug);

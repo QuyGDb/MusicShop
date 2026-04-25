@@ -74,7 +74,6 @@ public sealed class UpdateArtistCommandHandler(
             }
         }
 
-        artistRepository.Update(artist);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<string>.Success(artist.Slug);

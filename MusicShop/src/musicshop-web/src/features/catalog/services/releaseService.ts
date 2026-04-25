@@ -2,17 +2,26 @@ import http from '@/shared/api/axiosInstance';
 import { ApiResponse, PaginatedResponse } from '@/shared/types/api';
 import { Release, Track, ReleaseVersion } from '../types';
 
+export interface TrackCreateDto {
+  position: number;
+  title: string;
+  durationSeconds?: number;
+  side?: string;
+}
+
 export interface CreateReleaseRequest {
   title: string;
+  slug: string;
   year: number;
   description?: string;
   coverUrl?: string;
   artistId: string;
   type: string;
+  genreIds?: string[];
+  tracks?: TrackCreateDto[];
 }
 
 export interface UpdateReleaseRequest extends CreateReleaseRequest {
-  slug: string;
 }
 
 export const releaseService = {

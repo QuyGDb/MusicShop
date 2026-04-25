@@ -18,7 +18,10 @@ export function ProductCreateModal({ onClose }: ProductCreateModalProps) {
   const { data: releasesData, isLoading: loadingReleases } = useReleases(1, 50);
   
   const {
-    form,
+    register,
+    control,
+    handleSubmit,
+    errors,
     selectedReleaseId,
     setSelectedReleaseId,
     handleVersionChange,
@@ -32,9 +35,6 @@ export function ProductCreateModal({ onClose }: ProductCreateModalProps) {
   // Re-fetch versions when release changes
   const { data: versionsData, isLoading: loadingVersions } = useReleaseVersions(selectedReleaseId);
 
-  // Update hook's knowledge of versionsData (or we could have put this fetch inside the hook)
-  // For simplicity here, we pass handlers down.
-  
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
       <Card className="w-full max-w-3xl bg-surface border-border shadow-2xl overflow-hidden flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-300">
@@ -55,37 +55,25 @@ export function ProductCreateModal({ onClose }: ProductCreateModalProps) {
 
         <CardContent className="p-0 overflow-y-auto">
           <form 
-            onSubmit={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              form.handleSubmit();
-            }}
+            onSubmit={handleSubmit}
             className="p-8 space-y-10"
           >
             <CatalogReferenceSection 
-              form={form}
+              register={register as any}
+              control={control as any}
               selectedReleaseId={selectedReleaseId}
               setSelectedReleaseId={setSelectedReleaseId}
               loadingReleases={loadingReleases}
               releasesData={releasesData}
               loadingVersions={loadingVersions}
               versionsData={versionsData}
-              onVersionChange={(id) => {
-                // We need the data here to pass to handleVersionChange if it's not in a unified hook
-                const version = versionsData?.find(v => v.id === id);
-                const release = releasesData?.items.find(r => r.id === selectedReleaseId);
-                if (version && release) {
-                   form.setFieldValue('name', `${release.title} (${version.notes || version.pressingCountry})`);
-                   form.setFieldValue('slug', `${release.slug}-${version.pressingCountry.toLowerCase()}-${version.id.slice(0, 4)}`);
-                   form.setFieldValue('coverUrl', release.coverUrl || '');
-                   form.setFieldValue('format', version.format);
-                }
-              }}
+              onVersionChange={handleVersionChange}
             />
 
-            <StorePresentationSection form={form} />
+            <StorePresentationSection register={register as any} />
 
-            <AvailabilitySection form={form} />
+            <AvailabilitySection register={register as any} control={control as any} />
+
           </form>
         </CardContent>
 
@@ -100,7 +88,7 @@ export function ProductCreateModal({ onClose }: ProductCreateModalProps) {
                 Cancel
               </Button>
               <Button 
-                onClick={() => form.handleSubmit()}
+                onClick={handleSubmit}
                 disabled={isPending}
                 className="h-12 px-8 rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20 flex items-center gap-2 group"
               >
@@ -119,3 +107,4 @@ export function ProductCreateModal({ onClose }: ProductCreateModalProps) {
     </div>
   );
 }
+

@@ -1,11 +1,11 @@
 import { cn } from '@/shared/lib/utils';
-
 import { Release, ReleaseVersion } from '@/features/catalog/types';
-import { ReactFormApi } from '@tanstack/react-form';
+import { UseFormRegister, Control, Controller } from 'react-hook-form';
 import { ProductFormValues } from '../../../types/product';
 
 interface CatalogReferenceSectionProps {
-  form: any;
+  register: any;
+  control: any;
   selectedReleaseId: string;
   setSelectedReleaseId: (id: string) => void;
   loadingReleases: boolean;
@@ -15,8 +15,10 @@ interface CatalogReferenceSectionProps {
   onVersionChange: (id: string) => void;
 }
 
+
 export function CatalogReferenceSection({
-  form,
+  register,
+  control,
   selectedReleaseId,
   setSelectedReleaseId,
   loadingReleases,
@@ -24,7 +26,8 @@ export function CatalogReferenceSection({
   loadingVersions,
   versionsData,
   onVersionChange,
-}: CatalogReferenceSectionProps) {
+}: any) {
+
   return (
     <section className="space-y-6">
       <div className="flex items-center gap-2 mb-4">
@@ -51,42 +54,43 @@ export function CatalogReferenceSection({
           </select>
         </div>
 
-        <form.Field
-          name="releaseVersionId"
-          children={(field: any) => (
-            <div className="space-y-2">
-              <label className="text-[10px] font-black uppercase tracking-widest text-subtle">Specific Version (Pressing)</label>
-              <select 
-                id={field.name}
-                name={field.name}
-                value={field.state.value}
-                onBlur={field.handleBlur}
-                onChange={(e) => {
-                  field.handleChange(e.target.value);
-                  onVersionChange(e.target.value);
-                }}
-                disabled={!selectedReleaseId}
-                className={cn(
-                  "w-full h-12 bg-muted/50 border rounded-xl px-4 focus:outline-none transition-all text-sm",
-                  field.state.meta.errors.length ? "border-red-500" : "border-border focus:border-primary"
+        <div className="space-y-2">
+          <label className="text-[10px] font-black uppercase tracking-widest text-subtle">Specific Version (Pressing)</label>
+          <Controller
+            name="releaseVersionId"
+            control={control}
+            render={({ field, fieldState }) => (
+              <>
+                <select 
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    onVersionChange(e.target.value);
+                  }}
+                  disabled={!selectedReleaseId}
+                  className={cn(
+                    "w-full h-12 bg-muted/50 border rounded-xl px-4 focus:outline-none transition-all text-sm",
+                    fieldState.error ? "border-red-500" : "border-border focus:border-primary"
+                  )}
+                >
+                  <option value="">Select a variant from catalog...</option>
+                  {loadingVersions ? (
+                    <option disabled>Loading versions...</option>
+                  ) : (
+                    versionsData?.map((v: any) => (
+                      <option key={v.id} value={v.id}>{v.pressingCountry} ({v.pressingYear}) - {v.labelName}</option>
+                    ))
+                  )}
+                </select>
+                {fieldState.error && (
+                  <p className="text-[10px] text-red-500 font-bold mt-1 uppercase tracking-tight">{fieldState.error.message}</p>
                 )}
-              >
-                <option value="">Select a variant from catalog...</option>
-                {loadingVersions ? (
-                  <option disabled>Loading versions...</option>
-                ) : (
-                  versionsData?.map((v: any) => (
-                    <option key={v.id} value={v.id}>{v.pressingCountry} ({v.pressingYear}) - {v.labelName}</option>
-                  ))
-                )}
-              </select>
-              {field.state.meta.errors.length > 0 && (
-                <p className="text-[10px] text-red-500 font-bold mt-1 uppercase tracking-tight">{field.state.meta.errors[0]}</p>
-              )}
-            </div>
-          )}
-        />
+              </>
+            )}
+          />
+        </div>
       </div>
     </section>
   );
 }
+

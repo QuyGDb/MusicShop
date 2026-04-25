@@ -2,6 +2,7 @@ import { X, Disc, ListMusic, ChevronRight, ChevronLeft, Loader2 } from 'lucide-r
 import { Button, Card, CardHeader, CardTitle, CardContent } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
 import { useArtists } from '@/features/catalog/hooks/useArtists';
+import { useRelease } from '@/features/catalog/hooks/useReleases';
 import { Release } from '@/features/catalog/types';
 
 // New specialized components and hooks
@@ -15,6 +16,9 @@ interface ReleaseFormProps {
 }
 
 export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
+  // Fetch detailed data if we are editing
+  const { data: detailedRelease, isLoading: loadingDetail } = useRelease(initialData?.slug || '');
+
   const {
     register,
     control,
@@ -26,15 +30,30 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
     prevStep,
     handleAddTrack,
     handleRemoveTrack,
+    handleTitleChange,
+    toggleGenre,
     isPending,
     fields,
+    genresData,
+    loadingGenres
   } = useReleaseForm({
-    initialData,
+    editingRelease: detailedRelease || initialData,
     onSuccess: onCancel
   });
 
-  // Dependencies (Data fetching still in container/page level component is acceptable)
+  // Dependencies
   const { data: artistsData, isLoading: loadingArtists } = useArtists(1, 100);
+
+  if (initialData && loadingDetail) {
+    return (
+      <Card className="bg-surface border-primary/20 shadow-2xl h-[600px] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <Loader2 className="h-10 w-10 text-primary animate-spin mx-auto" />
+          <p className="text-muted-foreground font-medium animate-pulse">Loading release details...</p>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="bg-surface border-primary/20 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-500">
@@ -92,6 +111,10 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
                   errors={errors}
                   artistsData={artistsData}
                   loadingArtists={loadingArtists}
+                  genresData={genresData}
+                  loadingGenres={loadingGenres}
+                  onTitleChange={handleTitleChange}
+                  onToggleGenre={toggleGenre}
                 />
               )}
 

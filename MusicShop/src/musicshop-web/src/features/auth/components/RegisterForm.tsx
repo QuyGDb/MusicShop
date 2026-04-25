@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom';
 import { Button, Input, Label, Alert, AlertDescription, AlertTitle } from '@/shared/components';
 import { AlertCircle, Loader2, UserPlus } from 'lucide-react';
-import { useRegisterForm, registerSchema, registerBaseSchema } from '@/features/auth';
+import { useRegisterForm } from '@/features/auth';
 
 export function RegisterForm() {
   const {
-    form,
+    register,
+    handleSubmit,
+    errors,
     isSubmitting,
     serverError,
   } = useRegisterForm();
@@ -26,11 +28,7 @@ export function RegisterForm() {
         <div className="absolute -top-24 -right-24 w-48 h-48 bg-blue-600/10 rounded-full blur-3xl group-hover:bg-blue-600/20 transition-colors duration-500" />
 
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            form.handleSubmit();
-          }}
+          onSubmit={handleSubmit}
           className="space-y-5 relative z-10"
         >
           {serverError && (
@@ -41,114 +39,60 @@ export function RegisterForm() {
             </Alert>
           )}
 
-          <form.Field
-            name="fullName"
-            validators={{
-              onChange: registerBaseSchema.shape.fullName,
-            }}
-          >
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name} className="text-sm font-medium text-neutral-300">Full Name</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  placeholder="John Doe"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  className={`bg-neutral-950/50 border-neutral-800 focus:border-blue-500 h-11 transition-all ${field.state.meta.errors.length > 0 ? 'border-red-500/50' : ''}`}
-                />
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-xs text-red-400 mt-1">{field.state.meta.errors.join(', ')}</p>
-                )}
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="fullName" className="text-sm font-medium text-neutral-300">Full Name</Label>
+            <Input
+              id="fullName"
+              {...register('fullName')}
+              placeholder="John Doe"
+              className={`bg-neutral-950/50 border-neutral-800 focus:border-blue-500 h-11 transition-all ${errors.fullName ? 'border-red-500/50' : ''}`}
+            />
+            {errors.fullName && (
+              <p className="text-xs text-red-400 mt-1">{errors.fullName.message}</p>
             )}
-          </form.Field>
+          </div>
 
-          <form.Field
-            name="email"
-            validators={{
-              onChange: registerBaseSchema.shape.email,
-            }}
-          >
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name} className="text-sm font-medium text-neutral-300">Email Address</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="email"
-                  placeholder="name@example.com"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  className={`bg-neutral-950/50 border-neutral-800 focus:border-blue-500 h-11 transition-all ${field.state.meta.errors.length > 0 ? 'border-red-500/50' : ''}`}
-                />
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-xs text-red-400 mt-1">{field.state.meta.errors.join(', ')}</p>
-                )}
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="email" className="text-sm font-medium text-neutral-300">Email Address</Label>
+            <Input
+              id="email"
+              {...register('email')}
+              type="email"
+              placeholder="name@example.com"
+              className={`bg-neutral-950/50 border-neutral-800 focus:border-blue-500 h-11 transition-all ${errors.email ? 'border-red-500/50' : ''}`}
+            />
+            {errors.email && (
+              <p className="text-xs text-red-400 mt-1">{errors.email.message}</p>
             )}
-          </form.Field>
+          </div>
 
-          <form.Field
-            name="password"
-            validators={{
-              onChange: registerBaseSchema.shape.password,
-            }}
-          >
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name} className="text-sm font-medium text-neutral-300">Password</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="password"
-                  placeholder="••••••••"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  className={`bg-neutral-950/50 border-neutral-800 focus:border-blue-500 h-11 transition-all ${field.state.meta.errors.length > 0 ? 'border-red-500/50' : ''}`}
-                />
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-xs text-red-400 mt-1">{field.state.meta.errors.join(', ')}</p>
-                )}
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-sm font-medium text-neutral-300">Password</Label>
+            <Input
+              id="password"
+              {...register('password')}
+              type="password"
+              placeholder="••••••••"
+              className={`bg-neutral-950/50 border-neutral-800 focus:border-blue-500 h-11 transition-all ${errors.password ? 'border-red-500/50' : ''}`}
+            />
+            {errors.password && (
+              <p className="text-xs text-red-400 mt-1">{errors.password.message}</p>
             )}
-          </form.Field>
+          </div>
 
-          <form.Field
-            name="confirmPassword"
-            validators={{
-              onChangeListenTo: ['password'],
-              onChange: ({ value, fieldApi }) => {
-                if (value !== fieldApi.form.getFieldValue('password')) {
-                  return 'Passwords do not match';
-                }
-                return undefined;
-              },
-            }}
-          >
-            {(field) => (
-              <div className="space-y-2">
-                <Label htmlFor={field.name} className="text-sm font-medium text-neutral-300">Confirm Password</Label>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="password"
-                  placeholder="••••••••"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  className={`bg-neutral-950/50 border-neutral-800 focus:border-blue-500 h-11 transition-all ${field.state.meta.errors.length > 0 ? 'border-red-500/50' : ''}`}
-                />
-                {field.state.meta.errors.length > 0 && (
-                  <p className="text-xs text-red-400 mt-1">{field.state.meta.errors.join(', ')}</p>
-                )}
-              </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword" className="text-sm font-medium text-neutral-300">Confirm Password</Label>
+            <Input
+              id="confirmPassword"
+              {...register('confirmPassword')}
+              type="password"
+              placeholder="••••••••"
+              className={`bg-neutral-950/50 border-neutral-800 focus:border-blue-500 h-11 transition-all ${errors.confirmPassword ? 'border-red-500/50' : ''}`}
+            />
+            {errors.confirmPassword && (
+              <p className="text-xs text-red-400 mt-1">{errors.confirmPassword.message}</p>
             )}
-          </form.Field>
+          </div>
 
           <Button
             type="submit"
@@ -176,5 +120,6 @@ export function RegisterForm() {
     </div>
   );
 }
+
 
 

@@ -1,4 +1,5 @@
-import { useForm } from '@tanstack/react-form';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 
 const userSchema = z.object({
@@ -13,29 +14,55 @@ interface UseUserFormProps {
   onSuccess: () => void;
 }
 
-export function useUserForm({ initialValues, onSuccess }: UseUserFormProps) {
-  const form = useForm({
+import { Control, FieldErrors } from 'react-hook-form';
+
+interface UseUserFormReturn {
+  handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
+  control: Control<UserFormValues>;
+  errors: FieldErrors<UserFormValues>;
+  isSubmitting: boolean;
+  toggleStatus: () => void;
+  setRole: (role: 'Customer' | 'Admin') => void;
+}
+
+
+export function useUserForm({ initialValues, onSuccess }: UseUserFormProps): UseUserFormReturn {
+
+  const {
+    handleSubmit,
+    setValue,
+    getValues,
+    control,
+    formState: { errors, isSubmitting }
+  } = useForm<UserFormValues>({
+    resolver: zodResolver(userSchema) as any,
     defaultValues: initialValues,
-    onSubmit: async ({ value }) => {
-      // Simulate API call
-      console.log('Saving user updates:', value);
-      await new Promise((resolve) => setTimeout(resolve, 800));
-      onSuccess();
-    },
   });
 
+  const onSubmit = async (value: UserFormValues) => {
+    // Simulate API call
+    console.log('Saving user updates:', value);
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    onSuccess();
+  };
+
   const toggleStatus = () => {
-    const currentStatus = form.getFieldValue('status');
-    form.setFieldValue('status', currentStatus === 'Active' ? 'Locked' : 'Active');
+    const currentStatus = getValues('status');
+    setValue('status', currentStatus === 'Active' ? 'Locked' : 'Active', { shouldValidate: true });
   };
 
   const setRole = (role: 'Customer' | 'Admin') => {
-    form.setFieldValue('role', role);
+    setValue('role', role, { shouldValidate: true });
   };
 
   return {
-    form,
+    handleSubmit: handleSubmit(onSubmit) as any,
+
+    control,
+    errors,
+    isSubmitting,
     toggleStatus,
     setRole,
   };
 }
+

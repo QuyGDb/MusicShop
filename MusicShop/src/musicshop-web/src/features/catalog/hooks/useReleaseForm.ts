@@ -1,24 +1,41 @@
 import { useState, useEffect } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, UseFormRegister, Control, FieldErrors } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useCreateRelease, useUpdateRelease } from '@/features/catalog/hooks/useReleases';
+import { useGenres } from '@/features/catalog/hooks/useGenres';
 import { Release } from '@/features/catalog/types';
 import { releaseSchema, ReleaseFormValues } from '../types/release';
 import { uploadService } from '@/shared/services/uploadService';
-import { toast } from 'sonner';
 import { slugify } from '@/shared/lib/utils';
 
 interface UseReleaseFormProps {
-  initialData?: Release | null;
+  editingRelease?: Release | null;
   onSuccess: () => void;
 }
-
-export function useReleaseForm({ initialData, onSuccess }: UseReleaseFormProps) {
+interface UseReleaseFormReturn {
+  register: UseFormRegister<ReleaseFormValues>;
+  control: Control<ReleaseFormValues>;
+  handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
+  errors: FieldErrors<ReleaseFormValues>;
+  step: number;
+  setStep: (step: number) => void;
+  nextStep: () => void;
+  prevStep: () => void;
+  handleAddTrack: () => void;
+  handleRemoveTrack: (index: number) => void;
+  handleTitleChange: (title: string) => void;
+  toggleGenre: (genreId: string) => void;
+  isPending: boolean;
+  fields: any[];
+  genresData: any;
+  loadingGenres: boolean;
+}
+export function useReleaseForm({ editingRelease, onSuccess }: UseReleaseFormProps): UseReleaseFormReturn {
   const [step, setStep] = useState(1);
 
   const createReleaseMutation = useCreateRelease();
   const updateReleaseMutation = useUpdateRelease();
-
+  const { data: genresData, isLoading: loadingGenres } = useGenres(1, 100);
   const {
     register,
     control,
@@ -31,15 +48,20 @@ export function useReleaseForm({ initialData, onSuccess }: UseReleaseFormProps) 
     resolver: zodResolver(releaseSchema) as any,
 
     defaultValues: {
-      title: initialData?.title ?? '',
-      slug: initialData?.slug ?? '',
-      artistId: initialData?.artistId ?? '',
-      year: initialData?.year ?? new Date().getFullYear(),
-      type: (initialData?.type as any) ?? 'Album',
-      description: initialData?.description ?? '',
-      coverUrl: initialData?.coverUrl ?? '',
-      genreIds: [],
-      tracks: initialData?.tracks ?? []
+      title: editingRelease?.title ?? '',
+      slug: editingRelease?.slug ?? '',
+      artistId: editingRelease?.artistId ?? '',
+      year: editingRelease?.year ?? new Date().getFullYear(),
+      type: (editingRelease?.type as any) ?? 'Album',
+      description: editingRelease?.description ?? '',
+      coverUrl: editingRelease?.coverUrl ?? '',
+      genreIds: editingRelease?.genres.map(g => g.id) ?? [],
+      tracks: editingRelease?.tracks?.map(t => ({
+        position: t.position,
+        title: t.title,
+        durationSeconds: t.durationSeconds,
+        side: t.side
+      })) ?? []
     }
   });
 
@@ -50,48 +72,63 @@ export function useReleaseForm({ initialData, onSuccess }: UseReleaseFormProps) 
 
   // Sync initialData when it changes (e.g. when loading finishes)
   useEffect(() => {
-    if (initialData) {
+    if (editingRelease) {
+      const mappedTracks = editingRelease.tracks?.map(t => ({
+        id: t.id,
+        position: t.position,
+        title: t.title,
+        durationSeconds: t.durationSeconds,
+        side: t.side
+      })) || [];
+
       reset({
-        title: initialData.title,
-        slug: initialData.slug,
-        artistId: initialData.artistId,
-        year: initialData.year,
-        type: initialData.type as any,
-        description: initialData.description || '',
-        coverUrl: initialData.coverUrl || '',
-        genreIds: [], // Assuming genres might be handled separately or added later
-        tracks: initialData.tracks || []
+        title: editingRelease.title,
+        slug: editingRelease.slug,
+        artistId: editingRelease.artistId,
+        year: editingRelease.year,
+        type: editingRelease.type as any,
+        description: editingRelease.description || '',
+        coverUrl: editingRelease.coverUrl || '',
+        genreIds: editingRelease.genres.map(g => g.id) || [],
+        tracks: mappedTracks
       });
     }
-  }, [initialData, reset]);
+  }, [editingRelease, reset]);
 
   const onSubmit = async (value: ReleaseFormValues) => {
     try {
       let finalCoverUrl = value.coverUrl;
-
       if (value.coverUrl instanceof File) {
         finalCoverUrl = await uploadService.uploadImage(value.coverUrl, 'releases');
       }
 
-      const payload = {
-        ...value,
+      const payload: any = {
+        title: value.title,
+        slug: value.slug || slugify(value.title),
+        year: value.year,
+        type: value.type,
+        artistId: value.artistId,
         coverUrl: finalCoverUrl as string,
-        slug: value.slug || slugify(value.title)
+        description: value.description,
+        genreIds: value.genreIds,
+        tracks: value.tracks.map(t => ({
+          id: t.id,
+          position: t.position,
+          title: t.title,
+          durationSeconds: t.durationSeconds,
+          side: t.side
+        }))
       };
-
-      if (initialData) {
+      if (editingRelease) {
         await updateReleaseMutation.mutateAsync(
-          { id: initialData.id, data: payload as any }
+          { id: editingRelease.id, data: payload as any }
         );
-        toast.success('Release updated successfully');
       } else {
         await createReleaseMutation.mutateAsync(payload as any);
-        toast.success('Release created successfully');
       }
       onSuccess();
     } catch (error: any) {
-      console.error('Release submission failed:', error);
-      toast.error(error.response?.data?.message || 'Failed to save release. Please try again.');
+      console.error(' [useReleaseForm] Submission error:', error);
     }
   };
 
@@ -111,13 +148,19 @@ export function useReleaseForm({ initialData, onSuccess }: UseReleaseFormProps) 
     });
   };
 
+  const handleTitleChange = (title: string) => {
+    setValue('title', title, { shouldValidate: true });
+    if (!editingRelease) {
+      setValue('slug', slugify(title), { shouldValidate: true });
+    }
+  };
+
   const isPending = createReleaseMutation.isPending || updateReleaseMutation.isPending || isSubmitting;
 
   return {
     register,
     control,
     handleSubmit: handleSubmit(onSubmit) as any,
-
     errors,
     step,
     setStep,
@@ -125,8 +168,18 @@ export function useReleaseForm({ initialData, onSuccess }: UseReleaseFormProps) 
     prevStep,
     handleAddTrack,
     handleRemoveTrack,
+    handleTitleChange,
+    toggleGenre: (genreId: string) => {
+      const current = getValues('genreIds') || [];
+      const next = current.includes(genreId)
+        ? current.filter(id => id !== genreId)
+        : [...current, genreId];
+      setValue('genreIds', next, { shouldValidate: true });
+    },
     isPending,
-    fields, // Passing fields for TracklistStep
+    fields,
+    genresData,
+    loadingGenres
   };
 }
 

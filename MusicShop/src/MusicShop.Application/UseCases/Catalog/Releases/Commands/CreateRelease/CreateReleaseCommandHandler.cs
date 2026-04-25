@@ -59,6 +59,7 @@ public sealed class CreateReleaseCommandHandler(
             {
                 release.Tracks.Add(new Track
                 {
+                    ReleaseId = release.Id,
                     Title = trackDto.Title,
                     Position = trackDto.Position,
                     DurationSeconds = trackDto.DurationSeconds,

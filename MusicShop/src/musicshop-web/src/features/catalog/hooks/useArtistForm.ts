@@ -65,20 +65,13 @@ export function useArtistForm({ editingArtist, onSuccess }: UseArtistFormProps):
 
       if (editingArtist) {
         await updateMutation.mutateAsync({ id: editingArtist.id, data: payload });
-        toast.success('Artist profile updated successfully');
       } else {
         await createMutation.mutateAsync(payload);
-        toast.success('Artist registered successfully');
       }
 
       onSuccess();
     } catch (error) {
-
-      const message = error instanceof Error
-        ? error.message
-        : 'Failed to save artist. Please try again.';
-
-      toast.error(message);
+      // Errors are handled by mutation hooks
     }
   };
 

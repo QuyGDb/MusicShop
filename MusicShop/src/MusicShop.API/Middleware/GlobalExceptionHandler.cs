@@ -14,7 +14,7 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
     {
         logger.LogError(exception, "An error occurred: {Message}", exception.Message);
 
-        ProblemDetails problemDetails = new ProblemDetails();
+        ProblemDetails problemDetails = new();
 
         if (exception is ValidationException validationException)
         {

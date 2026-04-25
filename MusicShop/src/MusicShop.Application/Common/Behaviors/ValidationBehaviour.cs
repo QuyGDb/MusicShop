@@ -3,36 +3,28 @@ using MediatR;
 
 namespace MusicShop.Application.Behaviors;
 
-public class ValidationBehavior<TRequest, TResponse>
+public class ValidationBehavior<TRequest, TResponse>(IEnumerable<IValidator<TRequest>> validators)
     : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {
-    private readonly IEnumerable<IValidator<TRequest>> _validators;
-
-    public ValidationBehavior(IEnumerable<IValidator<TRequest>> validators)
-    {
-        _validators = validators;
-    }
-
     public async Task<TResponse> Handle(
         TRequest request,
         RequestHandlerDelegate<TResponse> next,
         CancellationToken cancellationToken)
     {
-        if (!_validators.Any())
+        if (!validators.Any())
         {
-            return await next();
+            return await next(cancellationToken);
         }
 
-        ValidationContext<TRequest> context = new ValidationContext<TRequest>(request);
+        ValidationContext<TRequest> context = new(request);
 
         FluentValidation.Results.ValidationResult[] validationResults = await Task.WhenAll(
-            _validators.Select(v => v.ValidateAsync(context, cancellationToken)));
+            validators.Select(v => v.ValidateAsync(context, cancellationToken)));
 
-        List<FluentValidation.Results.ValidationFailure> failures = validationResults
+        List<FluentValidation.Results.ValidationFailure> failures = [.. validationResults
             .SelectMany(r => r.Errors)
-            .Where(f => f != null)
-            .ToList();
+            .Where(f => f != null)];
 
 
         if (failures.Count != 0)
@@ -40,6 +32,6 @@ public class ValidationBehavior<TRequest, TResponse>
             throw new ValidationException(failures);
         }
 
-        return await next();
+        return await next(cancellationToken);
     }
 }
