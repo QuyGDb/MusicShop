@@ -8,6 +8,11 @@ public static class GenreErrors
         "Genre.Conflict", 
         "A genre with the same slug already exists.",
         ErrorType.Conflict);
+
+    public static readonly Error DuplicateName = new(
+        "Genre.DuplicateName",
+        "A genre with the same name already exists.",
+        ErrorType.Conflict);
         
     public static readonly Error NotFound = new(
         "Genre.NotFound", 

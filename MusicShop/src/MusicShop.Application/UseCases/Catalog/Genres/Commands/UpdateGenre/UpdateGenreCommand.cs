@@ -4,4 +4,4 @@ using MusicShop.Domain.Common;
 
 namespace MusicShop.Application.UseCases.Catalog.Genres.Commands.UpdateGenre;
 
-public sealed record UpdateGenreCommand(Guid Id, string Name) : IRequest<Result<GenreResponse>>;
+public sealed record UpdateGenreCommand(Guid Id, string Name, string Slug) : IRequest<Result<GenreResponse>>;

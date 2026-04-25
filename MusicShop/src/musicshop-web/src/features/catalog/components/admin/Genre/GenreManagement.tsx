@@ -1,6 +1,7 @@
-import { Hash, Plus, X, Edit2, Trash2, Tag, Loader2 } from 'lucide-react';
-import { Button, Card, CardHeader, CardTitle, CardContent, Skeleton } from '@/shared/components';
+import { Hash, Plus, Edit2, Trash2, Tag, Loader2, AlertCircle } from 'lucide-react';
+import { Button, Card, CardContent, Skeleton } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
+import { GenreForm } from './GenreForm';
 import { useGenreManagement } from '../../../hooks/useGenreManagement';
 
 const GENRE_COLORS = [
@@ -22,6 +23,7 @@ export function GenreManagement() {
     genres,
     isLoading,
     isEmpty,
+    error,
     form,
     actions
   } = useGenreManagement();
@@ -30,6 +32,16 @@ export function GenreManagement() {
     const index = name.length % GENRE_COLORS.length;
     return GENRE_COLORS[index];
   };
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 space-y-4">
+        <AlertCircle className="h-12 w-12 text-red-500" />
+        <p className="text-xl font-bold">Failed to load genres</p>
+        <Button onClick={() => window.location.reload()}>Retry</Button>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -48,51 +60,10 @@ export function GenreManagement() {
       </div>
 
       {form.isOpen && (
-        <Card className="bg-surface border-primary/20 shadow-2xl max-w-lg animate-in zoom-in-95 duration-300">
-          <CardHeader className="flex flex-row items-center justify-between border-b border-border bg-muted/20">
-            <CardTitle className="text-xl font-bold flex items-center gap-2">
-              <Tag className="h-5 w-5 text-primary" />
-              {form.editingGenre ? 'Update Genre' : 'New Genre'}
-            </CardTitle>
-            <Button variant="ghost" size="icon" onClick={form.close}>
-              <X className="h-5 w-5" />
-            </Button>
-          </CardHeader>
-          <CardContent className="p-8 space-y-6">
-            <div className="space-y-2">
-              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Genre Name</label>
-              <input 
-                type="text" 
-                placeholder="e.g. Dream Pop"
-                autoFocus
-                className="w-full h-12 bg-muted/30 border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-colors text-foreground"
-                value={form.genreName}
-                onChange={(e) => form.setName(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && form.submit()}
-              />
-            </div>
-            <div className="flex items-center gap-3 pt-4">
-              <Button 
-                variant="outline" 
-                className="flex-1 h-12 rounded-xl" 
-                onClick={form.close}
-                disabled={form.isPending}
-              >
-                Cancel
-              </Button>
-              <Button 
-                className="flex-[2] h-12 rounded-xl bg-primary text-white" 
-                onClick={form.submit}
-                disabled={form.isPending || !form.genreName}
-              >
-                {form.isPending && (
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                )}
-                {form.editingGenre ? 'Update' : 'Create'} Genre
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <GenreForm 
+          editingGenre={form.editingGenre} 
+          onClose={form.close} 
+        />
       )}
 
       {/* Grid */}
