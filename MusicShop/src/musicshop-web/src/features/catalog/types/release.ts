@@ -1,7 +1,6 @@
 import { z } from 'zod';
 
 export const trackSchema = z.object({
-  id: z.string().optional(),
   position: z.number().int().positive(),
   title: z.string().min(1, 'Track title is required'),
   durationSeconds: z.number().int().nonnegative().default(0),

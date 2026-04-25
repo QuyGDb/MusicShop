@@ -74,7 +74,6 @@ export function useReleaseForm({ editingRelease, onSuccess }: UseReleaseFormProp
   useEffect(() => {
     if (editingRelease) {
       const mappedTracks = editingRelease.tracks?.map(t => ({
-        id: t.id,
         position: t.position,
         title: t.title,
         durationSeconds: t.durationSeconds,
@@ -112,7 +111,6 @@ export function useReleaseForm({ editingRelease, onSuccess }: UseReleaseFormProp
         description: value.description,
         genreIds: value.genreIds,
         tracks: value.tracks.map(t => ({
-          id: t.id,
           position: t.position,
           title: t.title,
           durationSeconds: t.durationSeconds,

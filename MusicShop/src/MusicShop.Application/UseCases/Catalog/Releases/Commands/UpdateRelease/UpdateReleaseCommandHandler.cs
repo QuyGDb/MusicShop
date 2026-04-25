@@ -5,19 +5,22 @@ using MusicShop.Application.Common.Interfaces;
 using MusicShop.Domain.Interfaces;
 using MusicShop.Domain.Errors;
 using MusicShop.Application.DTOs.Catalog;
+using Microsoft.Extensions.Logging;
 
 namespace MusicShop.Application.UseCases.Catalog.Releases.Commands.UpdateRelease;
 
 public sealed class UpdateReleaseCommandHandler(
     IReleaseRepository releaseRepository,
     IRepository<Artist> artistRepository,
-    IUnitOfWork unitOfWork)
+    IUnitOfWork unitOfWork,
+    ILogger<UpdateReleaseCommandHandler> logger)
     : IRequestHandler<UpdateReleaseCommand, Result<Guid>>
 {
     public async Task<Result<Guid>> Handle(
         UpdateReleaseCommand request,
         CancellationToken cancellationToken)
     {
+        logger.LogInformation("Updating release with request: {@ReleaseRequest}", request);
         // 1. Fetch Release with all related data
         Release? release = await releaseRepository.GetWithDetailsAsync(request.Id, track: true, cancellationToken);
 
@@ -64,49 +67,20 @@ public sealed class UpdateReleaseCommandHandler(
             }
         }
 
-        // 5. Update Tracks (Sync logic: Update existing by ID, Add new, Remove old)
+        // 5. Update Tracks (Replace existing with new list)
         if (request.Tracks != null)
         {
-            var requestIds = request.Tracks
-                .Where(t => t.Id.HasValue)
-                .Select(t => t.Id!.Value)
-                .ToList();
-
-            // 1. Remove tracks that are not in the request
-            var tracksToRemove = release.Tracks
-                .Where(t => !requestIds.Contains(t.Id))
-                .ToList();
-            
-            foreach (var track in tracksToRemove)
-            {
-                release.Tracks.Remove(track);
-            }
-
-            // 2. Update or Add
+            release.Tracks.Clear();
             foreach (var trackDto in request.Tracks)
             {
-                var existingTrack = trackDto.Id.HasValue 
-                    ? release.Tracks.FirstOrDefault(t => t.Id == trackDto.Id.Value) 
-                    : null;
-
-                if (existingTrack != null)
+                release.Tracks.Add(new Track
                 {
-                    existingTrack.Title = trackDto.Title;
-                    existingTrack.Position = trackDto.Position;
-                    existingTrack.DurationSeconds = trackDto.DurationSeconds;
-                    existingTrack.Side = trackDto.Side;
-                }
-                else
-                {
-                    release.Tracks.Add(new Track
-                    {
-                        ReleaseId = release.Id,
-                        Title = trackDto.Title,
-                        Position = trackDto.Position,
-                        DurationSeconds = trackDto.DurationSeconds,
-                        Side = trackDto.Side
-                    });
-                }
+                    ReleaseId = release.Id,
+                    Title = trackDto.Title,
+                    Position = trackDto.Position,
+                    DurationSeconds = trackDto.DurationSeconds,
+                    Side = trackDto.Side
+                });
             }
         }
 

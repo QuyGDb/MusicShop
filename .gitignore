@@ -57,3 +57,4 @@ docker-compose.override.yml
 
 # App Settings (keep for now, ignore if real secrets are added later)
 # appsettings.local.json
+MusicShop/src/MusicShop.API/Logs
