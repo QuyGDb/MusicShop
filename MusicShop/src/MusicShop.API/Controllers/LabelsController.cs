@@ -38,7 +38,7 @@ public class LabelsController(IMediator mediator) : BaseApiController
     public async Task<ActionResult<ApiResponse<string>>> CreateLabel([FromBody] CreateLabelCommand command)
     {
         var result = await mediator.Send(command);
-        return HandleCreatedResult(result, nameof(GetLabel), new { slug = result.Value });
+        return HandleCreatedResult(result, nameof(GetLabel), value => new { slug = value });
     }
 
     [Authorize(Roles = "admin")]

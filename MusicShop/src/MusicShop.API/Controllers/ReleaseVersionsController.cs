@@ -28,7 +28,7 @@ public class ReleaseVersionsController(IMediator mediator) : BaseApiController
     public async Task<ActionResult<ApiResponse<Guid>>> CreateReleaseVersion([FromBody] CreateReleaseVersionCommand command)
     {
         var result = await mediator.Send(command);
-        return HandleCreatedResult(result, nameof(GetByRelease), new { releaseId = command.ReleaseId });
+        return HandleCreatedResult(result, nameof(GetByRelease), _ => new { releaseId = command.ReleaseId });
     }
 
     [HttpPut("{id:guid}")]

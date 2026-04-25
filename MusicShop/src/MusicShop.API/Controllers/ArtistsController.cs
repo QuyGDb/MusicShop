@@ -37,7 +37,7 @@ public class ArtistsController(IMediator mediator) : BaseApiController
     public async Task<ActionResult<ApiResponse<string>>> CreateArtist([FromBody] CreateArtistCommand command)
     {
         Result<string> result = await mediator.Send(command);
-        return HandleCreatedResult(result, nameof(GetArtist), new { slug = result.Value });
+        return HandleCreatedResult(result, nameof(GetArtist), value => new { slug = value });
     }
 
     [Authorize(Roles = "admin")]

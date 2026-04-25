@@ -61,7 +61,7 @@ public sealed class ProductsController(IMediator mediator) : BaseApiController
         CancellationToken cancellationToken)
     {
         var result = await mediator.Send(command, cancellationToken);
-        return HandleCreatedResult(result, nameof(GetProductBySlug), new { slug = command.Slug });
+        return HandleCreatedResult(result, nameof(GetProductBySlug), _ => new { slug = command.Slug });
     }
 
     [Authorize(Roles = "admin")]
@@ -142,7 +142,7 @@ public sealed class ProductsController(IMediator mediator) : BaseApiController
             request.CdAttributes, 
             request.CassetteAttributes), cancellationToken);
 
-        return HandleCreatedResult(result, nameof(GetVariants), new { slug = "placeholder" }); // The route expects slug but we only have id here. 
+        return HandleCreatedResult(result, nameof(GetVariants), _ => new { slug = "placeholder" }); 
     }
 
     [Authorize(Roles = "admin")]

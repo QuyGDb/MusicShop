@@ -36,9 +36,7 @@ public sealed class CuratedCollectionsController(IMediator mediator) : BaseApiCo
     public async Task<ActionResult<ApiResponse<Guid>>> CreateCuratedCollection([FromBody] CreateCuratedCollectionCommand command)
     {
         var result = await mediator.Send(command);
-        return result.IsSuccess 
-            ? CreatedAtAction(nameof(GetCuratedCollectionById), new { id = result.Value }, new ApiResponse<Guid> { Data = result.Value })
-            : HandleResult(result);
+        return HandleCreatedResult(result, nameof(GetCuratedCollectionById), id => new { id });
     }
 
     [HttpPatch("{id:guid}")]

@@ -37,7 +37,7 @@ public class ReleasesController(IMediator mediator) : BaseApiController
     public async Task<ActionResult<ApiResponse<Guid>>> CreateRelease([FromBody] CreateReleaseCommand command)
     {
         var result = await mediator.Send(command);
-        return HandleCreatedResult(result, nameof(GetRelease), new { slug = command.Slug });
+        return HandleCreatedResult(result, nameof(GetRelease), _ => new { slug = command.Slug });
     }
 
     [Authorize(Roles = "admin")]

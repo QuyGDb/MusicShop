@@ -37,11 +37,11 @@ public abstract class BaseApiController : ControllerBase
         return Ok(ApiResponse<IReadOnlyList<T>>.SuccessResult(result.Value.Items, meta));
     }
 
-    protected ActionResult<ApiResponse<T>> HandleCreatedResult<T>(Result<T> result, string actionName, object routeValues)
+    protected ActionResult<ApiResponse<T>> HandleCreatedResult<T>(Result<T> result, string actionName, Func<T, object> routeValuesProvider)
     {
         if (result.IsFailure) return MapError(result.Error);
 
-        return CreatedAtAction(actionName, routeValues, ApiResponse<T>.SuccessResult(result.Value));
+        return CreatedAtAction(actionName, routeValuesProvider(result.Value), ApiResponse<T>.SuccessResult(result.Value));
     }
 
     protected ActionResult MapError(Error error)

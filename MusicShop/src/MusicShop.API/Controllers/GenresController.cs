@@ -38,7 +38,7 @@ public class GenresController(IMediator mediator) : BaseApiController
     public async Task<ActionResult<ApiResponse<string>>> CreateGenre([FromBody] CreateGenreCommand command)
     {
         var result = await mediator.Send(command);
-        return HandleCreatedResult(result, nameof(GetGenre), new { slug = result.Value });
+        return HandleCreatedResult(result, nameof(GetGenre), value => new { slug = value });
     }
 
 
@@ -49,7 +49,7 @@ public class GenresController(IMediator mediator) : BaseApiController
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async Task<ActionResult<ApiResponse<GenreResponse>>> UpdateGenre(Guid id, [FromBody] UpdateGenreRequest request)
     {
-        var result = await mediator.Send(new UpdateGenreCommand(id, request.Name));
+        var result = await mediator.Send(new UpdateGenreCommand(id, request.Name, request.Slug));
         return HandleResult(result);
     }
 
