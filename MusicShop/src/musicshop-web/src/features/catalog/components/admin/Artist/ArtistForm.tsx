@@ -1,12 +1,6 @@
 import { X, Loader2 } from 'lucide-react';
-import {
-  Button,
-  Card,
-  CardHeader,
-  CardTitle,
-  CardContent,
-  ImageUpload
-} from '@/shared/components';
+import { Controller } from 'react-hook-form';
+import { Button, Card, CardHeader, CardTitle, CardContent, ImageUpload } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
 import { Artist } from '@/features/catalog/types';
 import { useArtistForm } from '../../../hooks/useArtistForm';
@@ -20,7 +14,10 @@ interface ArtistFormProps {
 export function ArtistForm({ editingArtist, onClose }: ArtistFormProps) {
   const { data: genresData } = useGenres(1, 100);
   const {
-    form,
+    register,
+    control,
+    handleSubmit,
+    errors,
     handleNameChange,
     toggleGenre,
     isPending
@@ -41,100 +38,91 @@ export function ArtistForm({ editingArtist, onClose }: ArtistFormProps) {
       </CardHeader>
       <CardContent className="p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
         <div className="space-y-6">
-          <form.Field
-            name="imageUrl"
-            children={(field: any) => (
-              <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Artist Photo</label>
+          <div className="space-y-2">
+            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Artist Photo</label>
+            <Controller
+              name="imageUrl"
+              control={control}
+              render={({ field }) => (
                 <ImageUpload
-                  value={field.state.value}
-                  onChange={(url) => field.handleChange(url)}
-                  onRemove={() => field.handleChange('')}
+                  value={field.value as string | File}
+                  onChange={(url) => field.onChange(url)}
+                  onRemove={() => field.onChange('')}
                   label="Drop artist photo here"
                   folder="artists"
                   immediate={false}
                 />
-              </div>
+              )}
+            />
+            {errors.imageUrl && (
+              <p className="text-[10px] text-red-500 font-bold uppercase tracking-tight">{errors.imageUrl.message as string}</p>
             )}
-          />
+          </div>
 
-          <form.Field
-            name="bio"
-            children={(field: any) => (
-              <div className="space-y-2">
-                <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Biography</label>
-                <textarea
-                  placeholder="Tell the artist's story..."
-                  className="w-full h-32 bg-muted/30 border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-colors text-foreground resize-none text-sm"
-                  value={field.state.value}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                />
-              </div>
+          <div className="space-y-2">
+            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Biography</label>
+            <textarea
+              {...register('bio')}
+              placeholder="Tell the artist's story..."
+              className="w-full h-32 bg-muted/30 border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-colors text-foreground resize-none text-sm"
+            />
+            {errors.bio && (
+              <p className="text-[10px] text-red-500 font-bold uppercase tracking-tight">{errors.bio.message}</p>
             )}
-          />
+          </div>
         </div>
 
         <div className="space-y-6 flex flex-col justify-between">
           <div className="space-y-4">
-            <form.Field
-              name="name"
-              children={(field: any) => (
-                <div className="space-y-2">
-                  <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Display Name</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. Daft Punk"
-                    className="w-full h-12 bg-muted/30 border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-colors text-foreground"
-                    value={field.state.value}
-                    onChange={(e) => handleNameChange(e.target.value)}
-                  />
-                  {field.state.meta.errors && (
-                    <p className="text-[10px] text-red-500 font-bold uppercase tracking-tight">{field.state.meta.errors}</p>
-                  )}
-                </div>
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Display Name</label>
+              <input
+                type="text"
+                {...register('name')}
+                placeholder="e.g. Daft Punk"
+                className="w-full h-12 bg-muted/30 border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-colors text-foreground"
+                onChange={(e) => handleNameChange(e.target.value)}
+              />
+              {errors.name && (
+                <p className="text-[10px] text-red-500 font-bold uppercase tracking-tight">{errors.name.message}</p>
               )}
-            />
+            </div>
 
-            <form.Field
-              name="slug"
-              children={(field: any) => (
-                <div className="space-y-2">
-                  <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Custom URL Slug</label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      placeholder="e.g. daft-punk"
-                      className="w-full h-12 bg-muted/30 border border-border rounded-xl pl-4 pr-12 focus:outline-none focus:border-primary transition-colors text-foreground font-mono text-xs"
-                      value={field.state.value}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    />
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground/50 uppercase">/artists/</div>
-                  </div>
-                </div>
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Custom URL Slug</label>
+              <div className="relative">
+                <input
+                  type="text"
+                  {...register('slug')}
+                  placeholder="e.g. daft-punk"
+                  className="w-full h-12 bg-muted/30 border border-border rounded-xl pl-4 pr-12 focus:outline-none focus:border-primary transition-colors text-foreground font-mono text-xs"
+                />
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-bold text-muted-foreground/50 uppercase">/artists/</div>
+              </div>
+              {errors.slug && (
+                <p className="text-[10px] text-red-500 font-bold uppercase tracking-tight">{errors.slug.message}</p>
               )}
-            />
+            </div>
 
-            <form.Field
-              name="country"
-              children={(field: any) => (
-                <div className="space-y-2">
-                  <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Origin Country</label>
-                  <input
-                    type="text"
-                    placeholder="e.g. France"
-                    className="w-full h-12 bg-muted/30 border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-colors text-foreground"
-                    value={field.state.value}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                </div>
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Origin Country</label>
+              <input
+                type="text"
+                {...register('country')}
+                placeholder="e.g. France"
+                className="w-full h-12 bg-muted/30 border border-border rounded-xl px-4 focus:outline-none focus:border-primary transition-colors text-foreground"
+              />
+              {errors.country && (
+                <p className="text-[10px] text-red-500 font-bold uppercase tracking-tight">{errors.country.message}</p>
               )}
-            />
+            </div>
 
-            <form.Field
-              name="genreIds"
-              children={(field: any) => (
-                <div className="space-y-2">
-                  <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Genres</label>
+            <div className="space-y-2">
+              <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Genres</label>
+              <Controller
+                name="genreIds"
+                control={control}
+                render={({ field }) => (
                   <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto p-2 border border-border rounded-xl bg-muted/10">
                     {genresData?.items.map((genre) => (
                       <button
@@ -143,7 +131,7 @@ export function ArtistForm({ editingArtist, onClose }: ArtistFormProps) {
                         onClick={() => toggleGenre(genre.id)}
                         className={cn(
                           "px-3 py-1.5 rounded-lg text-xs font-bold transition-all border",
-                          field.state.value.includes(genre.id)
+                          field.value?.includes(genre.id)
                             ? "bg-primary text-white border-primary shadow-sm"
                             : "bg-surface text-muted-foreground border-border hover:border-primary/50"
                         )}
@@ -152,9 +140,12 @@ export function ArtistForm({ editingArtist, onClose }: ArtistFormProps) {
                       </button>
                     ))}
                   </div>
-                </div>
+                )}
+              />
+              {errors.genreIds && (
+                <p className="text-[10px] text-red-500 font-bold uppercase tracking-tight">{errors.genreIds.message}</p>
               )}
-            />
+            </div>
           </div>
 
           <div className="flex items-center gap-3 pt-6 border-t border-border">
@@ -168,7 +159,7 @@ export function ArtistForm({ editingArtist, onClose }: ArtistFormProps) {
             </Button>
             <Button
               className="flex-[2] h-12 rounded-xl bg-primary text-white"
-              onClick={() => form.handleSubmit()}
+              onClick={handleSubmit}
               disabled={isPending}
             >
               {isPending && (
@@ -182,3 +173,4 @@ export function ArtistForm({ editingArtist, onClose }: ArtistFormProps) {
     </Card>
   );
 }
+

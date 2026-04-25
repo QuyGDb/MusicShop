@@ -2,7 +2,6 @@ import { X, Disc, ListMusic, ChevronRight, ChevronLeft, Loader2 } from 'lucide-r
 import { Button, Card, CardHeader, CardTitle, CardContent } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
 import { useArtists } from '@/features/catalog/hooks/useArtists';
-import { useGenres } from '@/features/catalog/hooks/useGenres';
 import { Release } from '@/features/catalog/types';
 
 // New specialized components and hooks
@@ -17,7 +16,10 @@ interface ReleaseFormProps {
 
 export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
   const {
-    form,
+    register,
+    control,
+    handleSubmit,
+    errors,
     step,
     setStep,
     nextStep,
@@ -25,6 +27,7 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
     handleAddTrack,
     handleRemoveTrack,
     isPending,
+    fields,
   } = useReleaseForm({
     initialData,
     onSuccess: onCancel
@@ -32,7 +35,6 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
 
   // Dependencies (Data fetching still in container/page level component is acceptable)
   const { data: artistsData, isLoading: loadingArtists } = useArtists(1, 100);
-  const { data: genresData } = useGenres(1, 100);
 
   return (
     <Card className="bg-surface border-primary/20 shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-500">
@@ -82,34 +84,28 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
 
           {/* Form Content */}
           <div className="flex-1 p-8 max-h-[800px] overflow-y-auto custom-scrollbar">
-            <form.Subscribe
-              selector={(state: any) => state.canSubmit}
-              children={(canSubmit: boolean) => (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    form.handleSubmit();
-                  }}
-                >
-                  {step === 1 && (
-                    <GeneralInfoStep
-                      form={form}
-                      artistsData={artistsData}
-                      loadingArtists={loadingArtists}
-                    />
-                  )}
-
-                  {step === 2 && (
-                    <TracklistStep
-                      form={form}
-                      onAddTrack={handleAddTrack}
-                      onRemoveTrack={handleRemoveTrack}
-                    />
-                  )}
-                </form>
+            <form onSubmit={handleSubmit}>
+              {step === 1 && (
+                <GeneralInfoStep
+                  register={register}
+                  control={control}
+                  errors={errors}
+                  artistsData={artistsData}
+                  loadingArtists={loadingArtists}
+                />
               )}
-            />
+
+              {step === 2 && (
+                <TracklistStep
+                  register={register}
+                  control={control}
+                  errors={errors}
+                  fields={fields}
+                  onAddTrack={handleAddTrack}
+                  onRemoveTrack={handleRemoveTrack}
+                />
+              )}
+            </form>
           </div>
         </div>
       </CardContent>
@@ -134,7 +130,7 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
           ) : (
             <Button
               className="h-12 rounded-xl px-12 bg-primary text-white shadow-xl shadow-primary/30"
-              onClick={() => form.handleSubmit()}
+              onClick={handleSubmit}
               disabled={isPending}
             >
               {isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
@@ -146,3 +142,4 @@ export function ReleaseForm({ onCancel, initialData }: ReleaseFormProps) {
     </Card>
   );
 }
+

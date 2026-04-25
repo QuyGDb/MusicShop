@@ -1,16 +1,5 @@
-import { 
-  Globe, 
-  UserCircle, 
-  Edit2, 
-  Trash2, 
-  Loader2 
-} from 'lucide-react';
-import { 
-  Button, 
-  Card, 
-  CardContent 
-} from '@/shared/components';
-import { cn } from '@/shared/lib/utils';
+import { Globe, UserCircle, Edit2, Trash2, Loader2 } from 'lucide-react';
+import { Button, Card, CardContent } from '@/shared/components';
 import { Artist } from '@/features/catalog/types';
 
 interface ArtistCardProps {
@@ -25,10 +14,10 @@ export function ArtistCard({ artist, onEdit, onDelete, isDeleting }: ArtistCardP
     <Card className="bg-surface border-border overflow-hidden hover:shadow-xl transition-all group relative">
       <div className="aspect-[4/3] w-full relative overflow-hidden">
         {artist.imageUrl ? (
-          <img 
-            src={artist.imageUrl} 
-            alt={artist.name} 
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
+          <img
+            src={artist.imageUrl}
+            alt={artist.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
           />
         ) : (
           <div className="w-full h-full bg-muted flex items-center justify-center">
@@ -61,17 +50,17 @@ export function ArtistCard({ artist, onEdit, onDelete, isDeleting }: ArtistCardP
           {artist.bio || 'No biography available.'}
         </p>
         <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             className="h-8 w-8 text-muted-foreground hover:text-primary"
             onClick={() => onEdit(artist)}
           >
             <Edit2 className="h-4 w-4" />
           </Button>
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             className="h-8 w-8 text-muted-foreground hover:text-red-500"
             onClick={() => onDelete(artist.id)}
             disabled={isDeleting}

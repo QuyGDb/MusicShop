@@ -1,31 +1,43 @@
-import { useForm, standardSchemaValidators } from '@tanstack/react-form';
-import { z } from 'zod';
+import { useForm, UseFormRegister, Control, FieldErrors } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import { useCreateArtist, useUpdateArtist } from '@/features/catalog/hooks/useArtists';
 import { Artist } from '@/features/catalog/types';
+import { cn, slugify } from '@/shared/lib/utils';
 import { uploadService } from '@/shared/services/uploadService';
 import { toast } from 'sonner';
 
-const artistSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  slug: z.string().min(1, 'Slug is required'),
-  country: z.string().min(1, 'Country is required'),
-  bio: z.string().optional(),
-  imageUrl: z.union([z.string(), z.instanceof(File)]).optional(),
-  genreIds: z.array(z.string()),
-});
-
-type ArtistFormValues = z.infer<typeof artistSchema>;
+import { artistSchema, ArtistFormValues } from '../types/artist';
 
 interface UseArtistFormProps {
   editingArtist: Artist | null;
   onSuccess: () => void;
 }
 
-export function useArtistForm({ editingArtist, onSuccess }: UseArtistFormProps) {
+interface UseArtistFormReturn {
+  register: UseFormRegister<ArtistFormValues>;
+  control: Control<ArtistFormValues>;
+  handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
+  errors: FieldErrors<ArtistFormValues>;
+  handleNameChange: (name: string) => void;
+  toggleGenre: (genreId: string) => void;
+  isPending: boolean;
+}
+
+
+export function useArtistForm({ editingArtist, onSuccess }: UseArtistFormProps): UseArtistFormReturn {
+
   const createMutation = useCreateArtist();
   const updateMutation = useUpdateArtist();
 
-  const form: any = useForm({
+  const {
+    register,
+    control,
+    handleSubmit,
+    setValue,
+    getValues,
+    formState: { errors, isSubmitting }
+  } = useForm<ArtistFormValues>({
+    resolver: zodResolver(artistSchema) as any,
     defaultValues: {
       name: editingArtist?.name ?? '',
       slug: editingArtist?.slug ?? '',
@@ -33,69 +45,65 @@ export function useArtistForm({ editingArtist, onSuccess }: UseArtistFormProps) 
       bio: editingArtist?.bio ?? '',
       imageUrl: editingArtist?.imageUrl ?? '',
       genreIds: editingArtist?.genres.map((genre: any) => genre.id) ?? [],
-    } as ArtistFormValues,
-    validatorAdapter: standardSchemaValidators(),
-    validators: {
-      onChange: artistSchema,
-      onSubmit: artistSchema,
-    },
-    onSubmit: async ({ value }) => {
-      try {
-        let finalImageUrl = value.imageUrl;
-
-        if (value.imageUrl instanceof File) {
-          finalImageUrl = await uploadService.uploadImage(value.imageUrl, 'artists');
-        }
-
-        const payload = {
-          ...value,
-          imageUrl: finalImageUrl as string
-        };
-
-        if (editingArtist) {
-          await updateMutation.mutateAsync({
-            id: editingArtist.id,
-            data: payload,
-          });
-          toast.success('Artist profile updated successfully');
-        } else {
-          await createMutation.mutateAsync(payload);
-          toast.success('Artist registered successfully');
-        }
-        onSuccess();
-      } catch (error: any) {
-        console.error('Artist submission failed:', error);
-        toast.error(error.response?.data?.message || 'Failed to save artist. Please try again.');
-      }
-    },
+    }
   });
 
-  const slugify = (text: string) => {
-    return text
-      .toLowerCase()
-      .replace(/[^\w ]+/g, '')
-      .replace(/ +/g, '-');
-  };
+  const onSubmit = async (value: ArtistFormValues) => {
 
-  const handleNameChange = (name: string) => {
-    form.setFieldValue('name', name);
-    if (!editingArtist) {
-      form.setFieldValue('slug', slugify(name));
+    try {
+      let finalImageUrl = value.imageUrl;
+
+      if (value.imageUrl instanceof File) {
+        finalImageUrl = await uploadService.uploadImage(value.imageUrl, 'artists');
+      }
+
+      const payload = {
+        ...value,
+        imageUrl: finalImageUrl as string,
+      };
+
+
+      if (editingArtist) {
+        await updateMutation.mutateAsync({ id: editingArtist.id, data: payload });
+        toast.success('Artist profile updated successfully');
+      } else {
+        await createMutation.mutateAsync(payload);
+        toast.success('Artist registered successfully');
+      }
+
+      onSuccess();
+    } catch (error) {
+
+      const message = error instanceof Error
+        ? error.message
+        : 'Failed to save artist. Please try again.';
+
+      toast.error(message);
     }
   };
 
+  const handleNameChange = (name: string) => {
+    setValue('name', name, { shouldValidate: true });
+    setValue('slug', slugify(name), { shouldValidate: true });
+  };
+
   const toggleGenre = (genreId: string) => {
-    const currentGenres = form.getFieldValue('genreIds') || [];
+    const currentGenres = getValues('genreIds') || [];
     const nextGenres = currentGenres.includes(genreId)
       ? currentGenres.filter((id: string) => id !== genreId)
       : [...currentGenres, genreId];
-    form.setFieldValue('genreIds', nextGenres);
+
+    setValue('genreIds', nextGenres, { shouldValidate: true });
   };
 
+
   return {
-    form,
+    register,
+    control,
+    handleSubmit: handleSubmit(onSubmit) as any,
+    errors,
     handleNameChange,
     toggleGenre,
-    isPending: createMutation.isPending || updateMutation.isPending,
+    isPending: createMutation.isPending || updateMutation.isPending || isSubmitting,
   };
 }
