@@ -35,7 +35,9 @@ export interface Release {
   artistId: string;
   artistName: string;
   type: string;
+  tracks?: Track[];
 }
+
 
 export interface ReleaseVersion {
   id: string;

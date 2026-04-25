@@ -1,6 +1,7 @@
 import axios, { InternalAxiosRequestConfig, AxiosRequestConfig, AxiosInstance, AxiosResponseHeaders, AxiosInterceptorManager, AxiosResponse } from 'axios';
 import createAuthRefresh from 'axios-auth-refresh';
 import { getAccessToken, setAccessToken } from './tokenStore';
+import { ApiProblemDetails } from '../types/api';
 
 /**
  * Custom Axios instance type that reflects the behavior of the response interceptor
@@ -49,8 +50,8 @@ axiosInstance.interceptors.request.use(
  */
 const refreshAuthLogic = async (failedRequest: { response: AxiosResponse }) => {
   // Skip refresh logic for auth endpoints to avoid infinite loops
-  if (failedRequest.response.config.url?.includes('/auth/login') || 
-      failedRequest.response.config.url?.includes('/auth/refresh')) {
+  if (failedRequest.response.config.url?.includes('/auth/login') ||
+    failedRequest.response.config.url?.includes('/auth/refresh')) {
     return Promise.reject(failedRequest);
   }
 
@@ -68,7 +69,7 @@ const refreshAuthLogic = async (failedRequest: { response: AxiosResponse }) => {
     if (failedRequest.response.config.headers) {
       failedRequest.response.config.headers['Authorization'] = `Bearer ${accessToken}`;
     }
-    
+
     return Promise.resolve();
   } catch (refreshError) {
     // If refresh fails, clear auth state and notify UI
@@ -88,23 +89,20 @@ createAuthRefresh(axiosInstance, refreshAuthLogic);
 axiosInstance.interceptors.response.use(
   (response: AxiosResponse) => response.data,
   (error) => {
+    const data = error.response?.data as ApiProblemDetails;
+
     // 1. Try to extract from ProblemDetails (RFC 7807)
-    if (error.response?.data?.detail) {
-      error.message = error.response.data.detail;
-    } 
-    // 2. Handle standard HTTP status codes if no body is present
-    else if (error.response?.status === 403) {
-      error.message = "You do not have permission to perform this action.";
-    } 
-    else if (error.response?.status === 401) {
-      error.message = "Your session has expired. Please login again.";
+    if (data?.errors) {
+      const firstErrorKey = Object.keys(data.errors)[0];
+      const firstErrorMessage = data.errors[firstErrorKey][0];
+      error.message = `${firstErrorKey}: ${firstErrorMessage}`;
+    } else if (data?.detail) {
+      error.message = data.detail;
+    } else if (data?.title) {
+      error.message = data.title;
     }
-    // 3. Fallback to title
-    else if (error.response?.data?.title) {
-      error.message = error.response.data.title;
-    }
-    
-    return Promise.reject(error);
+
+    return Promise.reject(new Error(error.message));
   }
 );
 
