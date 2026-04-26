@@ -6,10 +6,12 @@ import { slugify } from '@/shared/lib/utils';
 
 interface StorePresentationSectionProps {
   register: any;
+  watch: any;
 }
 
 
-export function StorePresentationSection({ register }: StorePresentationSectionProps) {
+export function StorePresentationSection({ register, watch }: StorePresentationSectionProps) {
+  const format = watch('format');
   return (
     <section className="space-y-6 pt-10 border-t border-border">
       <div className="flex items-center gap-2 mb-4">
@@ -45,9 +47,7 @@ export function StorePresentationSection({ register }: StorePresentationSectionP
             <input type="hidden" {...register('format')} />
             <div className="h-12 bg-muted/30 border border-border rounded-xl px-4 flex items-center text-sm font-bold text-primary italic">
               <Layers className="h-4 w-4 mr-2" />
-              {/* Note: In a real scenario, we might need to watch the value to display it correctly */}
-              {/* For now, assuming it's correctly populated from version change */}
-              Format Selection Locked
+              {format || 'No Format Selected'}
             </div>
           </div>
         </div>

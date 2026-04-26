@@ -1,5 +1,11 @@
-export type UserRole = 'Admin' | 'Customer';
-export type UserStatus = 'Active' | 'Locked';
+export enum UserRole {
+  Customer = 'Customer',
+  Admin = 'Admin'
+}
+export enum UserStatus {
+  Active = 'Active',
+  Locked = 'Locked'
+}
 
 export interface UserProfile {
   id: string;

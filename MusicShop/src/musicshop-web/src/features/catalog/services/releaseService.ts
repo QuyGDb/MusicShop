@@ -16,7 +16,6 @@ export interface CreateReleaseRequest {
   description?: string;
   coverUrl?: string;
   artistId: string;
-  type: string;
   genreIds?: string[];
   tracks?: TrackCreateDto[];
 }
@@ -25,6 +24,11 @@ export interface UpdateReleaseRequest extends CreateReleaseRequest {
 }
 
 export const releaseService = {
+  getReleaseFormats: async (): Promise<string[]> => {
+    const response = await http.get<ApiResponse<string[]>>('/ReleaseVersions/formats');
+    return response.data || [];
+  },
+
   getReleases: async (page = 1, limit = 10): Promise<PaginatedResponse<Release>> => {
     const response = await http.get<ApiResponse<Release[]>>('/Releases', {
       params: { 

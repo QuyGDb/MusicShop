@@ -22,6 +22,7 @@ public class ReleasesController(IMediator mediator) : BaseApiController
         return HandlePaginatedResult(result);
     }
 
+
     [HttpGet("{slug}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<ReleaseDetailResponse>>> GetRelease(string slug)
@@ -52,7 +53,6 @@ public class ReleasesController(IMediator mediator) : BaseApiController
             request.Title, 
             request.Slug, 
             request.Year, 
-            request.Type, 
             request.ArtistId, 
             request.CoverUrl, 
             request.Description, 

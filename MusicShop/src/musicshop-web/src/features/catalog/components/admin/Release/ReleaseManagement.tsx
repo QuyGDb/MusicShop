@@ -102,9 +102,6 @@ export function ReleaseManagement() {
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
                             <h3 className="text-xl font-bold text-foreground leading-tight">{release.title}</h3>
-                            <span className="px-2 py-0.5 bg-muted border border-border rounded text-[10px] font-bold text-muted-foreground uppercase">
-                              {release.type}
-                            </span>
                           </div>
                           <div className="flex items-center gap-3 text-sm text-muted-foreground">
                             <span className="font-semibold text-primary">{release.artistName}</span>

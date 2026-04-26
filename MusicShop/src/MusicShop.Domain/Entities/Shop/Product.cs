@@ -11,7 +11,7 @@ public class Product : BaseEntity
     public string Slug { get; set; } = string.Empty;
     public string? Description { get; set; }
     public string? CoverUrl { get; set; }
-    public ReleaseFormat Format { get; set; } // Renamed from Type, matching ReleaseFormat enum
+    public ReleaseFormat Format { get; set; }
     public bool IsActive { get; set; } = true;
 
     // Limited Edition

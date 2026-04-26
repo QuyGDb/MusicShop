@@ -8,7 +8,6 @@ public record CreateReleaseCommand(
     string Title,
     string Slug,
     int Year,
-    string? Type,
     Guid ArtistId,
     string? CoverUrl,
     string? Description,

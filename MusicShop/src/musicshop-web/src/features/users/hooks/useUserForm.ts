@@ -1,10 +1,11 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { UserRole, UserStatus } from '../types';
 
 const userSchema = z.object({
-  role: z.enum(['Customer', 'Admin']),
-  status: z.enum(['Active', 'Locked']),
+  role: z.nativeEnum(UserRole),
+  status: z.nativeEnum(UserStatus),
 });
 
 type UserFormValues = z.infer<typeof userSchema>;
@@ -22,7 +23,7 @@ interface UseUserFormReturn {
   errors: FieldErrors<UserFormValues>;
   isSubmitting: boolean;
   toggleStatus: () => void;
-  setRole: (role: 'Customer' | 'Admin') => void;
+  setRole: (role: UserRole) => void;
 }
 
 
@@ -48,10 +49,10 @@ export function useUserForm({ initialValues, onSuccess }: UseUserFormProps): Use
 
   const toggleStatus = () => {
     const currentStatus = getValues('status');
-    setValue('status', currentStatus === 'Active' ? 'Locked' : 'Active', { shouldValidate: true });
+    setValue('status', currentStatus === UserStatus.Active ? UserStatus.Locked : UserStatus.Active, { shouldValidate: true });
   };
 
-  const setRole = (role: 'Customer' | 'Admin') => {
+  const setRole = (role: UserRole) => {
     setValue('role', role, { shouldValidate: true });
   };
 

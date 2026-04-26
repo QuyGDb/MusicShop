@@ -53,7 +53,6 @@ public sealed class UpdateReleaseCommandHandler(
 
         release.Title = request.Title;
         release.Year = request.Year;
-        release.Type = request.Type;
         release.CoverUrl = request.CoverUrl;
         release.Description = request.Description;
 

@@ -3,6 +3,7 @@ import { Button, Card, CardContent } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
 import { UserEditModal } from './UserEditModal';
 import { useCustomerManagement } from '../../hooks/useCustomerManagement';
+import { UserRole, UserStatus } from '../../types';
 
 /**
  * Presentational component for community and CRM management.
@@ -112,9 +113,9 @@ export function CustomerManagement() {
                   <td className="p-5">
                      <div className={cn(
                        "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border",
-                       user.role === 'Admin' ? "bg-primary/20 text-primary border-primary/20" : "bg-muted text-subtle border-border"
+                       user.role === UserRole.Admin ? "bg-primary/20 text-primary border-primary/20" : "bg-muted text-subtle border-border"
                      )}>
-                        {user.role === 'Admin' && <Shield className="h-3 w-3" />}
+                        {user.role === UserRole.Admin && <Shield className="h-3 w-3" />}
                         {user.role}
                      </div>
                   </td>
@@ -131,7 +132,7 @@ export function CustomerManagement() {
                      </div>
                   </td>
                   <td className="p-5 text-sm">
-                    {user.status === 'Active' ? (
+                    {user.status === UserStatus.Active ? (
                        <span className="flex items-center gap-1.5 text-emerald-600 font-bold">
                           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse" />
                           Active

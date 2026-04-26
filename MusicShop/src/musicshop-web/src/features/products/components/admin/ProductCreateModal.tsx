@@ -26,6 +26,7 @@ export function ProductCreateModal({ onClose }: ProductCreateModalProps) {
     setSelectedReleaseId,
     handleVersionChange,
     isPending,
+    watch,
   } = useProductForm({
     onSuccess: onClose,
     releasesData,
@@ -70,7 +71,7 @@ export function ProductCreateModal({ onClose }: ProductCreateModalProps) {
               onVersionChange={handleVersionChange}
             />
 
-            <StorePresentationSection register={register as any} />
+            <StorePresentationSection register={register as any} watch={watch} />
 
             <AvailabilitySection register={register as any} control={control as any} />
 

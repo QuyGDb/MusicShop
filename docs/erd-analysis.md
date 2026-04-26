@@ -126,7 +126,6 @@ id          | uuid     PK
 artist_id   | uuid     FK → artists.id
 title       | string               -- "Dark Side of the Moon"
 slug        | string               -- SEO / URL friendly
-type        | string   nullable    -- Album, EP, Single...
 description | text     nullable    -- Giới thiệu chung về album
 year        | int                  -- 1973 — năm phát hành gốc
 cover_url   | string   nullable    -- ảnh bìa gốc

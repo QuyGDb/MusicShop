@@ -29,13 +29,13 @@ export function OrderManagement() {
         {stats.map((stat, i) => (
           <Card key={i} className="bg-surface border-border">
             <CardContent className="p-6 flex items-center gap-4">
-               <div className={cn("p-3 rounded-2xl", stat.bg)}>
-                  <stat.icon className={cn("h-6 w-6", stat.color)} />
-               </div>
-               <div>
-                  <p className="text-xs font-black uppercase tracking-widest text-subtle">{stat.label}</p>
-                  <p className="text-2xl font-black text-foreground">{stat.value}</p>
-               </div>
+              <div className={cn("p-3 rounded-2xl", stat.bg)}>
+                <stat.icon className={cn("h-6 w-6", stat.color)} />
+              </div>
+              <div>
+                <p className="text-xs font-black uppercase tracking-widest text-subtle">{stat.label}</p>
+                <p className="text-2xl font-black text-foreground">{stat.value}</p>
+              </div>
             </CardContent>
           </Card>
         ))}
@@ -45,8 +45,8 @@ export function OrderManagement() {
       <div className="flex flex-wrap gap-4 items-center">
         <div className="relative flex-1 min-w-[300px]">
           <Search className="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-subtle" />
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Search by Order ID, Customer, or Email..."
             className="w-full h-14 bg-surface border border-border rounded-2xl pl-12 pr-4 focus:outline-none focus:border-primary transition-all shadow-sm"
           />
@@ -56,7 +56,7 @@ export function OrderManagement() {
             <Filter className="h-4 w-4" />
             Status
           </Button>
-           <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2">
+          <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2">
             <Calendar className="h-4 w-4" />
             Date
           </Button>
@@ -84,43 +84,43 @@ export function OrderManagement() {
                 return (
                   <tr key={order.id} className="border-b border-border/50 hover:bg-muted/10 transition-colors group">
                     <td className="p-5">
-                       <span className="font-mono text-sm font-bold text-foreground">#{order.id}</span>
+                      <span className="font-mono text-sm font-bold text-foreground">#{order.id}</span>
                     </td>
                     <td className="p-5">
-                       <div className="flex flex-col">
-                          <span className="font-bold text-foreground">{order.customerName}</span>
-                          <span className="text-xs text-muted-foreground">{order.email}</span>
-                       </div>
+                      <div className="flex flex-col">
+                        <span className="font-bold text-foreground">{order.customerName}</span>
+                        <span className="text-xs text-muted-foreground">{order.email}</span>
+                      </div>
                     </td>
                     <td className="p-5 text-sm text-muted-foreground">
-                       {order.date}
+                      {order.date}
                     </td>
                     <td className="p-5 font-bold text-foreground">
-                       ${order.total.toFixed(2)}
+                      ${order.total.toFixed(2)}
                     </td>
                     <td className="p-5">
-                       <div className={cn(
-                         "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border",
-                         style.color
-                       )}>
-                          <StatusIcon className="h-3 w-3" />
-                          {order.status}
-                       </div>
+                      <div className={cn(
+                        "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border",
+                        style.color
+                      )}>
+                        <StatusIcon className="h-3 w-3" />
+                        {order.status}
+                      </div>
                     </td>
                     <td className="p-5 text-right">
-                       <div className="flex justify-end gap-1">
-                          <Button 
-                            variant="ghost" 
-                            size="icon" 
-                            className="h-9 w-9 text-muted-foreground hover:text-primary rounded-xl"
-                            onClick={() => actions.openDetails(order)}
-                          >
-                             <Eye className="h-4 w-4" />
-                          </Button>
-                          <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground rounded-xl">
-                             <MoreVertical className="h-4 w-4" />
-                          </Button>
-                       </div>
+                      <div className="flex justify-end gap-1">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-9 w-9 text-muted-foreground hover:text-primary rounded-xl"
+                          onClick={() => actions.openDetails(order)}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="icon" className="h-9 w-9 text-muted-foreground rounded-xl">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </td>
                   </tr>
                 );
@@ -132,9 +132,9 @@ export function OrderManagement() {
 
       {/* Detail Modal */}
       {selectedOrderId && (
-        <OrderDetailsModal 
-          orderId={selectedOrderId} 
-          onClose={actions.closeDetails} 
+        <OrderDetailsModal
+          orderId={selectedOrderId}
+          onClose={actions.closeDetails}
         />
       )}
     </div>

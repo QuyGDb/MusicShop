@@ -37,7 +37,6 @@ public sealed class CreateReleaseCommandHandler(
             Title = request.Title,
             Slug = request.Slug,
             Year = request.Year,
-            Type = request.Type,
             ArtistId = request.ArtistId,
             CoverUrl = request.CoverUrl,
             Description = request.Description

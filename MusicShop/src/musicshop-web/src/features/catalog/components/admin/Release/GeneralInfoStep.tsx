@@ -112,33 +112,6 @@ export function GeneralInfoStep({
             </div>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Type</label>
-            <Controller
-              name="type"
-              control={control}
-              render={({ field }) => (
-                <div className="flex gap-2">
-                  {['Album', 'EP', 'Single', 'Compilation'].map(t => (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => field.onChange(t)}
-                      className={cn(
-                        "px-4 py-2 rounded-xl text-xs font-bold border transition-all",
-                        field.value === t ? "bg-primary/10 border-primary text-primary" : "border-border hover:border-primary/50"
-                      )}
-                    >
-                      {t}
-                    </button>
-                  ))}
-                </div>
-              )}
-            />
-            {errors.type && (
-              <p className="text-xs text-red-500 mt-1">{errors.type.message}</p>
-            )}
-          </div>
 
           <div className="space-y-2">
             <label className="text-xs font-black uppercase tracking-widest text-muted-foreground">Genres</label>

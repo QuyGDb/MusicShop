@@ -9,6 +9,14 @@ export function useReleases(page = 1, limit = 10) {
   });
 }
 
+export function useReleaseFormats() {
+  return useQuery({
+    queryKey: ['releases', 'formats'],
+    queryFn: () => releaseService.getReleaseFormats(),
+    staleTime: Infinity,
+  });
+}
+
 export function useRelease(slug: string) {
   return useQuery({
     queryKey: ['releases', slug],

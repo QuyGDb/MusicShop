@@ -1,8 +1,7 @@
 export enum ReleaseFormat {
-  Vinyl = 0,
-  CD = 1,
-  Cassette = 2,
-  Digital = 3
+  Vinyl = 'Vinyl',
+  CD = 'CD',
+  Cassette = 'Cassette'
 }
 
 export interface Product {

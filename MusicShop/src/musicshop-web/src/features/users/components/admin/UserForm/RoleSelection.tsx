@@ -18,7 +18,7 @@ export function RoleSelection({ control, onSetRole }: any) {
     <div className="space-y-4">
       <label className="text-[10px] font-black uppercase tracking-[0.2em] text-subtle">Privilege Level</label>
       <div className="space-y-3">
-        <div 
+        <div
           onClick={() => onSetRole('Customer')}
           className={cn(
             "p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center gap-4",
@@ -35,7 +35,7 @@ export function RoleSelection({ control, onSetRole }: any) {
           {role === 'Customer' && <div className="h-2 w-2 rounded-full bg-primary" />}
         </div>
 
-        <div 
+        <div
           onClick={() => onSetRole('Admin')}
           className={cn(
             "p-4 rounded-2xl border-2 cursor-pointer transition-all flex items-center gap-4",

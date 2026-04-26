@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { ReleaseFormat } from '@/features/products/types';
 
 export const trackSchema = z.object({
   position: z.number().int().positive(),
@@ -12,7 +13,6 @@ export const releaseSchema = z.object({
   slug: z.string().optional(),
   artistId: z.string().min(1, 'Artist is required'),
   year: z.number().int().min(1900).max(new Date().getFullYear() + 5),
-  type: z.enum(['Album', 'EP', 'Single', 'Compilation']),
   description: z.string().optional(),
   coverUrl: z.union([z.string(), z.instanceof(File)]).optional(),
   genreIds: z.array(z.string()).default([]),
@@ -21,7 +21,7 @@ export const releaseSchema = z.object({
 
 export const releaseVersionSchema = z.object({
   labelId: z.string().min(1, 'Label is required'),
-  format: z.enum(['Vinyl', 'CD', 'Cassette', 'Digital']),
+  format: z.nativeEnum(ReleaseFormat),
   catalogNumber: z.string().min(1, 'Catalog number is required'),
   pressingCountry: z.string().min(1, 'Pressing country is required'),
   pressingYear: z.number().int().min(1900),

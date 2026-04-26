@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
@@ -24,6 +24,7 @@ interface UseProductFormReturn {
   setSelectedReleaseId: (id: string) => void;
   handleVersionChange: (versionId: string) => void;
   isPending: boolean;
+  watch: any;
 }
 
 
@@ -38,8 +39,9 @@ export function useProductForm({ onSuccess, releasesData, versionsData }: UsePro
     register,
     handleSubmit,
     setValue,
+    watch,
     control,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting, dirtyFields }
   } = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema) as any,
 
@@ -56,6 +58,16 @@ export function useProductForm({ onSuccess, releasesData, versionsData }: UsePro
       preorderReleaseDate: undefined,
     }
   });
+
+  const name = watch('name');
+  const slug = watch('slug');
+
+  // Auto-generate slug from name if slug hasn't been manually edited yet
+  useEffect(() => {
+    if (name && !dirtyFields.slug) {
+      setValue('slug', slugify(name), { shouldValidate: true });
+    }
+  }, [name, setValue, dirtyFields.slug]);
 
   const onSubmit = async (value: ProductFormValues) => {
     createProduct.mutate(value, {
@@ -88,6 +100,7 @@ export function useProductForm({ onSuccess, releasesData, versionsData }: UsePro
     setSelectedReleaseId,
     handleVersionChange,
     isPending: createProduct.isPending || isSubmitting,
+    watch,
   };
 }
 

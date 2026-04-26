@@ -9,7 +9,6 @@ public record GetReleasesQuery(
     string? Q = null,
     Guid? ArtistId = null,
     Guid? GenreId = null,
-    string? Type = null,
     string? Format = null,
     int PageNumber = 1,
     int PageSize = 20) : IRequest<Result<PaginatedResult<ReleaseResponse>>>;

@@ -8,6 +8,7 @@ using MusicShop.Application.UseCases.Catalog.ReleaseVersions.Queries.GetReleaseV
 using MusicShop.Application.DTOs.Catalog;
 using MusicShop.API.Infrastructure;
 using MusicShop.Domain.Common;
+using MusicShop.Domain.Enums;
 
 namespace MusicShop.API.Controllers;
 
@@ -18,6 +19,13 @@ public class ReleaseVersionsController(IMediator mediator) : BaseApiController
     {
         var result = await mediator.Send(new GetReleaseVersionsByReleaseQuery(releaseId));
         return HandleResult(result);
+    }
+
+    [HttpGet("formats")]
+    public ActionResult<ApiResponse<IReadOnlyList<string>>> GetReleaseFormats()
+    {
+        IReadOnlyList<string> formats = Enum.GetNames<ReleaseFormat>();
+        return Ok(ApiResponse<IReadOnlyList<string>>.SuccessResult(formats));
     }
 
     [HttpPost]

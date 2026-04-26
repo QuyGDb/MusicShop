@@ -1,32 +1,26 @@
 using Microsoft.EntityFrameworkCore;
 using MusicShop.Domain.Entities.Catalog;
-using MusicShop.Domain.Entities.Shop;
 using MusicShop.Domain.Entities.System;
 using MusicShop.Domain.Enums;
 using MusicShop.Domain.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using CsvHelper;
+using CsvHelper.Configuration;
+using System.Globalization;
+using System.Reflection;
 
 namespace MusicShop.Infrastructure.Persistence;
 
-/// <summary>
-/// Handles initial database seeding with manual data generation.
-/// </summary>
 public static class DbInitializer
 {
     public static async Task SeedAsync(AppDbContext context, IPasswordHasher passwordHasher)
     {
-        // 0. Ensure database is created
         await context.Database.EnsureCreatedAsync();
 
-        // 0.5. Seed Admin User if not exists
+        // 1. Seed Admin
         if (!await context.Users.AnyAsync(u => u.Role == UserRole.Admin))
         {
             var adminUser = new User
             {
-                Id = Guid.NewGuid(),
                 Email = "admin@musicshop.com",
                 FullName = "System Admin",
                 PasswordHash = passwordHasher.Hash("Admin@123"),
@@ -37,164 +31,249 @@ public static class DbInitializer
             await context.SaveChangesAsync();
         }
 
-        // Check if seeding is needed (we use Genres as a marker)
-        if (await context.Genres.AnyAsync())
+        // 2. Seed Genres
+        if (!await context.Genres.AnyAsync())
         {
-            return;
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = "MusicShop.Infrastructure.Persistence.SeedData.genres.csv";
+
+            using var stream = assembly.GetManifestResourceStream(resourceName);
+            if (stream == null) throw new FileNotFoundException("Seed data file not found", resourceName);
+
+            using var reader = new StreamReader(stream);
+            using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true
+            });
+
+            var records = csv.GetRecords<dynamic>();
+            List<Genre> genres = new();
+
+            foreach (var record in records)
+            {
+                genres.Add(new Genre
+                {
+                    Name = record.Name,
+                    Slug = record.Slug
+                });
+            }
+
+            await context.Genres.AddRangeAsync(genres);
+            await context.SaveChangesAsync();
         }
 
-        var random = new Random(42);
-
-        // 1. Seed Genres
-        var genreNames = new[] { "Rock", "Jazz", "Electronic", "Classical", "Pop", "Metal", "Indie", "Hip Hop", "Soul", "Blues" };
-        var genres = genreNames.Select(name => new Genre
+        // 3. Seed Artists
+        if (!await context.Artists.AnyAsync())
         {
-            Id = Guid.NewGuid(),
-            Name = name,
-            Slug = name.ToLower().Replace(" ", "-"),
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        }).ToList();
-        await context.Genres.AddRangeAsync(genres);
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = "MusicShop.Infrastructure.Persistence.SeedData.artists.csv";
 
-        // 2. Seed Artists
-        var artistNames = new[] 
-        { 
-            "The Midnight Echo", "Solar Flare", "Luna Blue", "Electric Dreams", "Velvet Underground", 
-            "Neon Nights", "Aether", "Crystal Castles", "Deep Sea Diver", "Echo Park",
-            "Fever Ray", "Ghost Poet", "Hollow Coves", "Iron & Wine", "Jade Bird",
-            "King Krule", "Lord Huron", "Mt. Joy", "Night Tapes", "Ocean Alley"
-        };
-        
-        var artists = artistNames.Select(name => new Artist
-        {
-            Id = Guid.NewGuid(),
-            Name = name,
-            Slug = name.ToLower().Replace(" ", "-") + "-" + random.Next(100, 999),
-            Bio = $"A unique and experimental musical project exploring the depths of {name.ToLower()} sounds and rhythms. Formed in recent years, they have quickly gained a following for their innovative approach to production and performance.",
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        }).ToList();
-        await context.Artists.AddRangeAsync(artists);
+            using var stream = assembly.GetManifestResourceStream(resourceName);
+            if (stream == null) throw new FileNotFoundException("Seed data file not found", resourceName);
 
-        // 3. Seed Labels
-        var labelNames = new[] 
-        { 
-            "Blue Note", "Warp", "Domino", "4AD", "Sub Pop", 
-            "XL Recordings", "Ninja Tune", "Mute", "Rough Trade", "Matador" 
-        };
-        var countries = new[] { "USA", "UK", "Germany", "France", "Japan", "Canada", "Australia" };
-
-        var labels = labelNames.Select(name => new Label
-        {
-            Id = Guid.NewGuid(),
-            Name = name + " Records",
-            Slug = name.ToLower().Replace(" ", "-"),
-            Country = countries[random.Next(countries.Length)],
-            FoundedYear = random.Next(1950, 2015),
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        }).ToList();
-        await context.Labels.AddRangeAsync(labels);
-
-        // 4. Seed Releases (Albums)
-        var releases = new List<Release>();
-        var releaseVersions = new List<ReleaseVersion>();
-        var products = new List<Product>();
-        var productVariants = new List<ProductVariant>();
-
-        var albumAdjectives = new[] { "Mystic", "Electric", "Silent", "Golden", "Dark", "Neon", "Ethereal", "Lost", "Infinite", "Ancient" };
-        var albumNouns = new[] { "Dreams", "Nights", "Horizon", "Echoes", "Light", "Shadow", "Soul", "Voyage", "Heart", "City" };
-        
-        var albumCovers = new[] {
-            "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1514525253344-f8576996a63f?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=800&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1459749411177-042180ce673c?q=80&w=800&auto=format&fit=crop"
-        };
-
-        foreach (var artist in artists)
-        {
-            // Each artist has 2 albums
-            int albumCount = 2;
-            for (int i = 0; i < albumCount; i++)
+            using var reader = new StreamReader(stream);
+            using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                var title = albumAdjectives[random.Next(albumAdjectives.Length)] + " " + albumNouns[random.Next(albumNouns.Length)];
+                HasHeaderRecord = true,
+                MissingFieldFound = null
+            });
+
+            var records = csv.GetRecords<dynamic>();
+            var genresMap = await context.Genres.ToDictionaryAsync(g => g.Name);
+
+            List<Artist> artists = new();
+
+            foreach (var record in records)
+            {
+                var artist = new Artist
+                {
+                    Name = record.Name,
+                    Bio = record.Bio,
+                    Country = record.Country,
+                    Slug = Slugify(record.Name)
+                };
+
+                // Link genres via navigation property
+                string genresStr = record.Genres ?? string.Empty;
+                var artistGenreNames = genresStr.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                              .Select(g => g.Trim());
+
+                foreach (var genreName in artistGenreNames)
+                {
+                    if (genresMap.TryGetValue(genreName, out var genre))
+                    {
+                        artist.ArtistGenres.Add(new ArtistGenre
+                        {
+                            Genre = genre
+                        });
+                    }
+                }
+
+                artists.Add(artist);
+            }
+
+            await context.Artists.AddRangeAsync(artists);
+        }
+
+        await context.SaveChangesAsync();
+
+        // 4. Seed Labels
+        if (!await context.Labels.AnyAsync())
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = "MusicShop.Infrastructure.Persistence.SeedData.labels.csv";
+
+            using var stream = assembly.GetManifestResourceStream(resourceName);
+            if (stream == null) throw new FileNotFoundException("Seed data file not found", resourceName);
+
+            using var reader = new StreamReader(stream);
+            using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                MissingFieldFound = null
+            });
+
+            var records = csv.GetRecords<dynamic>();
+            List<Label> labels = new();
+
+            foreach (var record in records)
+            {
+                labels.Add(new Label
+                {
+                    Name = record.Name,
+                    Slug = record.Slug,
+                    Country = record.Country,
+                    FoundedYear = int.TryParse(record.FoundedYear?.ToString(), out int year) ? year : null,
+                    Website = record.Website
+                });
+            }
+
+            await context.Labels.AddRangeAsync(labels);
+        }
+
+        await context.SaveChangesAsync();
+
+        // 5. Seed Releases
+        if (!await context.Releases.AnyAsync())
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = "MusicShop.Infrastructure.Persistence.SeedData.releases.csv";
+
+            using var stream = assembly.GetManifestResourceStream(resourceName);
+            if (stream == null) throw new FileNotFoundException("Seed data file not found", resourceName);
+
+            using var reader = new StreamReader(stream);
+            using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                MissingFieldFound = null
+            });
+
+            var records = csv.GetRecords<dynamic>().ToList();
+            var artistsMap = await context.Artists.ToDictionaryAsync(a => a.Name);
+            var genresMap = await context.Genres.ToDictionaryAsync(g => g.Name);
+
+            List<Release> releases = new();
+
+            foreach (var record in records)
+            {
+                string artistName = record.ArtistName ?? string.Empty;
+                if (!artistsMap.TryGetValue(artistName, out var artist)) continue;
+
                 var release = new Release
                 {
-                    Id = Guid.NewGuid(),
-                    Title = title,
-                    Year = random.Next(1970, 2024),
-                    Description = $"A critically acclaimed album by {artist.Name}, featuring a blend of atmospheric melodies and driving rhythms.",
-                    CoverUrl = albumCovers[random.Next(albumCovers.Length)],
-                    ArtistId = artist.Id,
-                    Type = "Album",
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    Title = record.Title,
+                    Slug = record.Slug,
+                    Year = int.TryParse(record.Year?.ToString(), out int year) ? year : 0,
+                    Description = record.Description,
+                    Artist = artist
                 };
-                release.Slug = release.Title.ToLower().Replace(" ", "-") + "-" + random.Next(1000, 9999);
-                releases.Add(release);
 
-                // For each album, create versions (Vinyl and/or CD)
-                var formats = new[] { ReleaseFormat.Vinyl, ReleaseFormat.CD };
-                foreach (var format in formats)
+                // Link genres via navigation property
+                string genresStr = record.Genres ?? string.Empty;
+                var releaseGenreNames = genresStr.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                                                 .Select(g => g.Trim());
+
+                foreach (var genreName in releaseGenreNames)
                 {
-                    var label = labels[random.Next(labels.Count)];
-                    var version = new ReleaseVersion
+                    if (genresMap.TryGetValue(genreName, out var genre))
                     {
-                        Id = Guid.NewGuid(),
-                        ReleaseId = release.Id,
-                        LabelId = label.Id,
-                        Format = format,
-                        CatalogNumber = $"MS-{random.Next(10000, 99999)}",
-                        PressingCountry = countries[random.Next(countries.Length)],
-                        PressingYear = release.Year + random.Next(0, 3),
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
-                    };
-                    releaseVersions.Add(version);
-
-                    // Create Shop Product for this version
-                    var product = new Product
-                    {
-                        Id = Guid.NewGuid(),
-                        Name = release.Title + " [" + format.ToString() + "]",
-                        Slug = release.Slug + "-" + format.ToString().ToLower(),
-                        Description = release.Description,
-                        CoverUrl = release.CoverUrl,
-                        Format = format,
-                        ReleaseVersionId = version.Id,
-                        IsActive = true,
-                        IsLimited = random.NextDouble() < 0.2,
-                        IsPreorder = release.Year > 2023,
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
-                    };
-                    products.Add(product);
-
-                    // Create standard Variant for the product
-                    var variant = new ProductVariant
-                    {
-                        Id = Guid.NewGuid(),
-                        ProductId = product.Id,
-                        VariantName = format == ReleaseFormat.Vinyl ? "Black 180g Vinyl" : "Standard CD",
-                        Price = format == ReleaseFormat.Vinyl ? (decimal)(random.NextDouble() * 20 + 25) : (decimal)(random.NextDouble() * 10 + 12),
-                        StockQty = random.Next(0, 50),
-                        CreatedAt = DateTime.UtcNow,
-                        UpdatedAt = DateTime.UtcNow
-                    };
-                    productVariants.Add(variant);
+                        release.ReleaseGenres.Add(new ReleaseGenre
+                        {
+                            Genre = genre
+                        });
+                    }
                 }
+
+                releases.Add(release);
             }
+
+            await context.Releases.AddRangeAsync(releases);
         }
 
-        await context.Releases.AddRangeAsync(releases);
-        await context.ReleaseVersions.AddRangeAsync(releaseVersions);
-        await context.Products.AddRangeAsync(products);
-        await context.ProductVariants.AddRangeAsync(productVariants);
-
-        // 5. Final Save
         await context.SaveChangesAsync();
+
+        // 6. Seed ReleaseVersions
+        if (!await context.ReleaseVersions.AnyAsync())
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = "MusicShop.Infrastructure.Persistence.SeedData.release_versions.csv";
+
+            using var stream = assembly.GetManifestResourceStream(resourceName);
+            if (stream == null) throw new FileNotFoundException("Seed data file not found", resourceName);
+
+            using var reader = new StreamReader(stream);
+            using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                MissingFieldFound = null
+            });
+
+            var records = csv.GetRecords<dynamic>().ToList();
+            var releasesMap = await context.Releases.ToDictionaryAsync(r => r.Title);
+            var labelsMap = await context.Labels.ToDictionaryAsync(l => l.Name);
+
+            List<ReleaseVersion> versions = new();
+
+            foreach (var record in records)
+            {
+                string releaseTitle = record.ReleaseTitle ?? string.Empty;
+                string labelName = record.LabelName ?? string.Empty;
+
+                if (!releasesMap.TryGetValue(releaseTitle, out var release)) continue;
+                if (!labelsMap.TryGetValue(labelName, out var label)) continue;
+
+                versions.Add(new ReleaseVersion
+                {
+                    Name = record.VersionName,
+                    Release = release,
+                    Label = label,
+                    Format = Enum.TryParse<ReleaseFormat>(record.Format?.ToString(), out ReleaseFormat format) ? format : ReleaseFormat.Vinyl,
+                    PressingCountry = record.PressingCountry,
+                    PressingYear = int.TryParse(record.PressingYear?.ToString(), out int year) ? year : null,
+                    CatalogNumber = record.CatalogNumber,
+                    Notes = record.Notes
+                });
+            }
+
+            await context.ReleaseVersions.AddRangeAsync(versions);
+        }
+
+        await context.SaveChangesAsync();
+    }
+
+    private static string Slugify(string text)
+    {
+        if (string.IsNullOrEmpty(text)) return string.Empty;
+
+        return text.ToLowerInvariant()
+            .Replace(" ", "-")
+            .Replace(".", "")
+            .Replace("'", "")
+            .Replace("(", "")
+            .Replace(")", "")
+            .Replace("&", "and")
+            .Replace(",", "")
+            .Trim('-');
     }
 }

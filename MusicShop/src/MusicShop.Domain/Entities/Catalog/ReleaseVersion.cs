@@ -10,6 +10,7 @@ namespace MusicShop.Domain.Entities.Catalog;
 /// </summary>
 public class ReleaseVersion : BaseEntity
 {
+    public string Name { get; set; } = string.Empty;
     public string? PressingCountry { get; set; }
     public int? PressingYear { get; set; }
     public ReleaseFormat Format { get; set; }

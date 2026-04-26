@@ -35,10 +35,6 @@ public sealed class ReleaseRepository(AppDbContext context) : GenericRepository<
             query = query.Where(release => release.ReleaseGenres.Any(releaseGenre => releaseGenre.GenreId == request.GenreId.Value));
         }
 
-        if (!string.IsNullOrWhiteSpace(request.Type))
-        {
-            query = query.Where(release => release.Type == request.Type);
-        }
 
         if (!string.IsNullOrWhiteSpace(request.Format))
         {
