@@ -1,12 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useGenres, useDeleteGenre } from './useGenres';
 import { Genre } from '../types';
 
 export function useGenreManagement() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = parseInt(searchParams.get('page') || '1');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
+
   const [showForm, setShowForm] = useState(false);
   const [editingGenre, setEditingGenre] = useState<Genre | null>(null);
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Sync debounced search to URL
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    if (debouncedSearch) {
+      params.set('q', debouncedSearch);
+    } else {
+      params.delete('q');
+    }
+    params.set('page', '1');
+    setSearchParams(params, { replace: true });
+  }, [debouncedSearch]);
   
-  const { data: genresData, isLoading, error } = useGenres();
+  const { data: genresData, isLoading, error } = useGenres(page, 20, debouncedSearch || undefined);
   const deleteMutation = useDeleteGenre();
 
   const handleOpenCreate = () => {
@@ -30,11 +54,22 @@ export function useGenreManagement() {
     }
   };
 
+  const setPage = (pageNum: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('page', pageNum.toString());
+    setSearchParams(params);
+  };
+
   return {
     genres: genresData?.items ?? [],
     isLoading,
     error,
     isEmpty: !isLoading && (genresData?.items.length === 0),
+    page,
+    setPage,
+    searchQuery,
+    setSearchQuery,
+    totalPages: genresData?.meta ? Math.ceil(genresData.meta.total / 20) : 1,
     form: {
       isOpen: showForm,
       editingGenre,

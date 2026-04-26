@@ -2,10 +2,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { genreService, CreateGenreRequest, UpdateGenreRequest } from '../services/genreService';
 import { toast } from 'sonner';
 
-export function useGenres(page = 1, limit = 10) {
+export function useGenres(page = 1, limit = 50, search?: string) {
   return useQuery({
-    queryKey: ['genres', { page, limit }],
-    queryFn: () => genreService.getGenres(page, limit),
+    queryKey: ['genres', { page, limit, search }],
+    queryFn: () => genreService.getGenres(page, limit, search),
   });
 }
 

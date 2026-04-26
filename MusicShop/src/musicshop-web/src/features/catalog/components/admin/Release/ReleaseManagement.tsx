@@ -1,5 +1,6 @@
 import { Plus, Search, Filter, Edit2, Trash2, Disc, Calendar, Loader2, Package } from 'lucide-react';
-import { Button, Card, CardContent, Skeleton } from '@/shared/components';
+import { Button, Card, CardContent, Skeleton, Pagination } from '@/shared/components';
+import { cn } from '@/shared/lib/utils';
 import { useReleaseManagement } from '../../../hooks/useReleaseManagement';
 import { ReleaseForm } from './ReleaseForm';
 import { ReleaseVersionsModal } from './ReleaseVersionsModal';
@@ -13,6 +14,9 @@ export function ReleaseManagement() {
     isLoading,
     page,
     setPage,
+    totalPages,
+    searchQuery,
+    setSearchQuery,
     handleOpenCreate,
     handleOpenEdit,
     handleDelete,
@@ -22,6 +26,9 @@ export function ReleaseManagement() {
     isDeleting,
     deletingId
   } = useReleaseManagement();
+
+  const releases = releasesData?.items ?? [];
+  const isEmpty = !isLoading && releases.length === 0;
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -55,6 +62,8 @@ export function ReleaseManagement() {
               <input
                 type="text"
                 placeholder="Search releases, artists, or labels..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full h-14 bg-surface border border-border rounded-2xl pl-12 pr-4 focus:outline-none focus:border-primary transition-all shadow-sm"
               />
             </div>
@@ -77,7 +86,7 @@ export function ReleaseManagement() {
                 <Skeleton key={i} className="h-32 w-full rounded-2xl bg-muted/50" />
               ))
             ) : (
-              releasesData?.items.map((release) => (
+              releases.map((release) => (
                 <Card key={release.id} className="bg-surface border-border overflow-hidden hover:shadow-md transition-all group p-0">
                   <CardContent className="p-0 flex flex-col md:flex-row items-stretch">
                     {/* Cover Art */}
@@ -151,12 +160,19 @@ export function ReleaseManagement() {
             )}
           </div>
 
-          {!isLoading && (releasesData?.items.length ?? 0) === 0 && (
+          {isEmpty && (
             <div className="text-center py-20 bg-muted/10 border-2 border-dashed border-border rounded-3xl">
               <Disc className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
               <p className="text-muted-foreground font-medium">Your catalog is silent. Create your first release!</p>
             </div>
           )}
+
+          {/* Pagination */}
+          <Pagination 
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
         </>
       )}
 

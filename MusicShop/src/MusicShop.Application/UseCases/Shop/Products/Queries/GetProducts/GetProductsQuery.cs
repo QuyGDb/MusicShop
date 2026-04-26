@@ -19,7 +19,8 @@ public sealed record GetProductsQuery : IRequest<Result<PaginatedResult<ProductL
     public decimal? MinPrice { get; init; }
     public decimal? MaxPrice { get; init; }
     public string? SearchQuery { get; init; }
+    public bool? IsActive { get; init; }
     
-    public int Page { get; init; } = 1;
-    public int Limit { get; init; } = 20;
+    public int PageNumber { get; init; } = 1;
+    public int PageSize { get; init; } = 20;
 }

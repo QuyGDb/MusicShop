@@ -22,8 +22,8 @@ public sealed class GetProductsQueryHandler(IProductRepository productRepository
         PaginatedResult<ProductListItemDto> paginatedResult = new PaginatedResult<ProductListItemDto>(
             productListItemDtos,
             totalCount,
-            request.Page,
-            request.Limit);
+            request.PageNumber,
+            request.PageSize);
 
         return Result<PaginatedResult<ProductListItemDto>>.Success(paginatedResult);
     }

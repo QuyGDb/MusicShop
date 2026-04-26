@@ -1,5 +1,6 @@
 import { Plus, Search, MapPin, Music, Users, AlertCircle } from 'lucide-react';
-import { Button, Skeleton } from '@/shared/components';
+import { Button, Skeleton, Pagination } from '@/shared/components';
+import { cn } from '@/shared/lib/utils';
 import { ArtistForm } from './ArtistForm';
 import { ArtistCard } from './ArtistCard';
 import { useArtistManagement } from '../../../hooks/useArtistManagement';
@@ -11,7 +12,12 @@ export function ArtistManagement() {
     error,
     isEmpty,
     form,
-    actions
+    actions,
+    page,
+    setPage,
+    totalPages,
+    searchQuery,
+    setSearchQuery
   } = useArtistManagement();
 
   if (error) {
@@ -56,6 +62,8 @@ export function ArtistManagement() {
               <input
                 type="text"
                 placeholder="Search artists by name, country, or genre..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full h-14 bg-surface border border-border rounded-2xl pl-12 pr-4 focus:outline-none focus:border-primary transition-all shadow-sm"
               />
             </div>
@@ -96,6 +104,13 @@ export function ArtistManagement() {
               <p className="text-muted-foreground font-medium">No artists found. Time to discover some talent!</p>
             </div>
           )}
+
+          {/* Pagination */}
+          <Pagination 
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
         </>
       )}
     </div>

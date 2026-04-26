@@ -20,7 +20,8 @@ export function useProductsList() {
     maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
     page: page,
     limit: 12,
-    searchQuery: searchQuery || undefined
+    searchQuery: searchQuery || undefined,
+    isActive: true
   };
 
   const { data, isLoading: loading, error } = useQuery({

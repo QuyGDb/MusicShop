@@ -20,10 +20,13 @@ public sealed class ProductRepository(AppDbContext context) : GenericRepository<
             .Include(product => product.ReleaseVersion)
                 .ThenInclude(releaseVersion => releaseVersion!.Release)
                     .ThenInclude(release => release!.Artist)
-            .Where(product => product.IsActive)
             .AsQueryable();
 
         // 1. Filtering
+        if (request.IsActive.HasValue)
+        {
+            query = query.Where(product => product.IsActive == request.IsActive.Value);
+        }
         if (request.Format.HasValue)
         {
             query = query.Where(product => product.ReleaseVersion != null && product.ReleaseVersion.Format == request.Format.Value);
@@ -73,8 +76,8 @@ public sealed class ProductRepository(AppDbContext context) : GenericRepository<
 
         List<Product> items = await query
             .OrderByDescending(product => product.CreatedAt)
-            .Skip((request.Page - 1) * request.Limit)
-            .Take(request.Limit)
+            .Skip((request.PageNumber - 1) * request.PageSize)
+            .Take(request.PageSize)
             .ToListAsync(ct);
 
         return (items, totalCount);

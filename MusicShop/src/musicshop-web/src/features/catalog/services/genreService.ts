@@ -11,11 +11,12 @@ export interface UpdateGenreRequest {
 }
 
 export const genreService = {
-  getGenres: async (page = 1, limit = 50): Promise<PaginatedResponse<Genre>> => {
+  getGenres: async (page = 1, limit = 50, search?: string): Promise<PaginatedResponse<Genre>> => {
     const response = await http.get<ApiResponse<Genre[]>>('/Genres', {
       params: { 
         PageNumber: page, 
-        PageSize: limit 
+        PageSize: limit,
+        Q: search
       }
     });
     return {

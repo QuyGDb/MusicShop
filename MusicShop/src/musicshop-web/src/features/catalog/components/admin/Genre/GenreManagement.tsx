@@ -1,5 +1,5 @@
-import { Hash, Plus, Edit2, Trash2, Tag, Loader2, AlertCircle } from 'lucide-react';
-import { Button, Card, CardContent, Skeleton } from '@/shared/components';
+import { Hash, Plus, Edit2, Trash2, Tag, Loader2, AlertCircle, Search } from 'lucide-react';
+import { Button, Card, CardContent, Skeleton, Pagination } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
 import { GenreForm } from './GenreForm';
 import { useGenreManagement } from '../../../hooks/useGenreManagement';
@@ -25,7 +25,12 @@ export function GenreManagement() {
     isEmpty,
     error,
     form,
-    actions
+    actions,
+    page,
+    setPage,
+    totalPages,
+    searchQuery,
+    setSearchQuery
   } = useGenreManagement();
 
   const getGenreColor = (name: string) => {
@@ -66,59 +71,84 @@ export function GenreManagement() {
         />
       )}
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {isLoading ? (
-          Array.from({ length: 8 }).map((_, i) => (
-            <Skeleton key={i} className="h-20 w-full rounded-2xl bg-muted/50" />
-          ))
-        ) : (
-          genres.map((genre) => (
-            <Card key={genre.id} className="bg-surface border-border hover:border-primary/30 transition-all group overflow-hidden">
-              <CardContent className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={cn("h-10 w-10 rounded-lg flex items-center justify-center shadow-inner", getGenreColor(genre.name))}>
-                    <Hash className="h-5 w-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-foreground truncate max-w-[120px]">{genre.name}</h3>
-                    <p className="text-[10px] text-muted-foreground uppercase tracking-tight truncate max-w-[120px]">{genre.slug}</p>
-                  </div>
-                </div>
-                <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-7 w-7 text-muted-foreground hover:text-primary"
-                    onClick={() => form.openEdit(genre)}
-                  >
-                    <Edit2 className="h-3 w-3" />
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-7 w-7 text-muted-foreground hover:text-red-500"
-                    onClick={() => actions.delete(genre.id)}
-                    disabled={actions.isDeleting}
-                  >
-                    {actions.isDeleting && actions.deletingId === genre.id ? (
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                    ) : (
-                      <Trash2 className="h-3 w-3" />
-                    )}
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
-      
-      {isEmpty && (
-        <div className="text-center py-20 bg-muted/20 border-2 border-dashed border-border rounded-3xl">
-          <Hash className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
-          <p className="text-muted-foreground font-medium">No genres found. Time to create some style!</p>
-        </div>
+      {!form.isOpen && (
+        <>
+          {/* Filters Bar */}
+          <div className="flex flex-wrap gap-4 items-center">
+            <div className="relative flex-1 min-w-[300px]">
+              <Search className="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-subtle" />
+              <input
+                type="text"
+                placeholder="Search genres by name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full h-14 bg-surface border border-border rounded-2xl pl-12 pr-4 focus:outline-none focus:border-primary transition-all shadow-sm"
+              />
+            </div>
+          </div>
+
+          {/* Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {isLoading ? (
+              Array.from({ length: 8 }).map((_, i) => (
+                <Skeleton key={i} className="h-20 w-full rounded-2xl bg-muted/50" />
+              ))
+            ) : (
+              genres.map((genre) => (
+                <Card key={genre.id} className="bg-surface border-border hover:border-primary/30 transition-all group overflow-hidden">
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className={cn("h-10 w-10 rounded-lg flex items-center justify-center shadow-inner", getGenreColor(genre.name))}>
+                        <Hash className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-foreground truncate max-w-[120px]">{genre.name}</h3>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-tight truncate max-w-[120px]">{genre.slug}</p>
+                      </div>
+                    </div>
+                    <div className="flex flex-col gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7 text-muted-foreground hover:text-primary"
+                        onClick={() => form.openEdit(genre)}
+                      >
+                        <Edit2 className="h-3 w-3" />
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-7 w-7 text-muted-foreground hover:text-red-500"
+                        onClick={() => actions.delete(genre.id)}
+                        disabled={actions.isDeleting}
+                      >
+                        {actions.isDeleting && actions.deletingId === genre.id ? (
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                        ) : (
+                          <Trash2 className="h-3 w-3" />
+                        )}
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+          
+          {isEmpty && (
+            <div className="text-center py-20 bg-muted/20 border-2 border-dashed border-border rounded-3xl">
+              <Hash className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
+              <p className="text-muted-foreground font-medium">No genres found. Time to create some style!</p>
+            </div>
+          )}
+
+          {/* Pagination */}
+          <Pagination 
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
+        </>
       )}
     </div>
   );

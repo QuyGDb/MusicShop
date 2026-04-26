@@ -21,7 +21,12 @@ export function ProductManagement() {
     openEdit,
     delete: handleDelete,
     isDeleting,
-    deletingId
+    deletingId,
+    page,
+    setPage,
+    totalPages,
+    searchQuery,
+    setSearchQuery
   } = useProductManagement();
 
   if (error) {
@@ -63,6 +68,8 @@ export function ProductManagement() {
               <input 
                 type="text" 
                 placeholder="Search products by title, artist, or SKU..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full h-14 bg-surface border border-border rounded-2xl pl-12 pr-4 focus:outline-none focus:border-primary transition-all shadow-sm"
               />
             </div>
@@ -170,6 +177,13 @@ export function ProductManagement() {
               <p className="text-muted-foreground font-medium">Your store is empty. Time to list some music!</p>
             </div>
           )}
+
+          {/* Pagination */}
+          <Pagination 
+            currentPage={page}
+            totalPages={totalPages}
+            onPageChange={setPage}
+          />
         </>
       )}
     </div>

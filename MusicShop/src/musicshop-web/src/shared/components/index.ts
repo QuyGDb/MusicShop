@@ -6,5 +6,6 @@ export * from './ui/checkbox';
 export * from './ui/input';
 export * from './ui/label';
 export * from './ui/slider';
+export * from './ui/pagination';
 export * from './ui/skeleton';
 export * from './common/ImageUpload';

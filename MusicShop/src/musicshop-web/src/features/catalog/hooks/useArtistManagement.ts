@@ -1,13 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useArtists, useDeleteArtist } from './useArtists';
 import { Artist } from '../types';
 
 export function useArtistManagement() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = parseInt(searchParams.get('page') || '1');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
+
   const [showForm, setShowForm] = useState(false);
   const [editingArtist, setEditingArtist] = useState<Artist | null>(null);
-  const [page, setPage] = useState(1);
 
-  const { data: artistsData, isLoading, error } = useArtists(page, 12);
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Sync debounced search to URL
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    if (debouncedSearch) {
+      params.set('q', debouncedSearch);
+    } else {
+      params.delete('q');
+    }
+    params.set('page', '1');
+    setSearchParams(params, { replace: true });
+  }, [debouncedSearch]);
+
+  const { data: artistsData, isLoading, error } = useArtists(page, 12, debouncedSearch || undefined);
   const deleteArtistMutation = useDeleteArtist();
 
   const handleOpenCreate = () => {
@@ -31,6 +54,12 @@ export function useArtistManagement() {
     }
   };
 
+  const setPage = (pageNum: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('page', pageNum.toString());
+    setSearchParams(params);
+  };
+
   return {
     artists: artistsData?.items ?? [],
     isLoading,
@@ -38,6 +67,9 @@ export function useArtistManagement() {
     isEmpty: !isLoading && (artistsData?.items.length === 0),
     page,
     setPage,
+    searchQuery,
+    setSearchQuery,
+    totalPages: artistsData?.meta ? Math.ceil(artistsData.meta.total / 12) : 1,
     form: {
       isOpen: showForm,
       editingArtist,

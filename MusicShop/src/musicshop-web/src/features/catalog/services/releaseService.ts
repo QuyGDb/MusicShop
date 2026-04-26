@@ -29,11 +29,12 @@ export const releaseService = {
     return response.data || [];
   },
 
-  getReleases: async (page = 1, limit = 10): Promise<PaginatedResponse<Release>> => {
+  getReleases: async (page = 1, limit = 10, search?: string): Promise<PaginatedResponse<Release>> => {
     const response = await http.get<ApiResponse<Release[]>>('/Releases', {
       params: { 
         PageNumber: page, 
-        PageSize: limit 
+        PageSize: limit,
+        Q: search
       }
     });
     return {

@@ -1,13 +1,40 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useProducts, useDeleteProduct } from './useProducts';
 
 export function useProductManagement() {
   const navigate = useNavigate();
-  const [showForm, setShowForm] = useState(false);
-  const [page, setPage] = useState(1);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const page = parseInt(searchParams.get('page') || '1');
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') || '');
+  const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
 
-  const { data: productsData, isLoading, error } = useProducts({ page, limit: 10 });
+  const [showForm, setShowForm] = useState(false);
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(searchQuery), 500);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
+  // Sync debounced search to URL
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams);
+    if (debouncedSearch) {
+      params.set('q', debouncedSearch);
+    } else {
+      params.delete('q');
+    }
+    params.set('page', '1');
+    setSearchParams(params, { replace: true });
+  }, [debouncedSearch]);
+
+  const { data: productsData, isLoading, error } = useProducts({ 
+    page, 
+    limit: 10,
+    searchQuery: debouncedSearch || undefined 
+  });
+
   const deleteProductMutation = useDeleteProduct();
 
   const handleOpenCreate = () => {
@@ -28,6 +55,12 @@ export function useProductManagement() {
     }
   };
 
+  const setPage = (pageNum: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('page', pageNum.toString());
+    setSearchParams(params);
+  };
+
   return {
     products: productsData?.items ?? [],
     isLoading,
@@ -35,6 +68,10 @@ export function useProductManagement() {
     isEmpty: !isLoading && (productsData?.items.length === 0),
     page,
     setPage,
+    searchQuery,
+    setSearchQuery,
+    totalPages: productsData?.meta ? Math.ceil(productsData.meta.total / 10) : 1,
+    meta: productsData?.meta,
     showForm,
     openCreate: handleOpenCreate,
     closeForm: handleCloseForm,

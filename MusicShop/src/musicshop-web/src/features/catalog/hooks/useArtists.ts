@@ -2,10 +2,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { artistService, CreateArtistRequest, UpdateArtistRequest } from '../services/artistService';
 import { toast } from 'sonner';
 
-export function useArtists(page = 1, limit = 10) {
+export function useArtists(page = 1, limit = 10, search?: string) {
   return useQuery({
-    queryKey: ['artists', { page, limit }],
-    queryFn: () => artistService.getArtists(page, limit),
+    queryKey: ['artists', { page, limit, search }],
+    queryFn: () => artistService.getArtists(page, limit, search),
   });
 }
 

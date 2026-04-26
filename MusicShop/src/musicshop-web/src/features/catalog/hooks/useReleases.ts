@@ -2,10 +2,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { releaseService, CreateReleaseRequest, UpdateReleaseRequest } from '../services/releaseService';
 import { toast } from 'sonner';
 
-export function useReleases(page = 1, limit = 10) {
+export function useReleases(page = 1, limit = 10, search?: string) {
   return useQuery({
-    queryKey: ['releases', { page, limit }],
-    queryFn: () => releaseService.getReleases(page, limit),
+    queryKey: ['releases', { page, limit, search }],
+    queryFn: () => releaseService.getReleases(page, limit, search),
   });
 }
 

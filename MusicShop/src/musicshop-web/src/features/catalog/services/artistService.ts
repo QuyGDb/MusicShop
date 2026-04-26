@@ -16,11 +16,12 @@ export interface UpdateArtistRequest extends CreateArtistRequest {
 }
 
 export const artistService = {
-  getArtists: async (page = 1, limit = 10): Promise<PaginatedResponse<Artist>> => {
+  getArtists: async (page = 1, limit = 10, search?: string): Promise<PaginatedResponse<Artist>> => {
     const response = await http.get<ApiResponse<Artist[]>>('/Artists', {
       params: { 
         PageNumber: page, 
-        PageSize: limit 
+        PageSize: limit,
+        Q: search
       }
     });
     return {

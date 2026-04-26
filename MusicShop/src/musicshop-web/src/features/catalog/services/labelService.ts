@@ -14,11 +14,12 @@ export interface UpdateLabelRequest extends CreateLabelRequest {
 }
 
 export const labelService = {
-  getLabels: async (page = 1, limit = 10): Promise<PaginatedResponse<Label>> => {
+  getLabels: async (page = 1, limit = 10, search?: string): Promise<PaginatedResponse<Label>> => {
     const response = await http.get<ApiResponse<Label[]>>('/Labels', {
       params: { 
         PageNumber: page, 
-        PageSize: limit 
+        PageSize: limit,
+        Q: search
       }
     });
     return {

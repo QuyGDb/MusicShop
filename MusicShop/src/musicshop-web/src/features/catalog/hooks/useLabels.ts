@@ -2,10 +2,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { labelService, CreateLabelRequest, UpdateLabelRequest } from '../services/labelService';
 import { toast } from 'sonner';
 
-export function useLabels(page = 1, limit = 10) {
+export function useLabels(page = 1, limit = 10, search?: string) {
   return useQuery({
-    queryKey: ['labels', { page, limit }],
-    queryFn: () => labelService.getLabels(page, limit),
+    queryKey: ['labels', { page, limit, search }],
+    queryFn: () => labelService.getLabels(page, limit, search),
   });
 }
 

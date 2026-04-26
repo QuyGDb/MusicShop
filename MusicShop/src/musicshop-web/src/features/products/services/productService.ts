@@ -11,6 +11,7 @@ export interface ProductFilters {
   minPrice?: number;
   maxPrice?: number;
   searchQuery?: string;
+  isActive?: boolean;
   page?: number;
   limit?: number;
 }
