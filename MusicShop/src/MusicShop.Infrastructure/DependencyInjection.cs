@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using MusicShop.Domain.Interfaces;
@@ -24,7 +25,16 @@ public static class DependencyInjection
         // 1. Configure DbContext with PostgreSQL
         string? connectionString = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContext<AppDbContext>(options =>
-            options.UseNpgsql(connectionString));
+        {
+            options.UseNpgsql(connectionString);
+            
+            // Enable logging only in Development
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+            {
+                options.LogTo(Console.WriteLine, LogLevel.Information)
+                       .EnableSensitiveDataLogging();
+            }
+        });
 
         // 2. Register Repository & UnitOfWork
         services.AddScoped<IUnitOfWork, UnitOfWork>();

@@ -35,11 +35,45 @@ src/
   types/           # Global TypeScript types/interfaces
   utils/           # Pure utility functions
 ```
+## Architecture Pattern: Custom Hook + Presentational Component
+Every feature component MUST follow the Hook + Component separation:
+- **Hook** (`useXxx`): Contains ALL business logic — state, mutations, handlers, derived values
+- **Component**: Contains ONLY JSX rendering — receives everything from hook, zero logic
+
+### Hook Rules (Contract)
+- Hook does NOT import any component, does NOT return JSX
+- Hook does NOT know about CSS, className, or any UI concept
+- Return interface must be self-describing: `isLoading`, `isEmpty`, `isSubmitting`, `handleDelete`
+- Return a typed object, never a raw query or tuple
+
+### Component Rules (Render)
+- Component does NOT call services directly
+- Component does NOT contain `useState` for business state (only local UI state like `isHovered`)
+- Component does NOT contain `useEffect` for side effects
+- All data and handlers come from the hook
+
+### Example
+```tsx
+// ✅ Hook: features/catalog/hooks/useGenreManagement.ts
+export function useGenreManagement() {
+  // state, queries, mutations, handlers...
+  return { genres, isLoading, isEmpty, handleSubmit, handleDelete };
+}
+
+// ✅ Component: features/catalog/components/admin/GenreManagement.tsx
+export function GenreManagement() {
+  const { genres, isLoading, isEmpty, handleSubmit, handleDelete } = useGenreManagement();
+  return ( /* JSX only */ );
+}
+```
+
 ## Components
 - Named exports everywhere except pages (`export function UserCard(...)`)
 - 1 component per file, max ~200 LOC, filename = component name
 - Props typed via `interface`, no `any`, no `as Type` unless necessary
 - Pages are thin shells — all logic goes in feature components or hooks
+- `ui/` directory: Primitive components ONLY (Button, Input, Card) — no service calls, no side effects
+- `common/` directory: Composite shared components (ImageUpload, Navbar) — may use hooks
 
 ## State
 - Server state → TanStack Query | Global client state → Zustand | Local UI → useState
@@ -47,6 +81,8 @@ src/
 
 ## Hooks & Forms
 - 1 hook per file, return typed object (not raw query)
+- Every feature with CRUD must have a dedicated management hook (e.g., `useGenreManagement`)
+- Form logic must live in a dedicated hook (e.g., `useArtistForm`), not in the component
 - Forms: Zod schema → infer type → useForm with zodResolver
 - Never validate inside submit handlers
 
@@ -68,4 +104,6 @@ src/
 ## Prohibited
 `any` · unsafe `as` casts · localStorage for tokens · business logic in pages ·
 direct axios in components · silent catch · mutating state directly ·
-`useEffect` for derived state · abbreviated names · unsanitized `dangerouslySetInnerHTML`
+`useEffect` for derived state · abbreviated names · unsanitized `dangerouslySetInnerHTML` ·
+service calls inside components · `useState` for business state in components ·
+mixing business logic and JSX in the same file (unless component is < 30 LOC)

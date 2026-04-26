@@ -67,18 +67,18 @@ public sealed class UpdateReleaseCommandHandler(
             }
         }
 
-        // 5. Update Tracks (Replace existing with new list)
+        // 5. Update Tracks (Replace all)
         if (request.Tracks != null)
         {
             release.Tracks.Clear();
-            foreach (var trackDto in request.Tracks)
+
+            foreach (TrackCreateDto trackDto in request.Tracks)
             {
                 release.Tracks.Add(new Track
                 {
-                    ReleaseId = release.Id,
                     Title = trackDto.Title,
                     Position = trackDto.Position,
-                    DurationSeconds = trackDto.DurationSeconds,
+                    DurationSeconds = trackDto.DurationSeconds ?? 0,
                     Side = trackDto.Side
                 });
             }
