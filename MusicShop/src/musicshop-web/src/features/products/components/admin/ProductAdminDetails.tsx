@@ -2,7 +2,6 @@ import { ArrowLeft, Package, Plus, Settings, Tag, ShieldCheck, AlertCircle, Load
 import { Button, Card, CardHeader, CardTitle, CardContent, Skeleton } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
 import { ReleaseFormat } from '../../types';
-import { VariantFormModal } from './VariantFormModal';
 import { useProductAdminDetails } from '../../hooks/useProductAdminDetails';
 
 interface ProductAdminDetailsProps {
@@ -18,7 +17,6 @@ export function ProductAdminDetails({ productId }: ProductAdminDetailsProps) {
     product,
     isLoading,
     error,
-    variantModal,
     actions
   } = useProductAdminDetails({ productId });
 
@@ -73,107 +71,96 @@ export function ProductAdminDetails({ productId }: ProductAdminDetailsProps) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column: Variants management */}
+        {/* Left Column: Product Info & Attributes */}
         <div className="lg:col-span-2 space-y-8">
            <Card className="bg-surface border-border shadow-sm rounded-3xl overflow-hidden">
               <CardHeader className="p-8 border-b border-border flex flex-row items-center justify-between bg-muted/5">
                  <div className="flex items-center gap-3">
                     <div className="bg-amber-500/10 p-2 rounded-xl">
-                       <Layers className="h-5 w-5 text-amber-600" />
+                       <Tag className="h-5 w-5 text-amber-600" />
                     </div>
                     <div>
-                       <h3 className="text-lg font-bold">Product Variants</h3>
-                       <p className="text-xs text-muted-foreground">Manage physical editions, colors, and stock levels.</p>
+                       <h3 className="text-lg font-bold">Product Pricing & Stock</h3>
+                       <p className="text-xs text-muted-foreground">Manage the active SKU details.</p>
                     </div>
                  </div>
-                 <Button 
-                   onClick={variantModal.openAdd}
-                   className="bg-primary hover:bg-primary-dark text-primary-foreground h-10 px-4 rounded-xl shadow-lg shadow-primary/20 flex gap-2"
-                 >
-                    <Plus className="h-4 w-4" />
-                    Add Variant
-                 </Button>
               </CardHeader>
-              <CardContent className="p-0">
-                 <table className="w-full text-left border-collapse">
-                    <thead className="bg-muted/30">
-                       <tr>
-                          <th className="px-8 py-4 text-[10px] font-black uppercase tracking-widest text-subtle">Variant Details</th>
-                          <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-subtle">Price</th>
-                          <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-subtle">Stock</th>
-                          <th className="px-6 py-4 text-[10px] font-black uppercase tracking-widest text-subtle text-right">Actions</th>
-                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                       {product.variants.map((variant) => (
-                          <tr key={variant.id} className="hover:bg-muted/10 transition-colors group">
-                             <td className="px-8 py-5">
-                                <div className="flex items-center gap-4">
-                                   <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center border border-border">
-                                      <Tag className="h-5 w-5 text-subtle" />
-                                   </div>
-                                   <div>
-                                      <p className="text-sm font-bold text-foreground">{variant.variantName}</p>
-                                      <div className="flex items-center gap-2 mt-0.5">
-                                         {variant.isSigned && (
-                                           <span className="text-[9px] font-black uppercase bg-emerald-500/10 text-emerald-600 px-1.5 py-0.5 rounded leading-none">SIGNED</span>
-                                         )}
-                                         <span className="text-[9px] font-medium text-muted-foreground uppercase">{variant.isAvailable ? 'Available' : 'Out of Stock'}</span>
-                                      </div>
-                                   </div>
-                                </div>
-                             </td>
-                             <td className="px-6 py-5">
-                                <span className="text-sm font-black text-foreground">${variant.price.toFixed(2)}</span>
-                             </td>
-                             <td className="px-6 py-5">
-                                <div className="flex items-center gap-2">
-                                   <span className={cn(
-                                     "h-2 w-2 rounded-full",
-                                     variant.stockQty > 10 ? "bg-emerald-500" : variant.stockQty > 0 ? "bg-amber-500" : "bg-red-500"
-                                   )} />
-                                   <span className="text-sm font-bold text-muted-foreground">{variant.stockQty} units</span>
-                                </div>
-                             </td>
-                             <td className="px-6 py-5 text-right">
-                                <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                   <Button 
-                                     variant="ghost" 
-                                     size="icon" 
-                                     className="h-9 w-9 rounded-lg"
-                                     onClick={() => variantModal.openEdit(variant)}
-                                   >
-                                      <Edit3 className="h-4 w-4" />
-                                   </Button>
-                                   <Button 
-                                     variant="ghost" 
-                                     size="icon" 
-                                     className="h-9 w-9 rounded-lg text-red-500 hover:bg-red-50"
-                                     onClick={() => actions.deleteVariant(variant.id)}
-                                     disabled={actions.isDeletingVariant}
-                                   >
-                                      {actions.isDeletingVariant && actions.deletingVariantId === variant.id ? (
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                      ) : (
-                                        <Trash2 className="h-4 w-4" />
-                                      )}
-                                   </Button>
-                                </div>
-                             </td>
-                          </tr>
-                       ))}
-                       {product.variants.length === 0 && (
-                          <tr>
-                             <td colSpan={4} className="px-8 py-12 text-center">
-                                <AlertCircle className="h-8 w-8 mx-auto text-subtle/30 mb-2" />
-                                <p className="text-sm text-muted-foreground">No variants added yet. This product cannot be sold without variants.</p>
-                             </td>
-                          </tr>
-                       )}
-                    </tbody>
-                 </table>
+              <CardContent className="p-8 space-y-6">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-black uppercase tracking-widest text-subtle">Base Price</label>
+                       <div className="text-3xl font-black text-foreground">${product.price.toFixed(2)}</div>
+                    </div>
+                    <div className="space-y-2">
+                       <label className="text-[10px] font-black uppercase tracking-widest text-subtle">Inventory Count</label>
+                       <div className="flex items-center gap-3">
+                          <div className="text-3xl font-black text-foreground">{product.stockQty}</div>
+                          <span className={cn(
+                             "px-2 py-0.5 rounded text-[10px] font-black uppercase",
+                             product.stockQty > 10 ? "bg-emerald-500/10 text-emerald-600" : product.stockQty > 0 ? "bg-amber-500/10 text-amber-600" : "bg-red-500/10 text-red-600"
+                          )}>
+                             {product.stockQty > 0 ? 'In Stock' : 'Out of Stock'}
+                          </span>
+                       </div>
+                    </div>
+                 </div>
+
+                 <div className="pt-6 border-t border-border">
+                    <div className="flex items-center gap-4">
+                       <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-xl border border-border">
+                          <ShieldCheck className={cn("h-4 w-4", product.isSigned ? "text-emerald-500" : "text-muted-foreground/30")} />
+                          <span className="text-xs font-bold">{product.isSigned ? 'Autographed Edition' : 'Standard Edition'}</span>
+                       </div>
+                       <div className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 rounded-xl border border-border">
+                          <AlertCircle className={cn("h-4 w-4", product.isAvailable ? "text-emerald-500" : "text-red-500")} />
+                          <span className="text-xs font-bold">{product.isAvailable ? 'Available for Purchase' : 'Currently Unavailable'}</span>
+                       </div>
+                    </div>
+                 </div>
               </CardContent>
            </Card>
+
+           {/* Attributes Card */}
+           {(product.vinylAttributes || product.cdAttributes || product.cassetteAttributes) && (
+              <Card className="bg-surface border-border shadow-sm rounded-3xl overflow-hidden">
+                 <CardHeader className="p-8 border-b border-border bg-muted/5">
+                    <div className="flex items-center gap-3">
+                       <div className="bg-primary/10 p-2 rounded-xl">
+                          <Layers className="h-5 w-5 text-primary" />
+                       </div>
+                       <div>
+                          <h3 className="text-lg font-bold">Physical Specifications</h3>
+                          <p className="text-xs text-muted-foreground">Format-specific attributes and details.</p>
+                       </div>
+                    </div>
+                 </CardHeader>
+                 <CardContent className="p-8">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-6">
+                       {product.vinylAttributes && (
+                          <>
+                             <AttributeItem label="Disc Color" value={product.vinylAttributes.discColor} />
+                             <AttributeItem label="Weight" value={product.vinylAttributes.weightGrams ? `${product.vinylAttributes.weightGrams}g` : null} />
+                             <AttributeItem label="Speed" value={product.vinylAttributes.speedRpm ? `${product.vinylAttributes.speedRpm} RPM` : null} />
+                             <AttributeItem label="Disc Count" value={product.vinylAttributes.discCount} />
+                             <AttributeItem label="Sleeve" value={product.vinylAttributes.sleeveType} />
+                          </>
+                       )}
+                       {product.cdAttributes && (
+                          <>
+                             <AttributeItem label="Edition" value={product.cdAttributes.edition} />
+                             <AttributeItem label="Japan Edition" value={product.cdAttributes.isJapanEdition ? 'Yes' : 'No'} />
+                          </>
+                       )}
+                       {product.cassetteAttributes && (
+                          <>
+                             <AttributeItem label="Tape Color" value={product.cassetteAttributes.tapeColor} />
+                             <AttributeItem label="Edition" value={product.cassetteAttributes.edition} />
+                          </>
+                       )}
+                    </div>
+                 </CardContent>
+              </Card>
+           )}
         </div>
 
         {/* Right Column: Master Info Summary */}
@@ -228,15 +215,16 @@ export function ProductAdminDetails({ productId }: ProductAdminDetailsProps) {
            </Card>
         </div>
       </div>
+    </div>
+  );
+}
 
-      {variantModal.isOpen && (
-        <VariantFormModal 
-          productId={product.id}
-          format={product.format}
-          editingVariant={variantModal.editingVariant}
-          onClose={variantModal.close} 
-        />
-      )}
+function AttributeItem({ label, value }: { label: string; value?: string | number | null }) {
+  if (!value) return null;
+  return (
+    <div className="space-y-1">
+      <p className="text-[10px] font-black uppercase tracking-widest text-subtle">{label}</p>
+      <p className="text-sm font-bold text-foreground capitalize">{value.toString()}</p>
     </div>
   );
 }

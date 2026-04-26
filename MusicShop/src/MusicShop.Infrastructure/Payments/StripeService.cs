@@ -53,8 +53,8 @@ public sealed class StripeService : IStripeService
                         Currency = "usd", // Should probably be configurable
                         ProductData = new SessionLineItemPriceDataProductDataOptions
                         {
-                            Name = item.Variant?.Product?.Name ?? "Music Item",
-                            Description = item.Variant?.VariantName
+                            Name = item.Product?.Name ?? "Music Item",
+                            Description = item.ProductNameSnapshot
                         },
                     },
                     Quantity = item.Quantity,

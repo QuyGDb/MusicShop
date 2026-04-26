@@ -45,6 +45,11 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
         builder.Property(x => x.ProductNameSnapshot)
             .IsRequired()
             .HasMaxLength(300);
+
+        builder.HasOne(x => x.Product)
+            .WithMany()
+            .HasForeignKey(x => x.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
 
@@ -60,6 +65,20 @@ public class CartConfiguration : IEntityTypeConfiguration<Cart>
         builder.HasMany(x => x.Items)
             .WithOne(x => x.Cart)
             .HasForeignKey(x => x.CartId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+    }
+}
+
+public class CartItemConfiguration : IEntityTypeConfiguration<CartItem>
+{
+    public void Configure(EntityTypeBuilder<CartItem> builder)
+    {
+        builder.HasKey(x => x.Id);
+
+        builder.HasOne(x => x.Product)
+            .WithMany()
+            .HasForeignKey(x => x.ProductId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

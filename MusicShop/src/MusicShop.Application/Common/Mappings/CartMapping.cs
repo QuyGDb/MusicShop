@@ -21,13 +21,12 @@ public static class CartMapping
             Items = cart.Items.Select(i => new CartItemDto
             {
                 Id = i.Id,
-                VariantId = i.VariantId,
+                ProductId = i.ProductId,
                 Quantity = i.Quantity,
-                ProductName = i.Variant?.Product?.Name ?? "Unknown Product",
-                VariantName = i.Variant?.VariantName ?? "Standard",
-                CoverUrl = i.Variant?.Product?.CoverUrl,
-                UnitPrice = i.Variant?.Price ?? 0,
-                InStock = (i.Variant?.StockQty ?? 0) >= i.Quantity
+                ProductName = i.Product?.Name ?? "Unknown Product",
+                CoverUrl = i.Product?.CoverUrl,
+                UnitPrice = i.Product?.Price ?? 0,
+                InStock = (i.Product?.StockQty ?? 0) >= i.Quantity
             }).ToList()
         };
     }

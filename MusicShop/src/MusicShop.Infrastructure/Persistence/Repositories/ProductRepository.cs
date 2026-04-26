@@ -14,7 +14,9 @@ public sealed class ProductRepository(AppDbContext context) : GenericRepository<
         CancellationToken ct = default)
     {
         IQueryable<Product> query = _dbSet.AsNoTracking()
-            .Include(product => product.Variants)
+            .Include(product => product.VinylAttributes)
+            .Include(product => product.CdAttributes)
+            .Include(product => product.CassetteAttributes)
             .Include(product => product.ReleaseVersion)
                 .ThenInclude(releaseVersion => releaseVersion!.Release)
                     .ThenInclude(release => release!.Artist)
@@ -24,7 +26,7 @@ public sealed class ProductRepository(AppDbContext context) : GenericRepository<
         // 1. Filtering
         if (request.Format.HasValue)
         {
-            query = query.Where(product => product.Format == request.Format.Value);
+            query = query.Where(product => product.ReleaseVersion != null && product.ReleaseVersion.Format == request.Format.Value);
         }
 
         if (!string.IsNullOrEmpty(request.Genre))
@@ -58,12 +60,12 @@ public sealed class ProductRepository(AppDbContext context) : GenericRepository<
 
         if (request.MinPrice.HasValue)
         {
-            query = query.Where(product => product.Variants.Any(variant => variant.Price >= request.MinPrice.Value));
+            query = query.Where(product => product.Price >= request.MinPrice.Value);
         }
 
         if (request.MaxPrice.HasValue)
         {
-            query = query.Where(product => product.Variants.Any(variant => variant.Price <= request.MaxPrice.Value));
+            query = query.Where(product => product.Price <= request.MaxPrice.Value);
         }
 
         // 2. Execution
@@ -81,7 +83,9 @@ public sealed class ProductRepository(AppDbContext context) : GenericRepository<
     public async Task<Product?> GetByIdWithDetailsAsync(Guid id, CancellationToken ct = default)
     {
         return await _dbSet.AsNoTracking()
-            .Include(product => product.Variants)
+            .Include(product => product.VinylAttributes)
+            .Include(product => product.CdAttributes)
+            .Include(product => product.CassetteAttributes)
             .Include(product => product.ReleaseVersion)
                 .ThenInclude(releaseVersion => releaseVersion!.Release)
                     .ThenInclude(release => release!.Artist)
@@ -91,7 +95,9 @@ public sealed class ProductRepository(AppDbContext context) : GenericRepository<
     public async Task<Product?> GetBySlugWithDetailsAsync(string slug, CancellationToken ct = default)
     {
         return await _dbSet.AsNoTracking()
-            .Include(product => product.Variants)
+            .Include(product => product.VinylAttributes)
+            .Include(product => product.CdAttributes)
+            .Include(product => product.CassetteAttributes)
             .Include(product => product.ReleaseVersion)
                 .ThenInclude(releaseVersion => releaseVersion!.Release)
                     .ThenInclude(release => release!.Artist)
@@ -102,34 +108,8 @@ public sealed class ProductRepository(AppDbContext context) : GenericRepository<
     {
         return await _context.Set<Domain.Entities.Orders.OrderItem>()
             .AnyAsync(orderItem =>
-                orderItem.Variant.ProductId == productId &&
+                orderItem.ProductId == productId &&
                 (orderItem.Order.Status == OrderStatus.Pending || orderItem.Order.Status == OrderStatus.Confirmed),
                 ct);
-    }
-
-    public async Task<IReadOnlyList<ProductVariant>> GetVariantsAsync(Guid productId, CancellationToken ct = default)
-    {
-        return await _context.Set<ProductVariant>()
-            .AsNoTracking()
-            .Include(variant => variant.VinylAttributes)
-            .Include(variant => variant.CdAttributes)
-            .Include(variant => variant.CassetteAttributes)
-            .Where(variant => variant.ProductId == productId)
-            .ToListAsync(ct);
-    }
-
-    public async Task<ProductVariant?> GetVariantByIdAsync(Guid productId, Guid variantId, CancellationToken ct = default)
-    {
-        return await _context.Set<ProductVariant>()
-            .Include(variant => variant.Product)
-            .Include(variant => variant.VinylAttributes)
-            .Include(variant => variant.CdAttributes)
-            .Include(variant => variant.CassetteAttributes)
-            .FirstOrDefaultAsync(variant => variant.Id == variantId && variant.ProductId == productId, ct);
-    }
-
-    public void DeleteVariant(ProductVariant variant)
-    {
-        _context.Set<ProductVariant>().Remove(variant);
     }
 }

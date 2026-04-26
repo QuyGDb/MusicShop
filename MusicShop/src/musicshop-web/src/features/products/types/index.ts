@@ -21,12 +21,6 @@ export interface Product {
   minPrice: number;
   maxPrice: number;
   inStock: boolean;
-}
-
-export interface ProductVariant {
-  id: string;
-  productId: string;
-  variantName: string;
   price: number;
   stockQty: number;
   isAvailable: boolean;
@@ -34,33 +28,25 @@ export interface ProductVariant {
 }
 
 export interface VinylAttributes {
-  id: string;
-  productVariantId: string;
-  discColor: 'black' | 'colored' | 'splatter' | 'picture_disc';
-  weightGrams: 140 | 180;
-  speedRpm: 33 | 45;
-  discCount: '1lp' | '2lp' | 'box_set';
-  sleeveType: 'standard' | 'gatefold' | 'obi_strip';
+  discColor?: string;
+  weightGrams?: number;
+  speedRpm?: number;
+  discCount?: string;
+  sleeveType?: string;
 }
 
 export interface CdAttributes {
-  id: string;
-  productVariantId: string;
-  edition: 'standard' | 'deluxe' | 'box_set';
+  edition?: string;
   isJapanEdition: boolean;
 }
 
 export interface CassetteAttributes {
-  id: string;
-  productVariantId: string;
-  tapeColor: 'black' | 'clear' | 'white' | 'colored';
-  edition: 'standard' | 'limited';
+  tapeColor?: string;
+  edition?: string;
 }
 
 export interface ProductDetail extends Product {
-  variants: (ProductVariant & {
-    vinylAttributes?: VinylAttributes;
-    cdAttributes?: CdAttributes;
-    cassetteAttributes?: CassetteAttributes;
-  })[];
+  vinylAttributes?: VinylAttributes;
+  cdAttributes?: CdAttributes;
+  cassetteAttributes?: CassetteAttributes;
 }

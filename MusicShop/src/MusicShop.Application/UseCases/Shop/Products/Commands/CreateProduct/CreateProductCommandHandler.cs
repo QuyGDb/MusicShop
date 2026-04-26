@@ -27,12 +27,32 @@ public sealed class CreateProductCommandHandler(
             Slug = request.Slug,
             Description = request.Description,
             CoverUrl = request.CoverUrl,
-            Format = request.Format,
             IsLimited = request.IsLimited,
             LimitedQty = request.LimitedQty,
             IsPreorder = request.IsPreorder,
             PreorderReleaseDate = request.PreorderReleaseDate,
-            IsActive = true
+            IsActive = true,
+            Price = request.Price,
+            StockQty = request.StockQty,
+            IsSigned = request.IsSigned,
+            VinylAttributes = request.VinylAttributes != null ? new VinylAttributes
+            {
+                DiscColor = request.VinylAttributes.DiscColor,
+                WeightGrams = request.VinylAttributes.WeightGrams,
+                SpeedRpm = request.VinylAttributes.SpeedRpm,
+                DiscCount = request.VinylAttributes.DiscCount,
+                SleeveType = request.VinylAttributes.SleeveType
+            } : null,
+            CdAttributes = request.CdAttributes != null ? new CdAttributes
+            {
+                Edition = request.CdAttributes.Edition,
+                IsJapanEdition = request.CdAttributes.IsJapanEdition
+            } : null,
+            CassetteAttributes = request.CassetteAttributes != null ? new CassetteAttributes
+            {
+                TapeColor = request.CassetteAttributes.TapeColor,
+                Edition = request.CassetteAttributes.Edition
+            } : null
         };
 
         productRepository.Add(product);

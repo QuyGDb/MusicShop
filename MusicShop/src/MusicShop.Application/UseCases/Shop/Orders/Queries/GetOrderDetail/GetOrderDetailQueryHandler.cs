@@ -43,15 +43,9 @@ public sealed class GetOrderDetailQueryHandler(
                 orderItem.Quantity,
                 orderItem.PriceSnapshot,
                 orderItem.PriceSnapshot * orderItem.Quantity,
-                new OrderItemVariantDto(
-                    orderItem.VariantId,
-                    orderItem.Variant.VariantName,
-                    new OrderItemProductDto(
-                        orderItem.Variant.ProductId,
-                        orderItem.Variant.Product.Name,
-                        orderItem.Variant.Product.CoverUrl
-                    )
-                )
+                orderItem.ProductId,
+                orderItem.Product.Name,
+                orderItem.Product.CoverUrl
             )).ToList(),
             order.Payment != null ? new PaymentDetailDto(
                 order.Payment.Method,

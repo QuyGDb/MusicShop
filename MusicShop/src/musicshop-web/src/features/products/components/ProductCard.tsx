@@ -53,7 +53,7 @@ export function ProductCard({ product }: ProductCardProps) {
         <div className="flex flex-col">
           <span className="text-xs text-subtle font-medium">Price</span>
           <span className="text-xl font-black text-foreground">
-            ${product.minPrice.toFixed(2)}
+            ${product.price.toFixed(2)}
           </span>
         </div>
         {!product.inStock && (

@@ -7,4 +7,10 @@ public sealed record UpdateProductRequest(
     bool? IsActive,
     bool? IsPreorder,
     DateTime? PreorderReleaseDate,
-    int? LimitedQty);
+    int? LimitedQty,
+    decimal? Price,
+    int? StockQty,
+    bool? IsSigned,
+    VinylAttributesDto? VinylAttributes = null,
+    CdAttributesDto? CdAttributes = null,
+    CassetteAttributesDto? CassetteAttributes = null);

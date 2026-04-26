@@ -35,7 +35,7 @@ public sealed class CartController(
     {
         var result = await mediator.Send(new AddToCartCommand(
             GetUserId(),
-            request.ProductVariantId,
+            request.ProductId,
             request.Quantity));
             
         return HandleResult(result);

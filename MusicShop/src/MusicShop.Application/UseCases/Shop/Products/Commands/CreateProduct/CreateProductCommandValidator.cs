@@ -12,8 +12,6 @@ public sealed class CreateProductCommandValidator : AbstractValidator<CreateProd
             .NotEmpty()
             .MaximumLength(300);
 
-        RuleFor(x => x.Format).IsInEnum();
-
         RuleFor(x => x.LimitedQty)
             .GreaterThan(0)
             .When(x => x.IsLimited);

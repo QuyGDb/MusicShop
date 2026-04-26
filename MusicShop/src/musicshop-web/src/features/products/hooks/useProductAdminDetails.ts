@@ -1,7 +1,5 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAdminProduct, useDeleteProductVariant } from './useProducts';
-import { ProductVariant } from '../types';
+import { useAdminProduct } from './useProducts';
 
 interface UseProductAdminDetailsProps {
   productId: string;
@@ -9,32 +7,8 @@ interface UseProductAdminDetailsProps {
 
 export function useProductAdminDetails({ productId }: UseProductAdminDetailsProps) {
   const navigate = useNavigate();
-  const [showVariantModal, setShowVariantModal] = useState(false);
-  const [editingVariant, setEditingVariant] = useState<ProductVariant | null>(null);
 
   const { data: product, isLoading, error } = useAdminProduct(productId);
-  const deleteVariantMutation = useDeleteProductVariant(productId);
-
-  const handleOpenAddVariant = () => {
-    setEditingVariant(null);
-    setShowVariantModal(true);
-  };
-
-  const handleOpenEditVariant = (variant: ProductVariant) => {
-    setEditingVariant(variant);
-    setShowVariantModal(true);
-  };
-
-  const handleCloseVariantModal = () => {
-    setShowVariantModal(false);
-    setEditingVariant(null);
-  };
-
-  const handleDeleteVariant = (variantId: string) => {
-    if (window.confirm('Delete this variant?')) {
-      deleteVariantMutation.mutate(variantId);
-    }
-  };
 
   const handleBack = () => {
     navigate('/admin/products');
@@ -50,17 +24,7 @@ export function useProductAdminDetails({ productId }: UseProductAdminDetailsProp
     product,
     isLoading,
     error,
-    variantModal: {
-      isOpen: showVariantModal,
-      editingVariant,
-      openAdd: handleOpenAddVariant,
-      openEdit: handleOpenEditVariant,
-      close: handleCloseVariantModal,
-    },
     actions: {
-      deleteVariant: handleDeleteVariant,
-      isDeletingVariant: deleteVariantMutation.isPending,
-      deletingVariantId: deleteVariantMutation.variables,
       back: handleBack,
       viewStore: handleViewStore,
     }

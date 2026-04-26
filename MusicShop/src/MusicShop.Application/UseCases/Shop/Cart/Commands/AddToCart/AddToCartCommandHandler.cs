@@ -15,29 +15,29 @@ namespace MusicShop.Application.UseCases.Shop.Cart.Commands.AddToCart;
 public sealed class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, Result<Guid>>
 {
     private readonly ICartRepository _cartRepository;
-    private readonly IRepository<ProductVariant> _variantRepository;
+    private readonly IProductRepository _productRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public AddToCartCommandHandler(
         ICartRepository cartRepository,
-        IRepository<ProductVariant> variantRepository,
+        IProductRepository productRepository,
         IUnitOfWork unitOfWork)
     {
         _cartRepository = cartRepository;
-        _variantRepository = variantRepository;
+        _productRepository = productRepository;
         _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<Guid>> Handle(AddToCartCommand request, CancellationToken cancellationToken)
     {
-        // 1. Validate Product Variant & Stock
-        ProductVariant? productVariant = await _variantRepository.FirstOrDefaultAsync(variant => variant.Id == request.ProductVariantId, cancellationToken);
-        if (productVariant == null)
+        // 1. Validate Product & Stock
+        Product? product = await _productRepository.FirstOrDefaultAsync(p => p.Id == request.ProductId, cancellationToken);
+        if (product == null)
         {
-            return Result<Guid>.Failure(ProductErrors.VariantNotFound);
+            return Result<Guid>.Failure(ProductErrors.NotFound);
         }
 
-        if (!productVariant.IsAvailable || productVariant.StockQty < request.Quantity)
+        if (!product.IsAvailable || product.StockQty < request.Quantity)
         {
             return Result<Guid>.Failure(CartErrors.InsufficientStock);
         }
@@ -57,11 +57,11 @@ public sealed class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, 
         }
 
         // 3. Add or Update Item
-        CartItem? existingCartItem = cart.Items.FirstOrDefault(item => item.VariantId == request.ProductVariantId);
+        CartItem? existingCartItem = cart.Items.FirstOrDefault(item => item.ProductId == request.ProductId);
         if (existingCartItem != null)
         {
             int newQuantity = existingCartItem.Quantity + request.Quantity;
-            if (productVariant.StockQty < newQuantity)
+            if (product.StockQty < newQuantity)
             {
                 return Result<Guid>.Failure(CartErrors.InsufficientStock);
             }
@@ -73,7 +73,7 @@ public sealed class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, 
             {
                 Id = Guid.NewGuid(),
                 CartId = cart.Id,
-                VariantId = request.ProductVariantId,
+                ProductId = request.ProductId,
                 Quantity = request.Quantity
             });
         }

@@ -15,5 +15,13 @@ public class ProductDetailDto
     public string? CoverUrl { get; set; }
     
     public ArtistShortDto Artist { get; set; } = null!;
-    public IEnumerable<ProductVariantDto> Variants { get; set; } = new List<ProductVariantDto>();
+    
+    public decimal Price { get; set; }
+    public int StockQty { get; set; }
+    public bool IsAvailable { get; set; }
+    public bool IsSigned { get; set; }
+    
+    public VinylAttributesDto? VinylAttributes { get; set; }
+    public CdAttributesDto? CdAttributes { get; set; }
+    public CassetteAttributesDto? CassetteAttributes { get; set; }
 }

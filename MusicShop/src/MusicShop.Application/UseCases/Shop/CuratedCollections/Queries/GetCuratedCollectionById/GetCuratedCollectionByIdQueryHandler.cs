@@ -22,14 +22,14 @@ public sealed class GetCuratedCollectionByIdQueryHandler(
             {
                 Id = product.Id,
                 Name = product.Name,
-                ArtistName = product.ReleaseVersion.Release.Artist.Name,
-                Format = product.Format,
+                ArtistName = product.ReleaseVersion?.Release?.Artist?.Name,
+                Format = product.ReleaseVersion?.Format ?? Domain.Enums.ReleaseFormat.Vinyl,
                 IsLimited = product.IsLimited,
                 IsPreorder = product.IsPreorder,
-                CoverUrl = product.ReleaseVersion.Release.CoverUrl,
-                MinPrice = product.Variants.Count > 0 ? product.Variants.Min(variant => variant.Price) : 0,
-                MaxPrice = product.Variants.Count > 0 ? product.Variants.Max(variant => variant.Price) : 0,
-                InStock = product.Variants.Any(variant => variant.StockQty > 0 && variant.IsAvailable)
+                CoverUrl = product.ReleaseVersion?.Release?.CoverUrl,
+                Price = product.Price,
+                StockQty = product.StockQty,
+                InStock = product.IsAvailable && product.StockQty > 0
             })
             .ToList();
 

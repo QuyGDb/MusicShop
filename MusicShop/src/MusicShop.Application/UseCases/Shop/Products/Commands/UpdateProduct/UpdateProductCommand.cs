@@ -11,4 +11,10 @@ public sealed record UpdateProductCommand(
     bool? IsActive,
     bool? IsPreorder,
     DateTime? PreorderReleaseDate,
-    int? LimitedQty) : IRequest<Result>;
+    int? LimitedQty,
+    decimal? Price,
+    int? StockQty,
+    bool? IsSigned,
+    DTOs.Shop.VinylAttributesDto? VinylAttributes = null,
+    DTOs.Shop.CdAttributesDto? CdAttributes = null,
+    DTOs.Shop.CassetteAttributesDto? CassetteAttributes = null) : IRequest<Result>;

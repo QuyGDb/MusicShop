@@ -69,7 +69,6 @@ public sealed class ReleaseRepository(AppDbContext context) : GenericRepository<
                 .ThenInclude(releaseVersion => releaseVersion.Label)
             .Include(release => release.Versions)
                 .ThenInclude(releaseVersion => releaseVersion.Products)
-                    .ThenInclude(product => product.Variants)
             .AsQueryable();
 
         if (!track)
@@ -91,7 +90,6 @@ public sealed class ReleaseRepository(AppDbContext context) : GenericRepository<
                 .ThenInclude(releaseVersion => releaseVersion.Label)
             .Include(release => release.Versions)
                 .ThenInclude(releaseVersion => releaseVersion.Products)
-                    .ThenInclude(product => product.Variants)
             .AsQueryable();
 
         if (!track)

@@ -15,13 +15,13 @@ public static class ProductMapping
             ArtistName = p.ReleaseVersion != null && p.ReleaseVersion.Release != null && p.ReleaseVersion.Release.Artist != null 
                 ? p.ReleaseVersion.Release.Artist.Name 
                 : null,
-            Format = p.Format,
+            Format = p.ReleaseVersion != null ? p.ReleaseVersion.Format : ReleaseFormat.Vinyl,
             IsLimited = p.IsLimited,
             IsPreorder = p.IsPreorder,
             CoverUrl = p.CoverUrl,
-            MinPrice = p.Variants.Any() ? p.Variants.Min(v => v.Price) : 0,
-            MaxPrice = p.Variants.Any() ? p.Variants.Max(v => v.Price) : 0,
-            InStock = p.Variants.Any(v => v.StockQty > 0 && v.IsAvailable)
+            Price = p.Price,
+            StockQty = p.StockQty,
+            InStock = p.StockQty > 0 && p.IsAvailable
         });
     }
 
@@ -35,7 +35,7 @@ public static class ProductMapping
             Id = p.Id,
             Name = p.Name,
             Description = p.Description,
-            Format = p.Format,
+            Format = p.ReleaseVersion != null ? p.ReleaseVersion.Format : ReleaseFormat.Vinyl,
             IsLimited = p.IsLimited,
             LimitedQty = p.LimitedQty,
             IsPreorder = p.IsPreorder,
@@ -48,15 +48,22 @@ public static class ProductMapping
                     ? p.ReleaseVersion.Release.Artist.Name 
                     : string.Empty
             },
-            Variants = p.Variants.Select(v => new ProductVariantDto
-            {
-                Id = v.Id,
-                VariantName = v.VariantName,
-                Price = v.Price,
-                StockQty = v.StockQty,
-                IsAvailable = v.IsAvailable,
-                IsSigned = v.IsSigned
-            }).ToList() // EF Core handles collection projection
+            Price = p.Price,
+            StockQty = p.StockQty,
+            IsAvailable = p.IsAvailable,
+            IsSigned = p.IsSigned,
+            VinylAttributes = p.VinylAttributes != null ? new VinylAttributesDto(
+                p.VinylAttributes.DiscColor,
+                p.VinylAttributes.WeightGrams,
+                p.VinylAttributes.SpeedRpm,
+                p.VinylAttributes.DiscCount,
+                p.VinylAttributes.SleeveType) : null,
+            CdAttributes = p.CdAttributes != null ? new CdAttributesDto(
+                p.CdAttributes.Edition,
+                p.CdAttributes.IsJapanEdition) : null,
+            CassetteAttributes = p.CassetteAttributes != null ? new CassetteAttributesDto(
+                p.CassetteAttributes.TapeColor,
+                p.CassetteAttributes.Edition) : null
         });
     }
 }

@@ -20,17 +20,9 @@ public sealed record OrderItemDetailDto(
     int Quantity,
     decimal UnitPrice,
     decimal Subtotal,
-    OrderItemVariantDto Variant);
-
-public sealed record OrderItemVariantDto(
-    Guid Id,
-    string VariantName,
-    OrderItemProductDto Product);
-
-public sealed record OrderItemProductDto(
-    Guid Id,
-    string Name,
-    string? CoverUrl);
+    Guid ProductId,
+    string ProductName,
+    string? ProductCoverUrl);
 
 public sealed record PaymentDetailDto(
     PaymentGateway Method,

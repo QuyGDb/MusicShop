@@ -87,8 +87,6 @@ public static class MappingExtensions
     // Release Versions
     public static ReleaseVersionDto ToDto(this ReleaseVersion version)
     {
-        List<ProductVariant> variants = version.Products.SelectMany(p => p.Variants).ToList();
-
         return new ReleaseVersionDto
         {
             Id = version.Id,
@@ -98,8 +96,8 @@ public static class MappingExtensions
             CatalogNumber = version.CatalogNumber,
             LabelName = version.Label?.Name ?? string.Empty,
             Notes = version.Notes,
-            Price = variants.OrderBy(v => v.Price).Select(v => (decimal?)v.Price).FirstOrDefault(),
-            StockQty = variants.Sum(v => (int?)v.StockQty) ?? 0
+            Price = version.Products.OrderBy(p => p.Price).Select(p => (decimal?)p.Price).FirstOrDefault(),
+            StockQty = version.Products.Sum(p => p.StockQty)
         };
     }
 

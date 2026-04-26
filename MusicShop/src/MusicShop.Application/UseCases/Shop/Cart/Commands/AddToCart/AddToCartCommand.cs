@@ -8,5 +8,5 @@ namespace MusicShop.Application.UseCases.Shop.Cart.Commands.AddToCart;
 /// </summary>
 public sealed record AddToCartCommand(
     Guid UserId,
-    Guid ProductVariantId,
+    Guid ProductId,
     int Quantity) : IRequest<Result<Guid>>;

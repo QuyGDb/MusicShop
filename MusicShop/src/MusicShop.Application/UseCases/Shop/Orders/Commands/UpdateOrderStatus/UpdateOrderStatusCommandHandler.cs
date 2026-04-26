@@ -26,9 +26,9 @@ public sealed class UpdateOrderStatusCommandHandler(
         {
             foreach (OrderItem orderItem in order.OrderItems)
             {
-                if (!orderItem.Variant.Product.IsPreorder)
+                if (!orderItem.Product.IsPreorder)
                 {
-                    orderItem.Variant.StockQty += orderItem.Quantity;
+                    orderItem.Product.StockQty += orderItem.Quantity;
                 }
             }
         }
@@ -38,9 +38,9 @@ public sealed class UpdateOrderStatusCommandHandler(
         {
             foreach (OrderItem orderItem in order.OrderItems)
             {
-                if (!orderItem.Variant.Product.IsPreorder)
+                if (!orderItem.Product.IsPreorder)
                 {
-                    orderItem.Variant.StockQty -= orderItem.Quantity;
+                    orderItem.Product.StockQty -= orderItem.Quantity;
                 }
             }
         }

@@ -274,7 +274,7 @@ release_versions → products → product_variants
 
 ### `products` — Sản phẩm
 
-Một `product` đại diện cho một `release_version` mà shop đang kinh doanh. Không phải mọi `release_version` đều được bán — chỉ những bản admin chủ động tạo product mới xuất hiện trong shop.
+Một `product` đại diện cho một `release_version` mà shop đang kinh doanh. Hiện tại mỗi Product là một SKU độc lập (không còn lớp Variant trung gian).
 
 ```
 products
@@ -285,65 +285,46 @@ name                 | string               -- tên hiển thị trong shop
 slug                 | string               -- SEO / URL friendly
 cover_url            | string   nullable    -- ảnh gốc sản phẩm
 description          | text     nullable
-format               | enum                 -- vinyl | cd | cassette (denormalize từ release_version để query nhanh)
+price                | decimal              -- giá bán
+stock_qty            | int      default 0   -- số lượng tồn kho
+is_available         | boolean  default true-- trạng thái kinh doanh
+is_signed            | boolean  default false-- có chữ ký hay không
 is_limited           | boolean  default false
-limited_qty          | int      nullable    -- chỉ có giá trị khi is_limited = true
+limited_qty          | int      nullable
 is_preorder          | boolean  default false
-preorder_release_date| date     nullable    -- chỉ có giá trị khi is_preorder = true
-is_active            | boolean  default true
+preorder_release_date| date     nullable
+is_active            | boolean  default true-- ẩn/hiện sản phẩm
 created_at           | timestamp
 ```
 
 **Giải thích:**
 
-- `format` được denormalize (copy lại) từ `release_version.format` để tránh join 3 tầng mỗi khi filter sản phẩm theo định dạng. `release_version.format` vẫn là source of truth — nếu thay đổi, cần sync lại.
-- `is_limited + limited_qty`: khi `is_limited = true`, `limited_qty` là số lượng tối đa từng phát hành. Nghiệp vụ yêu cầu không được tăng `limited_qty` sau khi bắt đầu bán — enforce ở tầng service, không phải DB constraint.
-- `is_preorder + preorder_release_date`: khi `is_preorder = true`, tồn kho không bị trừ cho đến ngày `preorder_release_date`. Logic này xử lý ở tầng service khi checkout.
+- `price` và `stock_qty` hiện được lưu trực tiếp tại Product. Hệ thống đã lược bỏ tầng Variant để đơn giản hóa quản lý SKU.
+- `Format` không còn nằm ở bảng `products`. Thông tin này được truy xuất trực tiếp từ `release_versions.format` để đảm bảo tính nhất quán dữ liệu (Single Source of Truth).
+- Thuộc tính riêng của từng format (màu đĩa, trọng lượng...) được tách sang 3 bảng extension (`vinyl_attributes`, `cd_attributes`, `cassette_attributes`) và nối trực tiếp với `product_id`.
 - `is_active = false` dùng khi ẩn sản phẩm thay vì xóa — không được xóa khi đang có đơn hàng Pending/Confirmed.
 
 ---
 
-### `product_variants` — Biến thể sản phẩm
-
-Mỗi product có thể có nhiều biến thể. **Giá và tồn kho nằm ở variant, không phải product.** Bảng này chỉ lưu phần chung — thuộc tính riêng của từng format được tách sang 3 bảng extension bên dưới.
-
-```
-product_variants
-─────────────────────────────────────────
-id           | uuid     PK
-product_id   | uuid     FK → products.id
-variant_name | string               -- "Black 180g Gatefold", "Japan Deluxe Edition"
-price        | decimal              -- giá của biến thể này
-stock_qty    | int      default 0
-is_available | boolean  default true
-is_signed    | boolean  default false   -- chung cho cả 3 format
-```
-
-**Giải thích:**
-
-- 3 bảng extension riêng cho từng format (`vinyl_attributes`, `cd_attributes`, `cassette_attributes`). Lý do: thuộc tính của mỗi format là **cố định và đã biết trước**, tách bảng giúp DB tự enforce kiểu dữ liệu và enum, schema self-documenting, query có index cụ thể thay vì scan JSON.
-- `is_signed` nằm ở đây vì là thuộc tính chung cho cả 3 format — vinyl, CD, cassette đều có thể có chữ ký nghệ sĩ.
-- `is_available` tự động chuyển về `false` khi `stock_qty = 0` — xử lý ở tầng service hoặc DB trigger.
-
 **Quan hệ với bảng extension (1-1):**
 
 ```
-product_variants ──| vinyl_attributes
-product_variants ──| cd_attributes
-product_variants ──| cassette_attributes
+products ──| vinyl_attributes
+products ──| cd_attributes
+products ──| cassette_attributes
 ```
 
-Một variant chỉ thuộc đúng 1 format nên chỉ có đúng 1 bảng extension tương ứng tồn tại. Biết variant thuộc format nào thông qua `products.format`.
+Một sản phẩm chỉ thuộc đúng 1 format nên chỉ có đúng 1 bảng extension tương ứng tồn tại.
 
 ---
 
-### `vinyl_attributes` — Thuộc tính biến thể Vinyl
+### `vinyl_attributes` — Thuộc tính Vinyl
 
 ```
 vinyl_attributes
 ─────────────────────────────────────────
 id                 | uuid   PK
-product_variant_id | uuid   FK → product_variants.id   unique
+product_id         | uuid   FK → products.id   unique
 disc_color         | enum   -- black | colored | splatter | picture_disc
 weight_grams       | enum   -- 140 | 180
 speed_rpm          | enum   -- 33 | 45
@@ -353,7 +334,7 @@ sleeve_type        | enum   -- standard | gatefold | obi_strip
 
 **Giải thích:**
 
-- `unique` trên `product_variant_id` enforce quan hệ 1-1 — một variant không thể có 2 dòng vinyl_attributes.
+- `unique` trên `product_id` enforce quan hệ 1-1 — một sản phẩm không thể có 2 dòng vinyl_attributes.
 - Tất cả dùng `enum` thay vì `string` tự do để DB từ chối giá trị không hợp lệ. Không thể lưu `weight_grams = "180g"` (string) hay `speed_rpm = 78` (không hợp lệ).
 - `disc_count` phân biệt 1LP, 2LP, Box set — mỗi loại có giá và tồn kho riêng nên là variant khác nhau.
 
@@ -367,15 +348,15 @@ sleeve_type        | enum   -- standard | gatefold | obi_strip
 
 ---
 
-### `cd_attributes` — Thuộc tính biến thể CD
+### `cd_attributes` — Thuộc tính CD
 
 ```
 cd_attributes
 ─────────────────────────────────────────
 id                 | uuid    PK
-product_variant_id | uuid    FK → product_variants.id   unique
+product_id         | uuid    FK → products.id   unique
 edition            | enum    -- standard | deluxe | box_set
-is_japan_edition   | boolean default false    -- Japan edition thường có bonus track riêng
+is_japan_edition   | boolean default false
 ```
 
 **Giải thích:**
@@ -385,13 +366,13 @@ is_japan_edition   | boolean default false    -- Japan edition thường có bon
 
 ---
 
-### `cassette_attributes` — Thuộc tính biến thể Cassette
+### `cassette_attributes` — Thuộc tính Cassette
 
 ```
 cassette_attributes
 ─────────────────────────────────────────
 id                 | uuid   PK
-product_variant_id | uuid   FK → product_variants.id   unique
+product_id         | uuid   FK → products.id   unique
 tape_color         | enum   -- black | clear | white | colored
 edition            | enum   -- standard | limited
 ```
@@ -486,14 +467,13 @@ cart_items
 ─────────────────────────────────────────
 id                 | uuid     PK
 cart_id            | uuid     FK → carts.id
-product_variant_id | uuid     FK → product_variants.id
+product_id         | uuid     FK → products.id
 quantity           | int      default 1
 ```
 
 **Giải thích:**
 
-- Gắn vào `product_variant_id` thay vì `product_id` vì user chọn cụ thể biến thể nào (màu đĩa, trọng lượng...).
-- Không lưu `price` vào `cart_items` — giá lấy real-time từ `product_variants.price` khi hiển thị giỏ hàng. Giá chỉ được chốt (snapshot) khi tạo `order_items`.
+- Gắn trực tiếp vào `product_id`.
 
 ---
 
@@ -540,15 +520,15 @@ order_items
 ─────────────────────────────────────────
 id                 | uuid     PK
 order_id           | uuid     FK → orders.id
-product_variant_id | uuid     FK → product_variants.id
+product_id         | uuid     FK → products.id
 quantity           | int
 unit_price         | decimal              -- snapshot giá lúc đặt
 ```
 
 **Giải thích:**
 
-- `unit_price` là snapshot giá tại thời điểm đặt hàng — không lấy lại từ `product_variants.price`. Nếu sau này admin thay đổi giá, đơn hàng cũ phản ánh đúng giá khách đã trả.
-- `product_variant_id` vẫn giữ FK dù là snapshot — để có thể tra cứu thông tin sản phẩm (tên, ảnh) khi hiển thị lịch sử đơn hàng.
+- `unit_price` là snapshot giá tại thời điểm đặt hàng.
+- `product_id` giữ FK để tra cứu thông tin sản phẩm (tên, ảnh) khi hiển thị lịch sử đơn hàng.
 
 ---
 
@@ -689,24 +669,22 @@ created_at   | timestamp
 | 7 | `tracks` | 2 | Danh sách bài hát |
 | 8 | `artist_genres` | 2 | Junction: artist ↔ genre |
 | 9 | `release_genres` | 2 | Junction: release ↔ genre |
-| 10 | `products` | 3 | Sản phẩm |
-| 11 | `product_variants` | 3 | Biến thể sản phẩm (phần chung) |
-| 12 | `vinyl_attributes` | 3 | Thuộc tính biến thể Vinyl |
-| 13 | `cd_attributes` | 3 | Thuộc tính biến thể CD |
-| 14 | `cassette_attributes` | 3 | Thuộc tính biến thể Cassette |
-| 15 | `curated_collections` | 3 | Bộ sưu tập chủ đề |
-| 16 | `curated_collection_items` | 3 | Junction: collection ↔ product |
-| 17 | `carts` | 4 | Giỏ hàng |
-| 18 | `cart_items` | 4 | Sản phẩm trong giỏ |
-| 19 | `orders` | 4 | Đơn hàng |
-| 20 | `order_items` | 4 | Chi tiết đơn hàng |
+| 10 | `products` | 3 | Sản phẩm (SKU) |
+| 11 | `vinyl_attributes` | 3 | Thuộc tính Vinyl |
+| 12 | `cd_attributes` | 3 | Thuộc tính CD |
+| 13 | `cassette_attributes` | 3 | Thuộc tính Cassette |
+| 14 | `curated_collections` | 3 | Bộ sưu tập chủ đề |
+| 15 | `curated_collection_items` | 3 | Junction: collection ↔ product |
+| 16 | `carts` | 4 | Giỏ hàng |
+| 17 | `cart_items` | 4 | Sản phẩm trong giỏ |
+| 18 | `orders` | 4 | Đơn hàng |
+| 19 | `order_items` | 4 | Chi tiết đơn hàng |
+| 20 | `payments` | 5 | Thanh toán |
+| 21 | `wantlist_items` | 6 | Danh sách muốn mua |
+| 22 | `user_collections` | 6 | Bộ sưu tập cá nhân |
+| 23 | `notification_logs` | 7 | Lịch sử thông báo |
 
-| 21 | `payments` | 5 | Thanh toán |
-| 22 | `wantlist_items` | 6 | Danh sách muốn mua |
-| 23 | `user_collections` | 6 | Bộ sưu tập cá nhân |
-| 24 | `notification_logs` | 7 | Lịch sử thông báo |
-
-**Tổng: 24 bảng**
+**Tổng: 23 bảng**
 
 ---
 
@@ -779,13 +757,15 @@ erDiagram
     string side
   }
 
-  %% ─── MỤC 3: SẢN PHẨM ───
   products {
     uuid id PK
     uuid release_version_id FK
     string name
     text description
-    enum format "vinyl | cd | cassette"
+    decimal price
+    int stock_qty
+    boolean is_available
+    boolean is_signed
     boolean is_limited
     int limited_qty
     boolean is_preorder
@@ -793,18 +773,9 @@ erDiagram
     boolean is_active
     timestamp created_at
   }
-  product_variants {
-    uuid id PK
-    uuid product_id FK
-    string variant_name
-    decimal price
-    int stock_qty
-    boolean is_available
-    boolean is_signed
-  }
   vinyl_attributes {
     uuid id PK
-    uuid product_variant_id FK
+    uuid product_id FK
     enum disc_color "black | colored | splatter | picture_disc"
     enum weight_grams "140 | 180"
     enum speed_rpm "33 | 45"
@@ -813,13 +784,13 @@ erDiagram
   }
   cd_attributes {
     uuid id PK
-    uuid product_variant_id FK
+    uuid product_id FK
     enum edition "standard | deluxe | box_set"
     boolean is_japan_edition
   }
   cassette_attributes {
     uuid id PK
-    uuid product_variant_id FK
+    uuid product_id FK
     enum tape_color "black | clear | white | colored"
     enum edition "standard | limited"
   }
@@ -847,7 +818,7 @@ erDiagram
   cart_items {
     uuid id PK
     uuid cart_id FK
-    uuid product_variant_id FK
+    uuid product_id FK
     int quantity
   }
   orders {
@@ -867,7 +838,7 @@ erDiagram
   order_items {
     uuid id PK
     uuid order_id FK
-    uuid product_variant_id FK
+    uuid product_id FK
     int quantity
     decimal unit_price
   }
@@ -922,21 +893,20 @@ erDiagram
   labels   ||--o{ release_versions : "phát hành"
 
   release_versions ||--o{ products : "là nền tảng"
-  products ||--o{ product_variants : "có biến thể"
-  product_variants ||--o| vinyl_attributes : "thuộc tính"
-  product_variants ||--o| cd_attributes : "thuộc tính"
-  product_variants ||--o| cassette_attributes : "thuộc tính"
+  products ||--o| vinyl_attributes : "thuộc tính"
+  products ||--o| cd_attributes : "thuộc tính"
+  products ||--o| cassette_attributes : "thuộc tính"
   users ||--o{ curated_collections : "tạo"
   curated_collections ||--o{ curated_collection_items : "chứa"
   products ||--o{ curated_collection_items : "thuộc"
 
   users ||--o| carts : "có"
   carts ||--o{ cart_items : "chứa"
-  product_variants ||--o{ cart_items : "trong giỏ"
+  products ||--o{ cart_items : "trong giỏ"
 
   users ||--o{ orders : "đặt"
   orders ||--o{ order_items : "chứa"
-  product_variants ||--o{ order_items : "trong đơn"
+  products ||--o{ order_items : "trong đơn"
   orders ||--|| payments : "có"
 
 

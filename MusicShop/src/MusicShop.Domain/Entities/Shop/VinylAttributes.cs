@@ -4,8 +4,8 @@ namespace MusicShop.Domain.Entities.Shop;
 
 public class VinylAttributes : BaseEntity
 {
-    public Guid ProductVariantId { get; set; }
-    public ProductVariant ProductVariant { get; set; } = null!;
+    public Guid ProductId { get; set; }
+    public Product Product { get; set; } = null!;
 
     public string? DiscColor { get; set; } // enum in DB, but string in simple C# if not using specific enums
     public int? WeightGrams { get; set; }

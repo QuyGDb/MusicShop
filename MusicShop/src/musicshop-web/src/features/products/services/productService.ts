@@ -58,17 +58,4 @@ export const productService = {
     await http.delete(`/Products/${id}`);
   },
 
-  // Variant specific operations
-  createVariant: async (productId: string, data: unknown): Promise<string> => {
-    const response = await http.post<ApiResponse<string>>(`/Products/${productId}/variants`, data);
-    return response.data || '';
-  },
-
-  updateVariant: async (productId: string, variantId: string, data: unknown): Promise<void> => {
-    await http.put(`/Products/${productId}/variants/${variantId}`, data);
-  },
-
-  deleteVariant: async (productId: string, variantId: string): Promise<void> => {
-    await http.delete(`/Products/${productId}/variants/${variantId}`);
-  }
 };

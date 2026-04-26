@@ -12,7 +12,7 @@ public sealed class UpdateProductCommandHandler(
 {
     public async Task<Result> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
     {
-        Domain.Entities.Shop.Product? product = await productRepository.GetByIdAsync(request.Id, cancellationToken);
+        Domain.Entities.Shop.Product? product = await productRepository.GetByIdWithDetailsAsync(request.Id, cancellationToken);
 
         if (product is null)
         {
@@ -46,6 +46,32 @@ public sealed class UpdateProductCommandHandler(
         if (request.IsPreorder.HasValue) product.IsPreorder = request.IsPreorder.Value;
         if (request.PreorderReleaseDate.HasValue) product.PreorderReleaseDate = request.PreorderReleaseDate;
         if (request.LimitedQty.HasValue) product.LimitedQty = request.LimitedQty;
+        
+        if (request.Price.HasValue) product.Price = request.Price.Value;
+        if (request.StockQty.HasValue) product.StockQty = request.StockQty.Value;
+        if (request.IsSigned.HasValue) product.IsSigned = request.IsSigned.Value;
+
+        // Update Attributes
+        if (request.VinylAttributes != null && product.VinylAttributes != null)
+        {
+            product.VinylAttributes.DiscColor = request.VinylAttributes.DiscColor;
+            product.VinylAttributes.WeightGrams = request.VinylAttributes.WeightGrams;
+            product.VinylAttributes.SpeedRpm = request.VinylAttributes.SpeedRpm;
+            product.VinylAttributes.DiscCount = request.VinylAttributes.DiscCount;
+            product.VinylAttributes.SleeveType = request.VinylAttributes.SleeveType;
+        }
+
+        if (request.CdAttributes != null && product.CdAttributes != null)
+        {
+            product.CdAttributes.Edition = request.CdAttributes.Edition;
+            product.CdAttributes.IsJapanEdition = request.CdAttributes.IsJapanEdition;
+        }
+
+        if (request.CassetteAttributes != null && product.CassetteAttributes != null)
+        {
+            product.CassetteAttributes.TapeColor = request.CassetteAttributes.TapeColor;
+            product.CassetteAttributes.Edition = request.CassetteAttributes.Edition;
+        }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 

@@ -14,16 +14,16 @@ namespace MusicShop.Application.UseCases.Shop.Cart.Commands.UpdateCartItem;
 public sealed class UpdateCartItemCommandHandler : IRequestHandler<UpdateCartItemCommand, Result>
 {
     private readonly ICartRepository _cartRepository;
-    private readonly IRepository<ProductVariant> _variantRepository;
+    private readonly IProductRepository _productRepository;
     private readonly IUnitOfWork _unitOfWork;
 
     public UpdateCartItemCommandHandler(
         ICartRepository cartRepository,
-        IRepository<ProductVariant> variantRepository,
+        IProductRepository productRepository,
         IUnitOfWork unitOfWork)
     {
         _cartRepository = cartRepository;
-        _variantRepository = variantRepository;
+        _productRepository = productRepository;
         _unitOfWork = unitOfWork;
     }
 
@@ -51,13 +51,13 @@ public sealed class UpdateCartItemCommandHandler : IRequestHandler<UpdateCartIte
         else
         {
             // 4. Validate Stock
-            ProductVariant? productVariant = await _variantRepository.FirstOrDefaultAsync(variant => variant.Id == cartItem.VariantId, cancellationToken);
-            if (productVariant == null)
+            Product? product = await _productRepository.FirstOrDefaultAsync(p => p.Id == cartItem.ProductId, cancellationToken);
+            if (product == null)
             {
-                return Result.Failure(ProductErrors.VariantNotFound);
+                return Result.Failure(ProductErrors.NotFound);
             }
 
-            if (!productVariant.IsAvailable || productVariant.StockQty < request.NewQuantity)
+            if (!product.IsAvailable || product.StockQty < request.NewQuantity)
             {
                 return Result.Failure(CartErrors.InsufficientStock);
             }

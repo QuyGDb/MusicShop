@@ -50,37 +50,37 @@ public sealed class CreateOrderCommandHandler(
 
         foreach (CartItem cartItem in cart.Items)
         {
-            // 3. Fetch tracked variant and its product
-            // We re-fetch to ensure variants are tracked for stock reduction
-            ProductVariant? variant = await productRepository.GetVariantByIdAsync(cartItem.Variant.ProductId, cartItem.VariantId, cancellationToken);
+            // 3. Fetch tracked product
+            // We re-fetch to ensure products are tracked for stock reduction
+            Product? product = await productRepository.FirstOrDefaultAsync(p => p.Id == cartItem.ProductId, cancellationToken);
 
-            if (variant == null)
+            if (product == null)
             {
-                return Result<CreateOrderResponse>.Failure(ProductErrors.VariantNotFound);
+                return Result<CreateOrderResponse>.Failure(ProductErrors.NotFound);
             }
 
             // 4. Stock check (only for non-preorder products)
-            if (!variant.Product.IsPreorder)
+            if (!product.IsPreorder)
             {
-                if (variant.StockQty < cartItem.Quantity)
+                if (product.StockQty < cartItem.Quantity)
                 {
                     return Result<CreateOrderResponse>.Failure(ProductErrors.InsufficientStock);
                 }
 
-                variant.StockQty -= cartItem.Quantity;
+                product.StockQty -= cartItem.Quantity;
             }
 
             // 5. Create OrderItem and Price Snapshot
             OrderItem orderItem = new()
             {
-                VariantId = cartItem.VariantId,
+                ProductId = cartItem.ProductId,
                 Quantity = cartItem.Quantity,
-                PriceSnapshot = variant.Price,
-                ProductNameSnapshot = $"{variant.Product.Name} ({variant.VariantName})"
+                PriceSnapshot = product.Price,
+                ProductNameSnapshot = product.Name
             };
 
             order.OrderItems.Add(orderItem);
-            totalAmount += variant.Price * cartItem.Quantity;
+            totalAmount += product.Price * cartItem.Quantity;
         }
 
         order.TotalAmount = totalAmount;

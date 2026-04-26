@@ -3,6 +3,7 @@ using MusicShop.Domain.Entities.Catalog;
 using MusicShop.Domain.Entities.System;
 using MusicShop.Domain.Enums;
 using MusicShop.Domain.Interfaces;
+using MusicShop.Domain.Entities.Shop;
 using CsvHelper;
 using CsvHelper.Configuration;
 using System.Globalization;
@@ -260,6 +261,59 @@ public static class DbInitializer
         }
 
         await context.SaveChangesAsync();
+
+        // 7. Seed Products
+        if (!await context.Products.AnyAsync())
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = "MusicShop.Infrastructure.Persistence.SeedData.product.csv";
+
+            using var stream = assembly.GetManifestResourceStream(resourceName);
+            if (stream != null)
+            {
+                using var reader = new StreamReader(stream);
+                using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    HasHeaderRecord = true,
+                    MissingFieldFound = null
+                });
+
+                var records = csv.GetRecords<dynamic>().ToList();
+                var versions = await context.ReleaseVersions
+                    .Include(v => v.Release)
+                    .ToListAsync();
+                
+                var versionsMap = versions.ToDictionary(v => $"{v.Release.Title}|{v.Name}");
+
+                List<Product> products = new();
+
+                foreach (var record in records)
+                {
+                    string key = $"{record.ReleaseTitle}|{record.VersionName}";
+                    if (!versionsMap.TryGetValue(key, out var version)) continue;
+
+                    string name = $"{record.ReleaseTitle} - {record.VersionName}";
+                    products.Add(new Product
+                    {
+                        ReleaseVersionId = version.Id,
+                        Name = name,
+                        Slug = Slugify(name),
+                        Price = decimal.TryParse(record.Price?.ToString(), out decimal price) ? price : 0,
+                        StockQty = int.TryParse(record.StockQty?.ToString(), out int stock) ? stock : 0,
+                        IsAvailable = true,
+                        IsActive = true,
+                        IsLimited = bool.TryParse(record.IsLimited?.ToString(), out bool limited) && limited,
+                        LimitedQty = int.TryParse(record.LimitedQty?.ToString(), out int lQty) ? lQty : null,
+                        IsPreorder = bool.TryParse(record.IsPreorder?.ToString(), out bool preorder) && preorder,
+                        PreorderReleaseDate = DateTime.TryParse(record.PreorderReleaseDate?.ToString(), out DateTime pDate) ? pDate : null,
+                        IsSigned = bool.TryParse(record.IsSigned?.ToString(), out bool signed) && signed
+                    });
+                }
+
+                await context.Products.AddRangeAsync(products);
+                await context.SaveChangesAsync();
+            }
+        }
     }
 
     private static string Slugify(string text)

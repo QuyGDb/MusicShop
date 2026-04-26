@@ -12,8 +12,7 @@ public sealed class OrderRepository(AppDbContext context) : GenericRepository<Or
     {
         return await _dbSet
             .Include(order => order.OrderItems)
-                .ThenInclude(orderItem => orderItem.Variant)
-                    .ThenInclude(variant => variant.Product)
+                .ThenInclude(orderItem => orderItem.Product)
             .Include(order => order.Payment)
             .FirstOrDefaultAsync(order => order.Id == orderId, ct);
     }

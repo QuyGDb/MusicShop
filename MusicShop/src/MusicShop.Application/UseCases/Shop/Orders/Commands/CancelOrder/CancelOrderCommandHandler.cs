@@ -39,9 +39,9 @@ public sealed class CancelOrderCommandHandler(
         foreach (OrderItem orderItem in order.OrderItems)
         {
             // Only restore stock for non-preorder products
-            if (!orderItem.Variant.Product.IsPreorder)
+            if (!orderItem.Product.IsPreorder)
             {
-                orderItem.Variant.StockQty += orderItem.Quantity;
+                orderItem.Product.StockQty += orderItem.Quantity;
             }
         }
 

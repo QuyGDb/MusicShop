@@ -11,11 +11,10 @@ public sealed class CartRepository(AppDbContext context) : GenericRepository<Car
     {
         return await _dbSet.AsNoTracking()
             .Include(cart => cart.Items)
-                .ThenInclude(cartItem => cartItem.Variant)
-                    .ThenInclude(variant => variant.Product)
-                        .ThenInclude(product => product.ReleaseVersion)
-                            .ThenInclude(releaseVersion => releaseVersion!.Release)
-                                .ThenInclude(release => release!.Artist)
+                .ThenInclude(cartItem => cartItem.Product)
+                    .ThenInclude(product => product.ReleaseVersion)
+                        .ThenInclude(releaseVersion => releaseVersion!.Release)
+                            .ThenInclude(release => release!.Artist)
             .FirstOrDefaultAsync(cart => cart.UserId == userId, ct);
     }
 

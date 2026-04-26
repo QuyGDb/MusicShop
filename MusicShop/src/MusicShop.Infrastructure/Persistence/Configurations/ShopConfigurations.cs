@@ -14,9 +14,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired()
             .HasMaxLength(300);
 
-        builder.Property(x => x.Format)
-            .HasConversion<string>(); // Map ReleaseFormat Enum to string
-
         builder.Property(x => x.Slug)
             .IsRequired()
             .HasMaxLength(300);
@@ -24,10 +21,23 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasIndex(x => x.Name);
         builder.HasIndex(x => x.Slug).IsUnique();
 
-        // 1 Product -> Many Variants
-        builder.HasMany(x => x.Variants)
+        builder.Property(x => x.Price)
+            .HasPrecision(18, 2);
+
+        // Extensions 1-1
+        builder.HasOne(x => x.VinylAttributes)
             .WithOne(x => x.Product)
-            .HasForeignKey(x => x.ProductId)
+            .HasForeignKey<VinylAttributes>(x => x.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(x => x.CdAttributes)
+            .WithOne(x => x.Product)
+            .HasForeignKey<CdAttributes>(x => x.ProductId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.HasOne(x => x.CassetteAttributes)
+            .WithOne(x => x.Product)
+            .HasForeignKey<CassetteAttributes>(x => x.ProductId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Linked to ReleaseVersion (Pressing)
@@ -38,36 +48,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
     }
 }
 
-public class ProductVariantConfiguration : IEntityTypeConfiguration<ProductVariant>
-{
-    public void Configure(EntityTypeBuilder<ProductVariant> builder)
-    {
-        builder.HasKey(x => x.Id);
-
-        builder.Property(x => x.VariantName)
-            .IsRequired()
-            .HasMaxLength(200);
-
-        builder.Property(x => x.Price)
-            .HasPrecision(18, 2);
-
-        // Extensions 1-1
-        builder.HasOne(x => x.VinylAttributes)
-            .WithOne(x => x.ProductVariant)
-            .HasForeignKey<VinylAttributes>(x => x.ProductVariantId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasOne(x => x.CdAttributes)
-            .WithOne(x => x.ProductVariant)
-            .HasForeignKey<CdAttributes>(x => x.ProductVariantId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        builder.HasOne(x => x.CassetteAttributes)
-            .WithOne(x => x.ProductVariant)
-            .HasForeignKey<CassetteAttributes>(x => x.ProductVariantId)
-            .OnDelete(DeleteBehavior.Cascade);
-    }
-}
 
 public class VinylAttributesConfiguration : IEntityTypeConfiguration<VinylAttributes>
 {

@@ -21,12 +21,11 @@ public sealed class CuratedCollectionRepository(AppDbContext context) : ICurated
         return await context.CuratedCollections
             .Include(collection => collection.Items.OrderBy(item => item.SortOrder))
                 .ThenInclude(item => item.Product)
-                    .ThenInclude(product => product.Variants)
             .Include(collection => collection.Items)
                 .ThenInclude(item => item.Product)
                     .ThenInclude(product => product.ReleaseVersion)
-                        .ThenInclude(releaseVersion => releaseVersion.Release)
-                            .ThenInclude(release => release.Artist)
+                        .ThenInclude(releaseVersion => releaseVersion!.Release)
+                            .ThenInclude(release => release!.Artist)
             .AsNoTracking()
             .FirstOrDefaultAsync(collection => collection.Id == id, ct);
     }

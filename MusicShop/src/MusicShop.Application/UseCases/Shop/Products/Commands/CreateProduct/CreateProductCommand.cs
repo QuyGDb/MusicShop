@@ -10,8 +10,13 @@ public sealed record CreateProductCommand(
     string Slug,
     string? Description,
     string? CoverUrl,
-    ReleaseFormat Format,
     bool IsLimited,
     int? LimitedQty,
     bool IsPreorder,
-    DateTime? PreorderReleaseDate) : IRequest<Result<Guid>>;
+    DateTime? PreorderReleaseDate,
+    decimal Price,
+    int StockQty,
+    bool IsSigned,
+    DTOs.Shop.VinylAttributesDto? VinylAttributes = null,
+    DTOs.Shop.CdAttributesDto? CdAttributes = null,
+    DTOs.Shop.CassetteAttributesDto? CassetteAttributes = null) : IRequest<Result<Guid>>;

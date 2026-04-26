@@ -28,7 +28,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     // 3. Products & Sales (Shop)
     public DbSet<Product> Products => Set<Product>();
-    public DbSet<ProductVariant> ProductVariants => Set<ProductVariant>();
     public DbSet<VinylAttributes> VinylAttributes => Set<VinylAttributes>();
     public DbSet<CdAttributes> CdAttributes => Set<CdAttributes>();
     public DbSet<CassetteAttributes> CassetteAttributes => Set<CassetteAttributes>();
