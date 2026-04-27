@@ -1,4 +1,4 @@
-import { Filter, Edit2, Trash2, Package, Loader2, Tag } from 'lucide-react';
+import { Edit2, Trash2, Package, Loader2 } from 'lucide-react';
 import { Button, Card, CardContent, Skeleton, ManagementLayout, EmptyState } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
 import { Product } from '../../types';
@@ -52,18 +52,7 @@ export function ProductManagement() {
           description="Your store is empty. Time to list some music!" 
         />
       }
-      filterContent={
-        <>
-          <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2">
-            <Filter className="h-4 w-4" />
-            Filters
-          </Button>
-          <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2">
-            <Tag className="h-4 w-4" />
-            Status
-          </Button>
-        </>
-      }
+
     >
       {showForm && (
         <ProductCreateModal onClose={closeForm} />

@@ -22,7 +22,7 @@ public sealed class ReleaseRepository(AppDbContext context) : GenericRepository<
         // 1. Filtering
         if (!string.IsNullOrWhiteSpace(request.Q))
         {
-            query = query.Where(release => release.Title.Contains(request.Q));
+            query = query.Where(release => EF.Functions.ILike(release.Title, $"%{request.Q}%"));
         }
 
         if (request.ArtistId.HasValue)
@@ -102,13 +102,11 @@ public sealed class ReleaseRepository(AppDbContext context) : GenericRepository<
 
     public async Task<List<Release>> SearchByTitleAsync(string searchTerm, int limit, CancellationToken ct = default)
     {
-        searchTerm = searchTerm.ToLower();
-
         return await _context.Set<Release>()
             .Include(r => r.Artist)
             .Include(r => r.ReleaseGenres)
                 .ThenInclude(rg => rg.Genre)
-            .Where(r => r.Title.ToLower().Contains(searchTerm))
+            .Where(r => EF.Functions.ILike(r.Title, $"%{searchTerm}%"))
             .Take(limit)
             .ToListAsync(ct);
     }

@@ -16,7 +16,7 @@ public sealed class GenreRepository(AppDbContext context) : GenericRepository<Ge
 
         if (!string.IsNullOrWhiteSpace(request.Q))
         {
-            query = query.Where(genre => genre.Name.Contains(request.Q));
+            query = query.Where(genre => EF.Functions.ILike(genre.Name, $"%{request.Q}%"));
         }
 
         int totalCount = await query.CountAsync(ct);

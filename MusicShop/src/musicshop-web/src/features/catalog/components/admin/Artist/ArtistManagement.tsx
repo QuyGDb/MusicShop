@@ -1,4 +1,4 @@
-import { MapPin, Music, Users } from 'lucide-react';
+import { Users } from 'lucide-react';
 import { Button, Skeleton, ManagementLayout, EmptyState } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
 import { ArtistForm } from './ArtistForm';
@@ -42,18 +42,6 @@ export function ArtistManagement() {
           title="No artists found"
           description="No artists found. Time to discover some talent!"
         />
-      }
-      filterContent={
-        <>
-          <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2">
-            <MapPin className="h-4 w-4" />
-            Origin
-          </Button>
-          <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2">
-            <Music className="h-4 w-4" />
-            Genre
-          </Button>
-        </>
       }
     >
       {form.isOpen && (

@@ -9,14 +9,14 @@ namespace MusicShop.Infrastructure.Persistence.Repositories;
 public sealed class LabelRepository(AppDbContext context) : GenericRepository<Label>(context), ILabelRepository
 {
     public async Task<(IReadOnlyList<Label> Items, int TotalCount)> GetPagedAsync(
-        GetLabelsQuery request, 
+        GetLabelsQuery request,
         CancellationToken ct = default)
     {
         IQueryable<Label> query = _context.Set<Label>().AsNoTracking();
 
         if (!string.IsNullOrWhiteSpace(request.Q))
         {
-            query = query.Where(label => label.Name.Contains(request.Q));
+            query = query.Where(label => EF.Functions.ILike(label.Name, $"%{request.Q}%"));
         }
 
         if (!string.IsNullOrWhiteSpace(request.Country))

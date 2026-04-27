@@ -6,12 +6,8 @@ using MusicShop.Domain.Interfaces;
 
 namespace MusicShop.Infrastructure.Persistence.Repositories;
 
-public sealed class ArtistRepository : GenericRepository<Artist>, IArtistRepository
+public sealed class ArtistRepository(AppDbContext context) : GenericRepository<Artist>(context), IArtistRepository
 {
-    public ArtistRepository(AppDbContext context) : base(context)
-    {
-    }
-
     public async Task<Artist?> GetWithGenresAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.Set<Artist>()
@@ -55,7 +51,7 @@ public sealed class ArtistRepository : GenericRepository<Artist>, IArtistReposit
         // 1. Apply Filtering
         if (!string.IsNullOrWhiteSpace(request.Q))
         {
-            query = query.Where(artist => artist.Name.Contains(request.Q));
+            query = query.Where(artist => EF.Functions.ILike(artist.Name, $"%{request.Q}%"));
         }
 
         if (request.GenreId.HasValue)
@@ -77,12 +73,10 @@ public sealed class ArtistRepository : GenericRepository<Artist>, IArtistReposit
 
     public async Task<List<Artist>> SearchByNameAsync(string searchTerm, int limit, CancellationToken ct = default)
     {
-        searchTerm = searchTerm.ToLower();
-
         return await _context.Set<Artist>()
             .Include(artist => artist.ArtistGenres)
                 .ThenInclude(artistGenre => artistGenre.Genre)
-            .Where(artist => artist.Name.ToLower().Contains(searchTerm))
+            .Where(artist => EF.Functions.ILike(artist.Name, $"%{searchTerm}%"))
             .Take(limit)
             .ToListAsync(ct);
     }

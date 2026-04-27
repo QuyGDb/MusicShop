@@ -30,7 +30,7 @@ export function useArtistManagement() {
     setSearchParams(params, { replace: true });
   }, [debouncedSearch]);
 
-  const { data: artistsData, isLoading, error } = useArtists(page, 12, debouncedSearch || undefined);
+  const { data: artistsData, isLoading, error } = useArtists(page, 12, debouncedSearch);
   const deleteArtistMutation = useDeleteArtist();
 
   const handleOpenCreate = () => {

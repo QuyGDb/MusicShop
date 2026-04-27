@@ -1,6 +1,5 @@
-import { Filter, Edit2, Trash2, Disc, Calendar, Loader2, Package } from 'lucide-react';
+import { Edit2, Trash2, Disc, Loader2, Package } from 'lucide-react';
 import { Button, Card, CardContent, Skeleton, ManagementLayout, EmptyState } from '@/shared/components';
-import { cn } from '@/shared/lib/utils';
 import { useReleaseManagement } from '../../../hooks/useReleaseManagement';
 import { ReleaseForm } from './ReleaseForm';
 import { ReleaseVersionsModal } from './ReleaseVersionsModal';
@@ -46,24 +45,13 @@ export function ReleaseManagement() {
         <Skeleton key={i} className="h-32 w-full rounded-2xl bg-muted/50" />
       ))}
       emptyState={
-        <EmptyState 
-          icon={Disc} 
-          title="No releases found" 
-          description="Your catalog is silent. Create your first release!" 
+        <EmptyState
+          icon={Disc}
+          title="No releases found"
+          description="Your catalog is silent. Create your first release!"
         />
       }
-      filterContent={
-        <>
-          <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2">
-            <Filter className="h-4 w-4" />
-            Filters
-          </Button>
-          <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2">
-            <Calendar className="h-4 w-4" />
-            Latest
-          </Button>
-        </>
-      }
+
     >
       {showForm ? (
         <div className="animate-in zoom-in-95 duration-300">
