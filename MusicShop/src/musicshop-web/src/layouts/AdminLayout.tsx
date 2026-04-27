@@ -33,7 +33,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
       links: [
         { name: 'Products', href: '/admin/products', icon: Package },
         { name: 'Orders', href: '/admin/orders', icon: ShoppingBag },
-        { name: 'Customers', href: '/admin/customers', icon: Users },
+
         { name: 'Curation', href: '/admin/collections', icon: Layers },
       ]
     }

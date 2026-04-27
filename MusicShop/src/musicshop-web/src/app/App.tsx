@@ -17,7 +17,7 @@ import GenreManagementPage from '@/pages/admin/GenreManagementPage';
 import ReleaseManagementPage from '@/pages/admin/ReleaseManagementPage';
 import ProductManagementPage from '@/pages/admin/ProductManagementPage';
 import OrderManagementPage from '@/pages/admin/OrderManagementPage';
-import CustomerManagementPage from '@/pages/admin/CustomerManagementPage';
+
 import CollectionManagementPage from '@/pages/admin/CollectionManagementPage';
 import ProductAdminDetailsPage from '@/pages/admin/ProductAdminDetailsPage';
 import { Toaster } from 'sonner';
@@ -68,7 +68,7 @@ export default function App() {
           <Route path="releases" element={<ReleaseManagementPage />} />
           <Route path="products" element={<ProductManagementPage />} />
           <Route path="orders" element={<OrderManagementPage />} />
-          <Route path="customers" element={<CustomerManagementPage />} />
+
           <Route path="collections" element={<CollectionManagementPage />} />
           <Route path="products/:id" element={<ProductAdminDetailsPage />} />
           {/* Future admin sub-routes will go here */}
