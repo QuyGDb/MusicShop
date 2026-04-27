@@ -97,7 +97,8 @@ public static class MappingExtensions
             LabelName = version.Label?.Name ?? string.Empty,
             Notes = version.Notes,
             Price = version.Products.OrderBy(p => p.Price).Select(p => (decimal?)p.Price).FirstOrDefault(),
-            StockQty = version.Products.Sum(p => p.StockQty)
+            StockQty = version.Products.Sum(p => p.StockQty),
+            ImageUrl = version.Products.FirstOrDefault()?.CoverUrl
         };
     }
 

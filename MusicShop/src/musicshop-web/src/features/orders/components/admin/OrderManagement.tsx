@@ -1,5 +1,5 @@
-import { Search, Filter, Eye, MoreVertical, Calendar } from 'lucide-react';
-import { Button, Card, CardHeader, CardTitle, CardContent } from '@/shared/components';
+import { Filter, Eye, MoreVertical, Calendar } from 'lucide-react';
+import { Button, Card, CardContent, ManagementLayout, EmptyState } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
 import { OrderDetailsModal } from './OrderDetailsModal';
 import { useOrderManagement } from '../../hooks/useOrderManagement';
@@ -17,13 +17,33 @@ export function OrderManagement() {
     actions
   } = useOrderManagement();
 
-  return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-4xl font-extrabold tracking-tight text-foreground">Orders & Fulfillment</h1>
-        <p className="text-muted-foreground">Monitor customer purchases and manage the lifecycle of every shipment.</p>
-      </div>
+  const isEmpty = orders.length === 0;
 
+  return (
+    <ManagementLayout
+      title="Orders & Fulfillment"
+      subtitle="Monitor customer purchases and manage the lifecycle of every shipment."
+      isEmpty={isEmpty}
+      emptyState={
+        <EmptyState 
+          icon={Calendar} 
+          title="No orders yet" 
+          description="Your shop is waiting for its first customer. Let's make some sales!" 
+        />
+      }
+      filterContent={
+        <>
+          <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2">
+            <Filter className="h-4 w-4" />
+            Status
+          </Button>
+          <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2">
+            <Calendar className="h-4 w-4" />
+            Date
+          </Button>
+        </>
+      }
+    >
       {/* Summary Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, i) => (
@@ -39,28 +59,6 @@ export function OrderManagement() {
             </CardContent>
           </Card>
         ))}
-      </div>
-
-      {/* Filters Bar */}
-      <div className="flex flex-wrap gap-4 items-center">
-        <div className="relative flex-1 min-w-[300px]">
-          <Search className="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-subtle" />
-          <input
-            type="text"
-            placeholder="Search by Order ID, Customer, or Email..."
-            className="w-full h-14 bg-surface border border-border rounded-2xl pl-12 pr-4 focus:outline-none focus:border-primary transition-all shadow-sm"
-          />
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2">
-            <Filter className="h-4 w-4" />
-            Status
-          </Button>
-          <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2">
-            <Calendar className="h-4 w-4" />
-            Date
-          </Button>
-        </div>
       </div>
 
       {/* Orders Table */}
@@ -137,6 +135,6 @@ export function OrderManagement() {
           onClose={actions.closeDetails}
         />
       )}
-    </div>
+    </ManagementLayout>
   );
 }

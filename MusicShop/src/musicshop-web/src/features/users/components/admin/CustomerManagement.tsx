@@ -1,5 +1,5 @@
-import { Users, Search, Filter, Edit2, Trash2, Shield, User as UserIcon, Clock, DollarSign, ShieldAlert, ShieldCheck } from 'lucide-react';
-import { Button, Card, CardContent } from '@/shared/components';
+import { Users, Filter, Edit2, Trash2, Shield, User as UserIcon, Clock, DollarSign, ShieldAlert, ShieldCheck } from 'lucide-react';
+import { Button, Card, CardContent, ManagementLayout, EmptyState } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
 import { UserEditModal } from './UserEditModal';
 import { useCustomerManagement } from '../../hooks/useCustomerManagement';
@@ -18,13 +18,27 @@ export function CustomerManagement() {
     actions
   } = useCustomerManagement();
 
-  return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-4xl font-extrabold tracking-tight text-foreground">Community & CRM</h1>
-        <p className="text-muted-foreground">Manage user identities, access levels, and customer relationships.</p>
-      </div>
+  const isEmpty = users.length === 0;
 
+  return (
+    <ManagementLayout
+      title="Community & CRM"
+      subtitle="Manage user identities, access levels, and customer relationships."
+      isEmpty={isEmpty}
+      emptyState={
+        <EmptyState 
+          icon={Users} 
+          title="No members yet" 
+          description="Your community is just beginning. Register your first member!" 
+        />
+      }
+      filterContent={
+        <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2">
+          <Filter className="h-4 w-4" />
+          More Filters
+        </Button>
+      }
+    >
       {/* Stats Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card className="bg-surface border-border">
@@ -60,22 +74,6 @@ export function CustomerManagement() {
              </div>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Filters Bar */}
-      <div className="flex flex-wrap gap-4 items-center">
-        <div className="relative flex-1 min-w-[300px]">
-          <Search className="h-5 w-5 absolute left-4 top-1/2 -translate-y-1/2 text-subtle" />
-          <input 
-            type="text" 
-            placeholder="Search by name, email or ID..."
-            className="w-full h-14 bg-surface border border-border rounded-2xl pl-12 pr-4 focus:outline-none focus:border-primary transition-all shadow-sm"
-          />
-        </div>
-        <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2">
-          <Filter className="h-4 w-4" />
-          More Filters
-        </Button>
       </div>
 
       {/* User Table */}
@@ -206,6 +204,6 @@ export function CustomerManagement() {
           onClose={actions.closeEdit} 
         />
       )}
-    </div>
+    </ManagementLayout>
   );
 }

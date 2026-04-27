@@ -12,11 +12,11 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
 
         builder.Property(x => x.Name)
             .IsRequired()
-            .HasMaxLength(300);
+            .HasMaxLength(1000);
 
         builder.Property(x => x.Slug)
             .IsRequired()
-            .HasMaxLength(300);
+            .HasMaxLength(1000);
 
         builder.HasIndex(x => x.Name);
         builder.HasIndex(x => x.Slug).IsUnique();

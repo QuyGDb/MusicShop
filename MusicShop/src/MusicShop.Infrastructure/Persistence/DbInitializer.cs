@@ -15,7 +15,7 @@ public static class DbInitializer
 {
     public static async Task SeedAsync(AppDbContext context, IPasswordHasher passwordHasher)
     {
-        await context.Database.EnsureCreatedAsync();
+        await context.Database.MigrateAsync();
 
         // 1. Seed Admin
         if (!await context.Users.AnyAsync(u => u.Role == UserRole.Admin))
@@ -91,7 +91,8 @@ public static class DbInitializer
                     Name = record.Name,
                     Bio = record.Bio,
                     Country = record.Country,
-                    Slug = Slugify(record.Name)
+                    Slug = Slugify(record.Name),
+                    ImageUrl = record.ImageUrl
                 };
 
                 // Link genres via navigation property
@@ -157,8 +158,8 @@ public static class DbInitializer
         // 5. Seed Releases
         if (!await context.Releases.AnyAsync())
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = "MusicShop.Infrastructure.Persistence.SeedData.releases.csv";
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            string resourceName = "MusicShop.Infrastructure.Persistence.SeedData.releases.csv";
 
             using var stream = assembly.GetManifestResourceStream(resourceName);
             if (stream == null) throw new FileNotFoundException("Seed data file not found", resourceName);
@@ -170,34 +171,35 @@ public static class DbInitializer
                 MissingFieldFound = null
             });
 
-            var records = csv.GetRecords<dynamic>().ToList();
-            var artistsMap = await context.Artists.ToDictionaryAsync(a => a.Name);
-            var genresMap = await context.Genres.ToDictionaryAsync(g => g.Name);
+            List<dynamic> records = csv.GetRecords<dynamic>().ToList();
+            Dictionary<string, Artist> artistsMap = await context.Artists.ToDictionaryAsync(a => a.Name);
+            Dictionary<string, Genre> genresMap = await context.Genres.ToDictionaryAsync(g => g.Name);
 
             List<Release> releases = new();
 
             foreach (var record in records)
             {
                 string artistName = record.ArtistName ?? string.Empty;
-                if (!artistsMap.TryGetValue(artistName, out var artist)) continue;
+                if (!artistsMap.TryGetValue(artistName, out Artist? artist)) continue;
 
-                var release = new Release
+                Release release = new Release
                 {
                     Title = record.Title,
                     Slug = record.Slug,
                     Year = int.TryParse(record.Year?.ToString(), out int year) ? year : 0,
                     Description = record.Description,
-                    Artist = artist
+                    Artist = artist,
+                    CoverUrl = record.ImageUrl
                 };
 
                 // Link genres via navigation property
                 string genresStr = record.Genres ?? string.Empty;
-                var releaseGenreNames = genresStr.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                IEnumerable<string> releaseGenreNames = genresStr.Split(',', StringSplitOptions.RemoveEmptyEntries)
                                                  .Select(g => g.Trim());
 
                 foreach (var genreName in releaseGenreNames)
                 {
-                    if (genresMap.TryGetValue(genreName, out var genre))
+                    if (genresMap.TryGetValue(genreName, out Genre? genre))
                     {
                         release.ReleaseGenres.Add(new ReleaseGenre
                         {
@@ -210,15 +212,56 @@ public static class DbInitializer
             }
 
             await context.Releases.AddRangeAsync(releases);
+            await context.SaveChangesAsync();
+            Console.WriteLine($"[Seed] Successfully seeded {releases.Count} releases.");
         }
 
-        await context.SaveChangesAsync();
+        // 6. Seed Tracks
+        if (!await context.Tracks.AnyAsync())
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            string resourceName = "MusicShop.Infrastructure.Persistence.SeedData.tracks.csv";
 
-        // 6. Seed ReleaseVersions
+            using Stream? stream = assembly.GetManifestResourceStream(resourceName);
+            if (stream == null) throw new FileNotFoundException("Seed data file not found", resourceName);
+
+            using StreamReader reader = new StreamReader(stream);
+            using CsvReader csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                MissingFieldFound = null
+            });
+
+            List<dynamic> records = csv.GetRecords<dynamic>().ToList();
+            Dictionary<string, Release> releasesMap = await context.Releases.ToDictionaryAsync(release => release.Title);
+
+            List<Track> tracks = new();
+
+            foreach (dynamic record in records)
+            {
+                string releaseTitle = record.ReleaseTitle ?? string.Empty;
+                if (!releasesMap.TryGetValue(releaseTitle, out Release? release)) continue;
+
+                tracks.Add(new Track
+                {
+                    Release = release,
+                    Position = int.TryParse(record.Position?.ToString(), out int position) ? position : 0,
+                    Title = record.Title ?? "Unknown Track",
+                    Side = record.Side,
+                    DurationSeconds = int.TryParse(record.DurationSeconds?.ToString(), out int seconds) ? seconds : null
+                });
+            }
+
+            await context.Tracks.AddRangeAsync(tracks);
+            await context.SaveChangesAsync();
+            Console.WriteLine($"[Seed] Successfully seeded {tracks.Count} tracks.");
+        }
+
+        // 7. Seed ReleaseVersions
         if (!await context.ReleaseVersions.AnyAsync())
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = "MusicShop.Infrastructure.Persistence.SeedData.release_versions.csv";
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            string resourceName = "MusicShop.Infrastructure.Persistence.SeedData.release_versions.csv";
 
             using var stream = assembly.GetManifestResourceStream(resourceName);
             if (stream == null) throw new FileNotFoundException("Seed data file not found", resourceName);
@@ -230,9 +273,9 @@ public static class DbInitializer
                 MissingFieldFound = null
             });
 
-            var records = csv.GetRecords<dynamic>().ToList();
-            var releasesMap = await context.Releases.ToDictionaryAsync(r => r.Title);
-            var labelsMap = await context.Labels.ToDictionaryAsync(l => l.Name);
+            List<dynamic> records = csv.GetRecords<dynamic>().ToList();
+            Dictionary<string, Release> releasesMap = await context.Releases.ToDictionaryAsync(r => r.Title);
+            Dictionary<string, Label> labelsMap = await context.Labels.ToDictionaryAsync(l => l.Name);
 
             List<ReleaseVersion> versions = new();
 
@@ -241,8 +284,28 @@ public static class DbInitializer
                 string releaseTitle = record.ReleaseTitle ?? string.Empty;
                 string labelName = record.LabelName ?? string.Empty;
 
-                if (!releasesMap.TryGetValue(releaseTitle, out var release)) continue;
-                if (!labelsMap.TryGetValue(labelName, out var label)) continue;
+                if (!releasesMap.TryGetValue(releaseTitle, out Release? release)) continue;
+
+                // Auto-create unknown labels instead of skipping — Discogs returns many label names
+                // that don't exist in the manually curated labels.csv
+                if (!labelsMap.TryGetValue(labelName, out Label? label))
+                {
+                    label = new Label
+                    {
+                        Name = labelName,
+                        Slug = labelName.ToLowerInvariant()
+                            .Replace(" ", "-")
+                            .Replace(".", "")
+                            .Replace("'", "")
+                            .Replace("(", "")
+                            .Replace(")", "")
+                            .Replace("&", "and")
+                            .Trim('-')
+                    };
+                    await context.Labels.AddAsync(label);
+                    await context.SaveChangesAsync();
+                    labelsMap[labelName] = label;
+                }
 
                 versions.Add(new ReleaseVersion
                 {
@@ -262,57 +325,65 @@ public static class DbInitializer
 
         await context.SaveChangesAsync();
 
-        // 7. Seed Products
+        // 8. Seed Products
         if (!await context.Products.AnyAsync())
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            var resourceName = "MusicShop.Infrastructure.Persistence.SeedData.product.csv";
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            string resourceName = "MusicShop.Infrastructure.Persistence.SeedData.product.csv";
 
             using var stream = assembly.GetManifestResourceStream(resourceName);
-            if (stream != null)
+            if (stream == null) throw new FileNotFoundException("Seed data file not found", resourceName);
+
+            using var reader = new StreamReader(stream);
+            using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                using var reader = new StreamReader(stream);
-                using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+                HasHeaderRecord = true,
+                MissingFieldFound = null
+            });
+
+            List<dynamic> records = csv.GetRecords<dynamic>().ToList();
+            List<ReleaseVersion> versions = await context.ReleaseVersions
+                .Include(v => v.Release)
+                .ToListAsync();
+            
+            Dictionary<string, ReleaseVersion> versionsMap = versions.ToDictionary(v => $"{v.Release.Title}|{v.Name}");
+
+            List<Product> products = new();
+
+            foreach (var record in records)
+            {
+                string releaseTitle = record.ReleaseTitle?.ToString() ?? string.Empty;
+                string versionName = record.VersionName?.ToString() ?? string.Empty;
+                string key = $"{releaseTitle}|{versionName}";
+
+                if (!versionsMap.TryGetValue(key, out ReleaseVersion? version))
                 {
-                    HasHeaderRecord = true,
-                    MissingFieldFound = null
-                });
-
-                var records = csv.GetRecords<dynamic>().ToList();
-                var versions = await context.ReleaseVersions
-                    .Include(v => v.Release)
-                    .ToListAsync();
-                
-                var versionsMap = versions.ToDictionary(v => $"{v.Release.Title}|{v.Name}");
-
-                List<Product> products = new();
-
-                foreach (var record in records)
-                {
-                    string key = $"{record.ReleaseTitle}|{record.VersionName}";
-                    if (!versionsMap.TryGetValue(key, out var version)) continue;
-
-                    string name = $"{record.ReleaseTitle} - {record.VersionName}";
-                    products.Add(new Product
-                    {
-                        ReleaseVersionId = version.Id,
-                        Name = name,
-                        Slug = Slugify(name),
-                        Price = decimal.TryParse(record.Price?.ToString(), out decimal price) ? price : 0,
-                        StockQty = int.TryParse(record.StockQty?.ToString(), out int stock) ? stock : 0,
-                        IsAvailable = true,
-                        IsActive = true,
-                        IsLimited = bool.TryParse(record.IsLimited?.ToString(), out bool limited) && limited,
-                        LimitedQty = int.TryParse(record.LimitedQty?.ToString(), out int lQty) ? lQty : null,
-                        IsPreorder = bool.TryParse(record.IsPreorder?.ToString(), out bool preorder) && preorder,
-                        PreorderReleaseDate = DateTime.TryParse(record.PreorderReleaseDate?.ToString(), out DateTime pDate) ? pDate : null,
-                        IsSigned = bool.TryParse(record.IsSigned?.ToString(), out bool signed) && signed
-                    });
+                    Console.WriteLine($"[Seed] Warning: ReleaseVersion not found for key: {key}. Skipping product.");
+                    continue;
                 }
 
-                await context.Products.AddRangeAsync(products);
-                await context.SaveChangesAsync();
+                string name = record.DisplayName?.ToString() ?? $"{releaseTitle} - {versionName}";
+                products.Add(new Product
+                {
+                    ReleaseVersionId = version.Id,
+                    Name = name,
+                    Slug = Slugify(name),
+                    Price = decimal.TryParse(record.Price?.ToString(), out decimal price) ? price : 0,
+                    StockQty = int.TryParse(record.StockQty?.ToString(), out int stock) ? stock : 0,
+                    IsAvailable = true,
+                    IsActive = true,
+                    IsLimited = bool.TryParse(record.IsLimited?.ToString(), out bool limited) && limited,
+                    LimitedQty = int.TryParse(record.LimitedQty?.ToString(), out int lQty) ? lQty : null,
+                    IsPreorder = bool.TryParse(record.IsPreorder?.ToString(), out bool preorder) && preorder,
+                    PreorderReleaseDate = DateTime.TryParse(record.PreorderReleaseDate?.ToString(), out DateTime pDate) ? pDate : null,
+                    IsSigned = bool.TryParse(record.IsSigned?.ToString(), out bool signed) && signed,
+                    CoverUrl = record.ImageUrl
+                });
             }
+
+            await context.Products.AddRangeAsync(products);
+            await context.SaveChangesAsync();
+            Console.WriteLine($"[Seed] Successfully seeded {products.Count} products.");
         }
     }
 

@@ -20,13 +20,13 @@ export const productService = {
   getProducts: async (filters: ProductFilters): Promise<PaginatedResponse<Product>> => {
     const { page, limit, ...restFilters } = filters;
     const response = await http.get<ApiResponse<Product[]>>('/Products', {
-      params: { 
+      params: {
         ...restFilters,
         PageNumber: page,
         PageSize: limit
       }
     });
-    
+
     return {
       items: response.data || [],
       meta: response.meta

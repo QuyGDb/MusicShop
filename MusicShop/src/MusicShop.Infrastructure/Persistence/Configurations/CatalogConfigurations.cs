@@ -90,14 +90,14 @@ public class ReleaseConfiguration : IEntityTypeConfiguration<Release>
 
         builder.Property(x => x.Title)
             .IsRequired()
-            .HasMaxLength(300);
+            .HasMaxLength(1000);
 
         builder.Property(x => x.Year)
             .IsRequired();
 
         builder.Property(x => x.Slug)
             .IsRequired()
-            .HasMaxLength(300);
+            .HasMaxLength(1000);
 
         builder.HasIndex(x => x.Title);
         builder.HasIndex(x => x.Slug).IsUnique();
@@ -152,7 +152,7 @@ public class TrackConfiguration : IEntityTypeConfiguration<Track>
 
         builder.Property(x => x.Title)
             .IsRequired()
-            .HasMaxLength(300);
+            .HasMaxLength(1000);
 
         builder.Property(x => x.Side)
             .HasMaxLength(10);

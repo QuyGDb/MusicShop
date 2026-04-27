@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { Plus, Edit2, Trash2, Eye, EyeOff, Disc, ArrowRight, Sparkles } from 'lucide-react';
-import { Button, Card, CardContent } from '@/shared/components';
+import { Edit2, Trash2, Eye, EyeOff, Disc, ArrowRight, Sparkles } from 'lucide-react';
+import { Button, Card, CardContent, ManagementLayout, EmptyState } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
 import { CollectionEditorModal } from './CollectionEditorModal';
 
@@ -25,25 +25,26 @@ export function CollectionManagement() {
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null);
   const [showEditor, setShowEditor] = useState(false);
 
-  return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-4xl font-extrabold tracking-tight text-foreground">Marketing & Curation</h1>
-          <p className="text-muted-foreground">Craft themed sections and showcase your finest products on the homepage.</p>
-        </div>
-        <Button 
-          onClick={() => {
-            setSelectedCollectionId(null);
-            setShowEditor(true);
-          }} 
-          className="bg-primary hover:bg-primary-dark text-primary-foreground h-12 px-6 rounded-xl shadow-lg shadow-primary/20"
-        >
-          <Plus className="h-5 w-5 mr-2" />
-          New Collection
-        </Button>
-      </div>
+  const isEmpty = collections.length === 0;
 
+  return (
+    <ManagementLayout
+      title="Marketing & Curation"
+      subtitle="Craft themed sections and showcase your finest products on the homepage."
+      createLabel="New Collection"
+      onCreate={() => {
+        setSelectedCollectionId(null);
+        setShowEditor(true);
+      }}
+      isEmpty={isEmpty}
+      emptyState={
+        <EmptyState 
+          icon={Sparkles} 
+          title="No collections" 
+          description="Your showcase is empty. Create a collection to engage your customers!" 
+        />
+      }
+    >
       {/* Logic Note / Banner */}
       <div className="p-6 bg-surface border-2 border-dashed border-primary/20 rounded-3xl flex items-center gap-6">
          <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
@@ -57,7 +58,6 @@ export function CollectionManagement() {
          </div>
       </div>
 
-      {/* Collections Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {collections.map((collection) => (
           <Card key={collection.id} className={cn(
@@ -140,6 +140,6 @@ export function CollectionManagement() {
           onClose={() => setShowEditor(false)} 
         />
       )}
-    </div>
+    </ManagementLayout>
   );
 }

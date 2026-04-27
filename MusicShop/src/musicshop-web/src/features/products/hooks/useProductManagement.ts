@@ -29,10 +29,10 @@ export function useProductManagement() {
     setSearchParams(params, { replace: true });
   }, [debouncedSearch]);
 
-  const { data: productsData, isLoading, error } = useProducts({ 
-    page, 
+  const { data: productsData, isLoading, error } = useProducts({
+    page,
     limit: 10,
-    searchQuery: debouncedSearch || undefined 
+    searchQuery: debouncedSearch || undefined
   });
 
   const deleteProductMutation = useDeleteProduct();

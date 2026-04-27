@@ -13,4 +13,5 @@ public class ReleaseVersionDto
     // Shop Integration properties
     public decimal? Price { get; set; }
     public int? StockQty { get; set; }
+    public string? ImageUrl { get; set; }
 }
