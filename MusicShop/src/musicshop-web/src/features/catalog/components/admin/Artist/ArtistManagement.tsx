@@ -37,10 +37,10 @@ export function ArtistManagement() {
         <Skeleton key={i} className="h-80 w-full rounded-3xl bg-muted/50" />
       ))}
       emptyState={
-        <EmptyState 
-          icon={Users} 
-          title="No artists found" 
-          description="No artists found. Time to discover some talent!" 
+        <EmptyState
+          icon={Users}
+          title="No artists found"
+          description="No artists found. Time to discover some talent!"
         />
       }
       filterContent={

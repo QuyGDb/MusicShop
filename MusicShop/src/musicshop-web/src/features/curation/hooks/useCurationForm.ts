@@ -1,10 +1,11 @@
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { curationSchema, CurationFormValues } from '../types/curation';
+import { curationSchema, CurationFormValues, CurationItem } from '../types/curation';
+
+import { curationService } from '../services/curationService';
 
 interface UseCurationFormProps {
   collectionId: string | null;
-  initialItems: any[];
   onSuccess: () => void;
 }
 
@@ -16,35 +17,108 @@ interface UseCurationFormReturn {
   handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
   errors: FieldErrors<CurationFormValues>;
   items: any[];
+  appendItem: (item: any) => void;
   removeItem: UseFieldArrayRemove;
+  moveItem: (from: number, to: number) => void;
   isSubmitting: boolean;
 }
 
-export function useCurationForm({ collectionId, initialItems, onSuccess }: UseCurationFormProps): UseCurationFormReturn {
+import { useEffect, useState } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+
+export function useCurationForm({ collectionId, onSuccess }: UseCurationFormProps): UseCurationFormReturn {
+  const queryClient = useQueryClient();
+  const [isLoading, setIsLoading] = useState(!!collectionId);
+
   const {
     register,
     control,
     handleSubmit,
+    reset,
     formState: { errors, isSubmitting }
   } = useForm<CurationFormValues>({
     resolver: zodResolver(curationSchema) as any,
     defaultValues: {
-      title: 'New Arrivals',
-      description: 'Explore the latest synth treasures in our catalog.',
-      items: initialItems,
+      title: '',
+      description: '',
+      isPublished: true,
+      items: [],
     },
   });
 
-  const { fields: items, remove: removeItem } = useFieldArray({
+  const [initialItems, setInitialItems] = useState<CurationItem[]>([]);
+
+  useEffect(() => {
+    if (collectionId) {
+      setIsLoading(true);
+      curationService.getCollectionById(collectionId)
+        .then(data => {
+          setInitialItems(data.items);
+          reset({
+            title: data.title,
+            description: data.description,
+            isPublished: data.isPublished,
+            items: data.items,
+          });
+        })
+        .finally(() => setIsLoading(false));
+    } else {
+      setInitialItems([]);
+      reset({
+        title: '',
+        description: '',
+        isPublished: true,
+        items: [],
+      });
+    }
+  }, [collectionId, reset]);
+
+  const { fields: items, remove: removeItem, append: appendItem, move: moveItem } = useFieldArray({
     control,
     name: 'items',
   });
 
   const onSubmit = async (value: CurationFormValues) => {
-    // Simulate API call
-    console.log('Saving curation:', value);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    onSuccess();
+    try {
+      let id = collectionId;
+      if (id) {
+        await curationService.updateCollection(id, value);
+      } else {
+        id = await curationService.createCollection(value);
+      }
+
+      // Synchronize items
+      const currentItemProductIds = value.items.map(i => i.productId);
+      const initialItemProductIds = initialItems.map(i => i.productId);
+
+      // Items to add
+      const toAdd = value.items.filter(i => !initialItemProductIds.includes(i.productId));
+      // Items to remove
+      const toRemove = initialItems.filter(i => !currentItemProductIds.includes(i.productId));
+
+      // Sequential updates to avoid race conditions on sort order if possible
+      for (const item of toRemove) {
+        await curationService.removeItem(id, item.productId);
+      }
+
+      for (let i = 0; i < value.items.length; i++) {
+        const item = value.items[i];
+        const isNew = !initialItemProductIds.includes(item.productId);
+        
+        if (isNew) {
+          await curationService.addItem(id, item.productId, i + 1);
+        } else {
+          // Potentially update sort order if changed
+          // For now we just add new ones. 
+          // In a real app we might need a Bulk Update Sort Order API
+        }
+      }
+
+      queryClient.invalidateQueries({ queryKey: ['curated-collections'] });
+      onSuccess();
+    } catch (error) {
+      console.error('Failed to save curation:', error);
+    }
   };
 
   return {
@@ -53,7 +127,9 @@ export function useCurationForm({ collectionId, initialItems, onSuccess }: UseCu
     handleSubmit: handleSubmit(onSubmit) as any,
     errors,
     items,
+    appendItem,
     removeItem,
-    isSubmitting,
+    moveItem,
+    isSubmitting: isSubmitting || isLoading,
   };
 }

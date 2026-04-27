@@ -12,6 +12,7 @@ export const curationItemSchema = z.object({
 export const curationSchema = z.object({
   title: z.string().min(1, 'Title is required'),
   description: z.string().optional(),
+  isPublished: z.boolean().default(true),
   items: z.array(curationItemSchema).default([]),
 });
 

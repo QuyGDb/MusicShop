@@ -12,24 +12,19 @@ interface CollectionEditorModalProps {
   onClose: () => void;
 }
 
-const MOCK_PRODUCTS = [
-  { id: 'item-1', productId: 'p1', title: 'Endless Summer', artistName: 'The Midnight', price: 45.00, coverUrl: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=300&q=80' },
-  { id: 'item-2', productId: 'p2', title: 'Dark All Day', artistName: 'Gunship', price: 18.00, coverUrl: 'https://images.unsplash.com/photo-1514525253361-bee243870eb2?w=300&q=80' },
-  { id: 'item-3', productId: 'p3', title: 'Uncanny Valley', artistName: 'Perturbator', price: 32.00, coverUrl: 'https://images.unsplash.com/photo-1493225255756-d9584f8606e9?w=300&q=80' },
-  { id: 'item-4', productId: 'p4', title: 'Moonbeam', artistName: 'VHS Dreams', price: 25.00, coverUrl: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=300&q=80' },
-];
-
 export function CollectionEditorModal({ collectionId, onClose }: CollectionEditorModalProps) {
   const { 
     register, 
     control, 
     handleSubmit, 
     items, 
+    appendItem,
     removeItem, 
-    isSubmitting 
+    moveItem,
+    isSubmitting,
+    errors 
   } = useCurationForm({
     collectionId,
-    initialItems: MOCK_PRODUCTS,
     onSuccess: onClose,
   });
 
@@ -59,11 +54,15 @@ export function CollectionEditorModal({ collectionId, onClose }: CollectionEdito
          </CardHeader>
 
          <CardContent className="flex-1 overflow-hidden p-0 flex flex-col md:flex-row">
-            <CurationSettings register={register} />
-            <CurationDeck items={items} onRemoveItem={(id) => {
-              const index = items.findIndex(item => item.id === id);
-              if (index !== -1) removeItem(index);
-            }} />
+            <CurationSettings register={register} errors={errors} onAddItem={appendItem} />
+            <CurationDeck 
+              items={items} 
+              onRemoveItem={(id) => {
+                const index = items.findIndex(item => item.id === id);
+                if (index !== -1) removeItem(index);
+              }} 
+              onMoveItem={moveItem}
+            />
          </CardContent>
 
          <div className="border-t border-border p-6 bg-muted/10 flex items-center justify-between">

@@ -385,6 +385,88 @@ public static class DbInitializer
             await context.SaveChangesAsync();
             Console.WriteLine($"[Seed] Successfully seeded {products.Count} products.");
         }
+
+        // 9. Seed CuratedCollections
+        if (!await context.CuratedCollections.AnyAsync())
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = "MusicShop.Infrastructure.Persistence.SeedData.curateCollection.csv";
+
+            using var stream = assembly.GetManifestResourceStream(resourceName);
+            if (stream == null) throw new FileNotFoundException("Seed data file not found", resourceName);
+
+            using var reader = new StreamReader(stream);
+            using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                MissingFieldFound = null
+            });
+
+            var records = csv.GetRecords<dynamic>();
+            List<CuratedCollection> collections = new();
+
+            foreach (var record in records)
+            {
+                collections.Add(new CuratedCollection
+                {
+                    Title = record.Title,
+                    Description = record.Description,
+                    IsPublished = bool.TryParse(record.IsPublished?.ToString(), out bool published) && published
+                });
+            }
+
+            await context.CuratedCollections.AddRangeAsync(collections);
+            await context.SaveChangesAsync();
+            Console.WriteLine($"[Seed] Successfully seeded {collections.Count} curated collections.");
+        }
+
+        // 10. Seed CuratedCollectionItems
+        if (!await context.Set<CuratedCollectionItem>().AnyAsync())
+        {
+            var assembly = Assembly.GetExecutingAssembly();
+            var resourceName = "MusicShop.Infrastructure.Persistence.SeedData.curateCollectionItem.csv";
+
+            using var stream = assembly.GetManifestResourceStream(resourceName);
+            if (stream == null) throw new FileNotFoundException("Seed data file not found", resourceName);
+
+            using var reader = new StreamReader(stream);
+            using var csv = new CsvReader(reader, new CsvConfiguration(CultureInfo.InvariantCulture)
+            {
+                HasHeaderRecord = true,
+                MissingFieldFound = null
+            });
+
+            var records = csv.GetRecords<dynamic>();
+            var collectionsMap = await context.CuratedCollections.ToDictionaryAsync(c => c.Title);
+            var productsMap = await context.Products.ToDictionaryAsync(p => p.Name);
+
+            List<CuratedCollectionItem> items = new();
+
+            foreach (var record in records)
+            {
+                string collectionTitle = record.CollectionTitle?.ToString() ?? string.Empty;
+                string productName = record.ProductName?.ToString() ?? string.Empty;
+
+                if (collectionsMap.TryGetValue(collectionTitle, out var collection) &&
+                    productsMap.TryGetValue(productName, out var product))
+                {
+                    items.Add(new CuratedCollectionItem
+                    {
+                        CollectionId = collection.Id,
+                        ProductId = product.Id,
+                        SortOrder = int.TryParse(record.SortOrder?.ToString(), out int order) ? order : 0
+                    });
+                }
+                else
+                {
+                    Console.WriteLine($"[Seed] Warning: Collection '{collectionTitle}' or Product '{productName}' not found. Skipping item.");
+                }
+            }
+
+            await context.Set<CuratedCollectionItem>().AddRangeAsync(items);
+            await context.SaveChangesAsync();
+            Console.WriteLine($"[Seed] Successfully seeded {items.Count} curated collection items.");
+        }
     }
 
     private static string Slugify(string text)

@@ -1,13 +1,15 @@
-import { MousePointer2, Plus, GripVertical, Trash2 } from 'lucide-react';
+import { MousePointer2, Plus, GripVertical, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button, Card, CardContent } from '@/shared/components';
 import { CurationItem } from '@/features/curation/types/curation';
 
 interface CurationDeckProps {
   items: CurationItem[];
   onRemoveItem: (id: string) => void;
+  onMoveItem: (from: number, to: number) => void;
 }
 
-export function CurationDeck({ items, onRemoveItem }: CurationDeckProps) {
+export function CurationDeck({ items, onRemoveItem, onMoveItem }: CurationDeckProps) {
+  console.log('CurationDeck items:', items);
   return (
     <div className="flex-1 p-8 bg-surface space-y-8 overflow-y-auto custom-scrollbar">
       <div className="flex items-center justify-between">
@@ -50,7 +52,26 @@ export function CurationDeck({ items, onRemoveItem }: CurationDeckProps) {
               <p className="text-[10px] text-muted-foreground truncate">{item.artistName}</p>
               <div className="mt-2 flex items-center justify-between">
                 <span className="text-[10px] font-bold text-primary font-mono">${item.price.toFixed(2)}</span>
-                <GripVertical className="h-3 w-3 text-subtle opacity-30 cursor-grab" />
+                <div className="flex items-center gap-1">
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    disabled={index === 0}
+                    onClick={(e) => { e.stopPropagation(); onMoveItem(index, index - 1); }}
+                    className="h-6 w-6 rounded-md hover:bg-muted text-subtle disabled:opacity-30"
+                  >
+                    <ChevronLeft className="h-3 w-3" />
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    disabled={index === items.length - 1}
+                    onClick={(e) => { e.stopPropagation(); onMoveItem(index, index + 1); }}
+                    className="h-6 w-6 rounded-md hover:bg-muted text-subtle disabled:opacity-30"
+                  >
+                    <ChevronRight className="h-3 w-3" />
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

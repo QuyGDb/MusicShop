@@ -10,12 +10,16 @@ public sealed class GetCuratedCollectionsQueryHandler(
 {
     public async Task<Result<IReadOnlyList<CuratedCollectionResponse>>> Handle(GetCuratedCollectionsQuery request, CancellationToken cancellationToken)
     {
-        IReadOnlyList<Domain.Entities.Shop.CuratedCollection> curatedCollections = await repository.GetPublishedAsync(cancellationToken);
+        IReadOnlyList<Domain.Entities.Shop.CuratedCollection> curatedCollections = request.IncludeUnpublished 
+            ? await repository.GetAllAsync(cancellationToken)
+            : await repository.GetPublishedAsync(cancellationToken);
 
         List<CuratedCollectionResponse> curatedCollectionResponses = curatedCollections.Select(curatedCollection => new CuratedCollectionResponse(
             curatedCollection.Id,
             curatedCollection.Title,
-            curatedCollection.Description))
+            curatedCollection.Description,
+            curatedCollection.IsPublished,
+            curatedCollection.Items.Count))
             .ToList();
 
         return Result<IReadOnlyList<CuratedCollectionResponse>>.Success(curatedCollectionResponses);

@@ -8,6 +8,7 @@ using MusicShop.Application.UseCases.Shop.CuratedCollections.Commands.CreateCura
 using MusicShop.Application.UseCases.Shop.CuratedCollections.Commands.UpdateCuratedCollection;
 using MusicShop.Application.UseCases.Shop.CuratedCollections.Commands.AddProductToCollection;
 using MusicShop.Application.UseCases.Shop.CuratedCollections.Commands.RemoveProductFromCollection;
+using MusicShop.Application.UseCases.Shop.CuratedCollections.Commands.DeleteCuratedCollection;
 using Microsoft.AspNetCore.Authorization;
 
 namespace MusicShop.API.Controllers;
@@ -15,9 +16,9 @@ namespace MusicShop.API.Controllers;
 public sealed class CuratedCollectionsController(IMediator mediator) : BaseApiController
 {
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<IReadOnlyList<CuratedCollectionResponse>>>> GetCuratedCollections()
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<CuratedCollectionResponse>>>> GetCuratedCollections([FromQuery] bool includeUnpublished = false)
     {
-        var result = await mediator.Send(new GetCuratedCollectionsQuery());
+        var result = await mediator.Send(new GetCuratedCollectionsQuery(includeUnpublished));
         return HandleResult(result);
     }
 
@@ -67,6 +68,16 @@ public sealed class CuratedCollectionsController(IMediator mediator) : BaseApiCo
     public async Task<ActionResult<ApiResponse<Unit>>> RemoveProductFromCollection([FromRoute] Guid id, [FromRoute] Guid productId)
     {
         var result = await mediator.Send(new RemoveProductFromCollectionCommand(id, productId));
+        return HandleResult(result);
+    }
+
+    [HttpDelete("{id:guid}")]
+    [Authorize(Roles = "admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ApiResponse<Unit>>> DeleteCuratedCollection([FromRoute] Guid id)
+    {
+        var result = await mediator.Send(new DeleteCuratedCollectionCommand(id));
         return HandleResult(result);
     }
 }

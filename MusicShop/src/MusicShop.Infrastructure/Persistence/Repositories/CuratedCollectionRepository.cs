@@ -7,6 +7,15 @@ namespace MusicShop.Infrastructure.Persistence.Repositories;
 
 public sealed class CuratedCollectionRepository(AppDbContext context) : ICuratedCollectionRepository
 {
+    public async Task<IReadOnlyList<CuratedCollection>> GetAllAsync(CancellationToken ct = default)
+    {
+        return await context.CuratedCollections
+            .Include(c => c.Items)
+            .AsNoTracking()
+            .OrderByDescending(c => c.CreatedAt)
+            .ToListAsync(ct);
+    }
+
     public async Task<IReadOnlyList<CuratedCollection>> GetPublishedAsync(CancellationToken ct = default)
     {
         return await context.CuratedCollections
