@@ -42,6 +42,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
     // 5. Payments
     public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<ProcessedWebhookEvent> ProcessedWebhookEvents => Set<ProcessedWebhookEvent>();
 
     // 6. Wantlist & Collection (Customer)
     public DbSet<WantlistItem> WantlistItems => Set<WantlistItem>();

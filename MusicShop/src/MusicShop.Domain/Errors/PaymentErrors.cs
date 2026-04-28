@@ -18,4 +18,9 @@ public static class PaymentErrors
         "Payment.InvalidWebhookEvent",
         "The received webhook event is invalid or not supported.",
         ErrorType.Failure);
+
+    public static Error CustomStripeError(string message) => new(
+        "Payment.StripeFailure",
+        message,
+        ErrorType.Failure);
 }

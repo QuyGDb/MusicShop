@@ -1,3 +1,4 @@
+using MusicShop.Application.Common.Models;
 using MusicShop.Application.DTOs.Shop;
 using MusicShop.Domain.Common;
 using MusicShop.Domain.Entities.Orders;
@@ -13,8 +14,7 @@ public interface IStripeService
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Verifies the webhook signature and returns the event data if valid.
-    /// This is used in the Infrastructure layer to handle Stripe webhooks.
+    /// Verifies the webhook signature and returns the process result.
     /// </summary>
-    Task<Result<string>> HandleWebhookAsync(string json, string signature, CancellationToken cancellationToken = default);
+    Task<WebhookProcessResult> HandleWebhookAsync(string json, string signature, CancellationToken cancellationToken = default);
 }

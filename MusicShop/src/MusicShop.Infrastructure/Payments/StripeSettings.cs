@@ -14,4 +14,6 @@ public sealed class StripeSettings
 
     [Required]
     public string WebhookSecret { get; init; } = string.Empty;
+
+    public string Currency { get; init; } = "usd";
 }
