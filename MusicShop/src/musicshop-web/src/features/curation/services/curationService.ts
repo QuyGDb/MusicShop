@@ -15,15 +15,26 @@ export interface CurationDetailResponse extends CurationResponse {
 }
 
 export const curationService = {
-  getCollections: async (includeUnpublished = false): Promise<CurationResponse[]> => {
-    const response = await http.get<ApiResponse<CurationResponse[]>>(`/CuratedCollections?includeUnpublished=${includeUnpublished}`);
+  getCollections: async (includeUnpublished = false, page = 1, limit = 10, searchQuery?: string): Promise<ApiResponse<CurationResponse[]>> => {
+    const params = new URLSearchParams({
+      includeUnpublished: includeUnpublished.toString(),
+      pageNumber: page.toString(),
+      pageSize: limit.toString(),
+    });
+    if (searchQuery) params.append('searchQuery', searchQuery);
+
+    return await http.get<ApiResponse<CurationResponse[]>>(`/CuratedCollections?${params.toString()}`);
+  },
+
+  getFeaturedCollections: async (count = 3): Promise<CurationDetailResponse[]> => {
+    const response = await http.get<ApiResponse<CurationDetailResponse[]>>(`/CuratedCollections/featured?count=${count}`);
     return response.data || [];
   },
 
   getCollectionById: async (id: string): Promise<CurationDetailResponse & { items: CurationItem[] }> => {
     const response = await http.get<ApiResponse<any>>(`/CuratedCollections/${id}`);
     if (!response.data) throw new Error('Collection not found');
-    
+
     // Map backend 'products' to frontend 'items'
     const items = (response.data.products || []).map((p: any) => ({
       id: p.id, // Using product ID as item ID for now
@@ -55,6 +66,10 @@ export const curationService = {
 
   removeItem: async (collectionId: string, productId: string): Promise<void> => {
     await http.delete(`/CuratedCollections/${collectionId}/items/${productId}`);
+  },
+
+  updateCollectionStatus: async (id: string, isPublished: boolean): Promise<void> => {
+    await http.put(`/CuratedCollections/${id}/status`, isPublished);
   },
 
   deleteCollection: async (id: string): Promise<void> => {

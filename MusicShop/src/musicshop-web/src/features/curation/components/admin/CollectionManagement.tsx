@@ -7,7 +7,16 @@ import { CollectionEditorModal } from './CollectionEditorModal';
 import { useCollections } from '../../hooks/useCollections';
 
 export function CollectionManagement() {
-  const { collections, isLoading, togglePublish, deleteCollection } = useCollections();
+  const { 
+    collections, 
+    meta,
+    isLoading, 
+    searchQuery,
+    onSearchChange,
+    onPageChange,
+    togglePublish, 
+    deleteCollection 
+  } = useCollections();
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null);
   const [showEditor, setShowEditor] = useState(false);
 
@@ -21,13 +30,21 @@ export function CollectionManagement() {
     return <div className="flex items-center justify-center h-64 font-black uppercase tracking-widest text-subtle animate-pulse">Loading Collections...</div>;
   }
 
-  const isEmpty = collections.length === 0;
+  const isEmpty = collections.length === 0 && !searchQuery;
+  const noSearchResults = collections.length === 0 && !!searchQuery;
 
   return (
     <ManagementLayout
       title="Marketing & Curation"
       subtitle="Craft themed sections and showcase your finest products on the homepage."
       createLabel="New Collection"
+      searchQuery={searchQuery}
+      onSearchChange={onSearchChange}
+      pagination={meta ? {
+        page: meta.page,
+        totalPages: Math.ceil(meta.total / meta.limit),
+        onPageChange
+      } : undefined}
       onCreate={() => {
         console.log('Opening collection editor for new collection');
         setSelectedCollectionId(null);
@@ -42,20 +59,19 @@ export function CollectionManagement() {
         />
       }
     >
-      {/* Logic Note / Banner */}
-      <div className="p-6 bg-surface border-2 border-dashed border-primary/20 rounded-3xl flex items-center gap-6">
-        <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center shrink-0">
-          <Sparkles className="h-8 w-8 text-primary" />
-        </div>
-        <div className="flex-1">
-          <h3 className="font-bold text-foreground">Homepage Logic</h3>
-          <p className="text-sm text-muted-foreground max-w-2xl">
-            Currently, your storefront is configured to display <span className="font-bold text-primary">3 random collections</span> from your published list. Albums will be presented in a single horizontal row.
-          </p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {noSearchResults ? (
+        <EmptyState
+          icon={Sparkles}
+          title="No results found"
+          description={`We couldn't find any collections matching "${searchQuery}"`}
+          action={
+            <Button variant="outline" onClick={() => onSearchChange('')}>
+              Clear Search
+            </Button>
+          }
+        />
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {collections.map((collection) => (
           <Card key={collection.id} className={cn(
             "bg-surface border-border overflow-hidden hover:shadow-md transition-all group",
@@ -136,6 +152,7 @@ export function CollectionManagement() {
           </Card>
         ))}
       </div>
+      )}
 
       {showEditor && (
         <CollectionEditorModal

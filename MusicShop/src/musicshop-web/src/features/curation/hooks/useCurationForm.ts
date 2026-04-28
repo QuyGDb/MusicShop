@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { curationSchema, CurationFormValues, CurationItem } from '../types/curation';
 
 import { curationService } from '../services/curationService';
+import { toast } from 'sonner';
 
 interface UseCurationFormProps {
   collectionId: string | null;
@@ -115,9 +116,11 @@ export function useCurationForm({ collectionId, onSuccess }: UseCurationFormProp
       }
 
       queryClient.invalidateQueries({ queryKey: ['curated-collections'] });
+      toast.success(collectionId ? 'Collection updated successfully' : 'Collection created successfully');
       onSuccess();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Failed to save curation:', error);
+      toast.error(error.message || 'Failed to save collection. Please try again.');
     }
   };
 
