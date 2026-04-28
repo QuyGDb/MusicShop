@@ -6,6 +6,7 @@ public class ProductListItemDto
 {
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
     public string? ArtistName { get; set; }
     public ReleaseFormat Format { get; set; }
     public bool IsLimited { get; set; }

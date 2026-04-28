@@ -123,14 +123,17 @@ interface EmptyStateProps {
   icon: React.ElementType;
   title: string;
   description: string;
+  action?: React.ReactNode;
   className?: string;
 }
 
-export function EmptyState({ icon: Icon, title, description, className }: EmptyStateProps) {
+export function EmptyState({ icon: Icon, title, description, action, className }: EmptyStateProps) {
   return (
     <div className={cn("text-center py-20 bg-muted/10 border-2 border-dashed border-border rounded-3xl", className)}>
       <Icon className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
-      <p className="text-muted-foreground font-medium">{description}</p>
+      <h3 className="text-lg font-bold text-foreground mb-1">{title}</h3>
+      <p className="text-muted-foreground font-medium mb-6">{description}</p>
+      {action && <div>{action}</div>}
     </div>
   );
 }

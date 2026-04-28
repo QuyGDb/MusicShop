@@ -10,3 +10,4 @@ export * from './ui/pagination';
 export * from './ui/skeleton';
 export * from './common/ImageUpload';
 export * from './common/ManagementLayout';
+export * from './common/PageHeader';

@@ -13,7 +13,6 @@ public interface IArtistRepository : IRepository<Artist>
     Task<Artist?> GetWithGenresAsync(Guid id, CancellationToken ct = default);
     Task<Artist?> GetWithGenresBySlugAsync(string slug, CancellationToken ct = default);
     Task<Artist?> GetWithReleasesAsync(Guid id, CancellationToken ct = default);
-    Task<Artist?> GetWithReleasesBySlugAsync(string slug, CancellationToken ct = default);
 
     // Get a paged list of Artists with their Genres and filters
     Task<(IReadOnlyList<Artist> Items, int TotalCount)> GetPagedAsync(

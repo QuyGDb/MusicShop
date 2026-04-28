@@ -29,6 +29,7 @@ public sealed class CartController(
     }
 
     [HttpPost("items")]
+    [ProducesResponseType(typeof(ApiResponse<Guid>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<Guid>>> AddToCart([FromBody] AddToCartRequest request)

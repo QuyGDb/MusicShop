@@ -2,10 +2,13 @@ import React from 'react';
 import { Outlet, Link } from 'react-router-dom';
 import { Navbar } from '@/widgets/navbar/ui/Navbar';
 
+import { CartDrawer } from '@/features/cart/components/CartDrawer';
+
 export const ShopLayout: React.FC = () => {
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <Navbar />
+      <CartDrawer />
       <main className="flex-1">
         <Outlet />
       </main>

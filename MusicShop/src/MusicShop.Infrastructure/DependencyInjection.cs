@@ -66,11 +66,7 @@ public static class DependencyInjection
             .Bind(configuration.GetSection(GoogleSettings.SectionName))
             .ValidateOnStart();
 
-        services.AddOptions<StripeSettings>()
-            .Bind(configuration.GetSection(StripeSettings.SectionName))
-            .ValidateOnStart();
-
-        services.AddScoped<IStripeService, StripeService>();
+        services.AddStripeServices(configuration);
 
         services.AddScoped<ITokenService, JwtTokenService>();
 

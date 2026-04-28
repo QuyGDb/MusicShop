@@ -6,6 +6,7 @@ export enum ReleaseFormat {
 
 export interface Product {
   id: string;
+  slug: string;
   releaseVersionId: string;
   name: string;
   description?: string;

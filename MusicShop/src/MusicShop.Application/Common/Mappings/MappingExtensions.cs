@@ -1,5 +1,6 @@
 using MusicShop.Application.DTOs.Catalog;
 using MusicShop.Application.DTOs.Auth;
+using MusicShop.Application.DTOs.Shop;
 using MusicShop.Domain.Entities.Catalog;
 using MusicShop.Domain.Entities.Shop;
 using MusicShop.Domain.Entities.System;
@@ -141,5 +142,29 @@ public static class MappingExtensions
             AccessTokenExpiresAt = accessTokenExpiresAtUtc,
             User = user.ToResponse()
         };
+    }
+
+    // Curated Collections
+    public static CuratedCollectionFeaturedResponse ToFeaturedResponse(this CuratedCollection collection)
+    {
+        return new CuratedCollectionFeaturedResponse(
+            collection.Id,
+            collection.Title,
+            collection.Description,
+            collection.Items
+                .OrderBy(i => i.SortOrder)
+                .Select(i => i.ToFeaturedItemResponse())
+                .ToList());
+    }
+
+    public static CuratedCollectionFeaturedItemResponse ToFeaturedItemResponse(this CuratedCollectionItem item)
+    {
+        return new CuratedCollectionFeaturedItemResponse(
+            item.ProductId,
+            item.Product.ReleaseVersion?.Release.Title ?? "Unknown",
+            item.Product.ReleaseVersion?.Release.Artist.Name ?? "Unknown Artist",
+            item.Product.Price,
+            item.Product.ReleaseVersion?.Release.CoverUrl ?? string.Empty,
+            item.SortOrder);
     }
 }

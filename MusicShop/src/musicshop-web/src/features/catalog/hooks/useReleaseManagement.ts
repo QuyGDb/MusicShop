@@ -70,7 +70,7 @@ export function useReleaseManagement() {
     totalPages: releasesData?.meta ? Math.ceil(releasesData.meta.total / 10) : 1,
     searchQuery,
     setSearchQuery,
-    
+
     // Actions
     setPage,
     handleOpenCreate,

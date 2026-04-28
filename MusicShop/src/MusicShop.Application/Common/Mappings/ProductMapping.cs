@@ -12,6 +12,7 @@ public static class ProductMapping
         {
             Id = p.Id,
             Name = p.Name,
+            Slug = p.Slug,
             ArtistName = p.ReleaseVersion != null && p.ReleaseVersion.Release != null && p.ReleaseVersion.Release.Artist != null 
                 ? p.ReleaseVersion.Release.Artist.Name 
                 : null,
