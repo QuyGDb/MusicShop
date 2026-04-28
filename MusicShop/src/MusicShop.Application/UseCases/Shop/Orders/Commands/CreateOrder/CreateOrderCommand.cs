@@ -10,6 +10,6 @@ public record CreateOrderCommand(
     string Phone,
     string ShippingAddress,
     PaymentGateway PaymentGateway,
-    string? SuccessUrl = null,
-    string? CancelUrl = null,
+    string SuccessUrl,
+    string CancelUrl,
     string? Note = null) : IRequest<Result<CreateOrderResponse>>;

@@ -7,4 +7,5 @@ namespace MusicShop.Application.UseCases.Shop.Orders.Commands.UpdateOrderStatus;
 public sealed record UpdateOrderStatusCommand(
     Guid OrderId,
     OrderStatus Status,
-    string? TrackingNumber) : IRequest<Result>;
+    string? TrackingNumber,
+    string? TransactionCode = null) : IRequest<MusicShop.Domain.Common.Result>;

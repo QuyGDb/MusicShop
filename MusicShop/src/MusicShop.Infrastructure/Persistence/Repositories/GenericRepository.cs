@@ -20,6 +20,11 @@ public class GenericRepository<T>(AppDbContext context) : IRepository<T> where T
         return await _dbSet.FirstOrDefaultAsync(predicate, cancellationToken);
     }
 
+    public async Task<IReadOnlyList<T>> GetByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+    {
+        return await _dbSet.Where(entity => ids.Contains(entity.Id)).ToListAsync(cancellationToken);
+    }
+
     public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default)
     {
         return await _dbSet.AnyAsync(predicate, cancellationToken);

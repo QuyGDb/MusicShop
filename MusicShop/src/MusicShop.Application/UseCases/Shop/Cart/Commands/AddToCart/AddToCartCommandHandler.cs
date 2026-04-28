@@ -12,26 +12,15 @@ namespace MusicShop.Application.UseCases.Shop.Cart.Commands.AddToCart;
 /// Handler for AddToCartCommand.
 /// Handles stock validation and cart item merging.
 /// </summary>
-public sealed class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, Result<Guid>>
+public sealed class AddToCartCommandHandler(
+    ICartRepository cartRepository,
+    IProductRepository productRepository,
+    IUnitOfWork unitOfWork) : IRequestHandler<AddToCartCommand, Result<Guid>>
 {
-    private readonly ICartRepository _cartRepository;
-    private readonly IProductRepository _productRepository;
-    private readonly IUnitOfWork _unitOfWork;
-
-    public AddToCartCommandHandler(
-        ICartRepository cartRepository,
-        IProductRepository productRepository,
-        IUnitOfWork unitOfWork)
-    {
-        _cartRepository = cartRepository;
-        _productRepository = productRepository;
-        _unitOfWork = unitOfWork;
-    }
-
     public async Task<Result<Guid>> Handle(AddToCartCommand request, CancellationToken cancellationToken)
     {
         // 1. Validate Product & Stock
-        Product? product = await _productRepository.FirstOrDefaultAsync(p => p.Id == request.ProductId, cancellationToken);
+        Product? product = await productRepository.FirstOrDefaultAsync(p => p.Id == request.ProductId, cancellationToken);
         if (product == null)
         {
             return Result<Guid>.Failure(ProductErrors.NotFound);
@@ -43,17 +32,16 @@ public sealed class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, 
         }
 
         // 2. Get or Create Cart (Tracked)
-        Domain.Entities.Orders.Cart? cart = await _cartRepository.GetByUserIdForUpdateAsync(request.UserId, cancellationToken);
+        Domain.Entities.Orders.Cart? cart = await cartRepository.GetByUserIdForUpdateAsync(request.UserId, cancellationToken);
         if (cart == null)
         {
             cart = new Domain.Entities.Orders.Cart
             {
-                Id = Guid.NewGuid(),
                 UserId = request.UserId,
                 CreatedAt = DateTime.UtcNow
             };
             cart.UpdatedAt = DateTime.UtcNow;
-            _cartRepository.Add(cart);
+            cartRepository.Add(cart);
         }
 
         // 3. Add or Update Item
@@ -71,8 +59,6 @@ public sealed class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, 
         {
             cart.Items.Add(new CartItem
             {
-                Id = Guid.NewGuid(),
-                CartId = cart.Id,
                 ProductId = request.ProductId,
                 Quantity = request.Quantity
             });
@@ -81,7 +67,7 @@ public sealed class AddToCartCommandHandler : IRequestHandler<AddToCartCommand, 
         cart.UpdatedAt = DateTime.UtcNow;
 
         // 4. Persistence
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<Guid>.Success(cart.Id);
     }

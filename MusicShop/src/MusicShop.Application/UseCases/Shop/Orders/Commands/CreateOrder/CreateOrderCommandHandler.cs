@@ -20,12 +20,10 @@ public sealed class CreateOrderCommandHandler(
 {
     public async Task<Result<CreateOrderResponse>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrEmpty(currentUserService.UserId))
+        if (!Guid.TryParse(currentUserService.UserId, out Guid userId))
         {
             return Result<CreateOrderResponse>.Failure(AuthErrors.Unauthorized);
         }
-
-        Guid userId = Guid.Parse(currentUserService.UserId);
 
         // 1. Fetch cart with items
         Domain.Entities.Orders.Cart? cart = await cartRepository.GetByUserIdAsync(userId, cancellationToken);
@@ -35,7 +33,12 @@ public sealed class CreateOrderCommandHandler(
             return Result<CreateOrderResponse>.Failure(OrderErrors.CartEmpty);
         }
 
-        // 2. Prepare Order
+        // 2. Fetch all products at once (Fix N+1 Query)
+        List<Guid> productIds = cart.Items.Select(item => item.ProductId).ToList();
+        IReadOnlyList<Product> products = await productRepository.GetByIdsAsync(productIds, cancellationToken);
+        Dictionary<Guid, Product> productMap = products.ToDictionary(product => product.Id);
+
+        // 3. Prepare Order
         Order order = new()
         {
             UserId = userId,
@@ -50,27 +53,18 @@ public sealed class CreateOrderCommandHandler(
 
         foreach (CartItem cartItem in cart.Items)
         {
-            // 3. Fetch tracked product
-            // We re-fetch to ensure products are tracked for stock reduction
-            Product? product = await productRepository.FirstOrDefaultAsync(p => p.Id == cartItem.ProductId, cancellationToken);
-
-            if (product == null)
+            if (!productMap.TryGetValue(cartItem.ProductId, out Product? product))
             {
                 return Result<CreateOrderResponse>.Failure(ProductErrors.NotFound);
             }
 
-            // 4. Stock check (only for non-preorder products)
-            if (!product.IsPreorder)
+            // Validation: Stock check (but don't deduct yet - Fix premature stock deduction)
+            if (!product.IsPreorder && product.StockQty < cartItem.Quantity)
             {
-                if (product.StockQty < cartItem.Quantity)
-                {
-                    return Result<CreateOrderResponse>.Failure(ProductErrors.InsufficientStock);
-                }
-
-                product.StockQty -= cartItem.Quantity;
+                return Result<CreateOrderResponse>.Failure(ProductErrors.InsufficientStock);
             }
 
-            // 5. Create OrderItem and Price Snapshot
+            // 4. Create OrderItem and Price Snapshot
             OrderItem orderItem = new()
             {
                 ProductId = cartItem.ProductId,
@@ -85,7 +79,7 @@ public sealed class CreateOrderCommandHandler(
 
         order.TotalAmount = totalAmount;
 
-        // 6. Initialize Payment & Create Session
+        // 5. Initialize Payment
         Payment payment = new()
         {
             Amount = totalAmount,
@@ -93,26 +87,30 @@ public sealed class CreateOrderCommandHandler(
             Status = PaymentStatus.Pending
         };
 
+        order.Payment = payment;
+
+        // 6. Persistence BEFORE Stripe call (Fix Race Condition)
+        orderRepository.Add(order);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        // 7. Create Stripe Session
         Result<StripeCheckoutDto> stripeResult = await stripeService.CreateCheckoutSessionAsync(
             order,
-            request.SuccessUrl ?? "https://localhost:5000/checkout/success",
-            request.CancelUrl ?? "https://localhost:5000/checkout/cancel",
+            request.SuccessUrl,
+            request.CancelUrl,
             cancellationToken);
 
         if (!stripeResult.IsSuccess)
         {
+            // Note: Order remains in DB as Pending if Stripe fails to create session.
+            // This allows for retry/cleanup later.
             return Result<CreateOrderResponse>.Failure(stripeResult.Error);
         }
 
         string checkoutUrl = stripeResult.Value.Url;
 
-        order.Payment = payment;
-
-        // 7. Save Order and Clear Cart
-        orderRepository.Add(order);
-        await cartRepository.ClearCartAsync(cart.Id, cancellationToken);
-
-        await unitOfWork.SaveChangesAsync(cancellationToken);
+        // Note: Cart is NOT cleared here anymore. It will be cleared in the Webhook 
+        // after successful payment. This prevents losing the cart if the user cancels Stripe.
 
         return Result<CreateOrderResponse>.Success(new CreateOrderResponse(
             new OrderSummaryDto(order.Id, order.Status, order.TotalAmount, order.CreatedAt),
