@@ -1,18 +1,15 @@
 using MusicShop.Domain.Entities.Shop;
+using MusicShop.Domain.Interfaces;
 
 namespace MusicShop.Application.Common.Interfaces;
 
-public interface ICuratedCollectionRepository
+public interface ICuratedCollectionRepository : IRepository<CuratedCollection>
 {
     Task<IReadOnlyList<CuratedCollection>> GetAllAsync(CancellationToken ct = default);
     Task<IReadOnlyList<CuratedCollection>> GetPublishedAsync(CancellationToken ct = default);
+    Task<IReadOnlyList<CuratedCollection>> GetFeaturedCollectionsAsync(int count, CancellationToken ct = default);
     Task<CuratedCollection?> GetByIdWithItemsAsync(Guid id, CancellationToken ct = default);
-    Task<CuratedCollection?> GetByIdAsync(Guid id, CancellationToken ct = default);
-    Task AddAsync(CuratedCollection collection, CancellationToken ct = default);
-    Task UpdateAsync(CuratedCollection collection, CancellationToken ct = default);
-    Task DeleteAsync(CuratedCollection collection, CancellationToken ct = default);
-    Task<bool> ExistsAsync(Guid id, CancellationToken ct = default);
-    
+
     // Items
     Task AddItemAsync(CuratedCollectionItem item, CancellationToken ct = default);
     Task RemoveItemAsync(Guid collectionId, Guid productId, CancellationToken ct = default);

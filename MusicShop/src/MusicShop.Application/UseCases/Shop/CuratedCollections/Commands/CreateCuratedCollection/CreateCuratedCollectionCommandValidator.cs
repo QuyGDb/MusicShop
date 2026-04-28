@@ -1,5 +1,4 @@
 using FluentValidation;
-
 namespace MusicShop.Application.UseCases.Shop.CuratedCollections.Commands.CreateCuratedCollection;
 
 public sealed class CreateCuratedCollectionCommandValidator : AbstractValidator<CreateCuratedCollectionCommand>

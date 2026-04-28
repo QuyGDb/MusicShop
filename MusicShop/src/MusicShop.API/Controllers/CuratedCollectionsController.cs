@@ -4,11 +4,13 @@ using MusicShop.API.Infrastructure;
 using MusicShop.Application.DTOs.Shop;
 using MusicShop.Application.UseCases.Shop.CuratedCollections.Queries.GetCuratedCollectionById;
 using MusicShop.Application.UseCases.Shop.CuratedCollections.Queries.GetCuratedCollections;
+using MusicShop.Application.UseCases.Shop.CuratedCollections.Queries.GetFeaturedCollections;
 using MusicShop.Application.UseCases.Shop.CuratedCollections.Commands.CreateCuratedCollection;
 using MusicShop.Application.UseCases.Shop.CuratedCollections.Commands.UpdateCuratedCollection;
 using MusicShop.Application.UseCases.Shop.CuratedCollections.Commands.AddProductToCollection;
 using MusicShop.Application.UseCases.Shop.CuratedCollections.Commands.RemoveProductFromCollection;
 using MusicShop.Application.UseCases.Shop.CuratedCollections.Commands.DeleteCuratedCollection;
+using MusicShop.Application.UseCases.Shop.CuratedCollections.Commands.UpdateCuratedCollectionStatus;
 using Microsoft.AspNetCore.Authorization;
 
 namespace MusicShop.API.Controllers;
@@ -16,9 +18,21 @@ namespace MusicShop.API.Controllers;
 public sealed class CuratedCollectionsController(IMediator mediator) : BaseApiController
 {
     [HttpGet]
-    public async Task<ActionResult<ApiResponse<IReadOnlyList<CuratedCollectionResponse>>>> GetCuratedCollections([FromQuery] bool includeUnpublished = false)
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<CuratedCollectionResponse>>>> GetCuratedCollections(
+        [FromQuery] bool includeUnpublished = false,
+        [FromQuery] int pageNumber = 1,
+        [FromQuery] int pageSize = 10,
+        [FromQuery] string? searchQuery = null)
     {
-        var result = await mediator.Send(new GetCuratedCollectionsQuery(includeUnpublished));
+        var result = await mediator.Send(new GetCuratedCollectionsQuery(includeUnpublished, pageNumber, pageSize, searchQuery));
+        return HandlePaginatedResult(result);
+    }
+
+    [HttpGet("featured")]
+    [AllowAnonymous]
+    public async Task<ActionResult<ApiResponse<IReadOnlyList<CuratedCollectionFeaturedResponse>>>> GetFeaturedCollections([FromQuery] int count = 3)
+    {
+        var result = await mediator.Send(new GetFeaturedCollectionsQuery(count));
         return HandleResult(result);
     }
 
@@ -47,6 +61,16 @@ public sealed class CuratedCollectionsController(IMediator mediator) : BaseApiCo
     public async Task<ActionResult<ApiResponse<Guid>>> UpdateCuratedCollection([FromRoute] Guid id, [FromBody] UpdateCuratedCollectionRequest request)
     {
         var result = await mediator.Send(new UpdateCuratedCollectionCommand(id, request.Title, request.Description, request.IsPublished));
+        return HandleResult(result);
+    }
+
+    [HttpPut("{id:guid}/status")]
+    [Authorize(Roles = "admin")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<ApiResponse<Unit>>> UpdateCuratedCollectionStatus([FromRoute] Guid id, [FromBody] bool isPublished)
+    {
+        var result = await mediator.Send(new UpdateCuratedCollectionStatusCommand(id, isPublished));
         return HandleResult(result);
     }
 

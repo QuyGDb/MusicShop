@@ -2,10 +2,13 @@ using MediatR;
 using MusicShop.Application.Common.Interfaces;
 using MusicShop.Domain.Common;
 using MusicShop.Domain.Errors;
+using MusicShop.Domain.Interfaces;
 
 namespace MusicShop.Application.UseCases.Shop.CuratedCollections.Commands.DeleteCuratedCollection;
 
-public sealed class DeleteCuratedCollectionCommandHandler(ICuratedCollectionRepository repository)
+public sealed class DeleteCuratedCollectionCommandHandler(
+    ICuratedCollectionRepository repository,
+    IUnitOfWork unitOfWork)
     : IRequestHandler<DeleteCuratedCollectionCommand, Result<Unit>>
 {
     public async Task<Result<Unit>> Handle(DeleteCuratedCollectionCommand request, CancellationToken cancellationToken)
@@ -15,7 +18,9 @@ public sealed class DeleteCuratedCollectionCommandHandler(ICuratedCollectionRepo
         if (collection == null)
             return Result<Unit>.Failure(CuratedCollectionErrors.NotFound);
 
-        await repository.DeleteAsync(collection, cancellationToken);
+        repository.Delete(collection);
+
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result<Unit>.Success(Unit.Value);
     }

@@ -9,6 +9,7 @@ public sealed class UpdateCuratedCollectionCommandValidator : AbstractValidator<
         RuleFor(x => x.Id).NotEmpty();
 
         RuleFor(x => x.Title)
+            .NotEmpty().When(x => x.Title != null)
             .MaximumLength(200).When(x => x.Title != null);
 
         RuleFor(x => x.Description)
