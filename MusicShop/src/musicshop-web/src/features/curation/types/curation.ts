@@ -7,6 +7,7 @@ export const curationItemSchema = z.object({
   artistName: z.string(),
   coverUrl: z.string(),
   price: z.number(),
+  slug: z.string(),
 });
 
 export const curationSchema = z.object({

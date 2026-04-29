@@ -45,7 +45,7 @@ public sealed class CuratedCollectionsController(IMediator mediator) : BaseApiCo
     }
 
     [HttpPost]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(ApiResponse<Guid>), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ApiResponse<Guid>>> CreateCuratedCollection([FromBody] CreateCuratedCollectionCommand command)
@@ -55,7 +55,7 @@ public sealed class CuratedCollectionsController(IMediator mediator) : BaseApiCo
     }
 
     [HttpPatch("{id:guid}")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<Guid>>> UpdateCuratedCollection([FromRoute] Guid id, [FromBody] UpdateCuratedCollectionRequest request)
@@ -65,7 +65,7 @@ public sealed class CuratedCollectionsController(IMediator mediator) : BaseApiCo
     }
 
     [HttpPut("{id:guid}/status")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<Unit>>> UpdateCuratedCollectionStatus([FromRoute] Guid id, [FromBody] bool isPublished)
@@ -75,7 +75,7 @@ public sealed class CuratedCollectionsController(IMediator mediator) : BaseApiCo
     }
 
     [HttpPost("{id:guid}/items")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(typeof(ApiResponse<Guid>), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -86,7 +86,7 @@ public sealed class CuratedCollectionsController(IMediator mediator) : BaseApiCo
     }
 
     [HttpDelete("{id:guid}/items/{productId:guid}")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<Unit>>> RemoveProductFromCollection([FromRoute] Guid id, [FromRoute] Guid productId)
@@ -96,7 +96,7 @@ public sealed class CuratedCollectionsController(IMediator mediator) : BaseApiCo
     }
 
     [HttpDelete("{id:guid}")]
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "Admin")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<Unit>>> DeleteCuratedCollection([FromRoute] Guid id)

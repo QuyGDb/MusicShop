@@ -11,7 +11,7 @@ export interface CurationResponse {
 }
 
 export interface CurationDetailResponse extends CurationResponse {
-  products: any[]; // Raw response from backend
+  items: CurationItem[];
 }
 
 export const curationService = {
@@ -31,7 +31,7 @@ export const curationService = {
     return response.data || [];
   },
 
-  getCollectionById: async (id: string): Promise<CurationDetailResponse & { items: CurationItem[] }> => {
+  getCollectionById: async (id: string): Promise<CurationDetailResponse> => {
     const response = await http.get<ApiResponse<any>>(`/CuratedCollections/${id}`);
     if (!response.data) throw new Error('Collection not found');
 
@@ -43,6 +43,7 @@ export const curationService = {
       artistName: p.artistName || 'Unknown Artist',
       coverUrl: p.coverUrl || '',
       price: p.price || 0,
+      slug: p.slug || '',
     }));
 
     return {

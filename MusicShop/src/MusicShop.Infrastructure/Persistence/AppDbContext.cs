@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using MusicShop.Domain.Entities.Catalog;
 using MusicShop.Domain.Entities.Shop;
 using MusicShop.Domain.Entities.Orders;
-using MusicShop.Domain.Entities.Customer;
 using MusicShop.Domain.Entities.System;
 using System.Reflection;
 
@@ -44,9 +43,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<ProcessedWebhookEvent> ProcessedWebhookEvents => Set<ProcessedWebhookEvent>();
 
-    // 6. Wantlist & Collection (Customer)
-    public DbSet<WantlistItem> WantlistItems => Set<WantlistItem>();
-    public DbSet<UserCollection> UserCollections => Set<UserCollection>();
 
     // 7. Notifications (System)
     public DbSet<NotificationLog> NotificationLogs => Set<NotificationLog>();

@@ -12,4 +12,5 @@ public sealed record CuratedCollectionFeaturedItemResponse(
     string ArtistName,
     decimal Price,
     string CoverUrl,
+    string Slug,
     int SortOrder);

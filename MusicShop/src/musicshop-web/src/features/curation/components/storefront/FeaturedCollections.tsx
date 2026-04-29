@@ -1,9 +1,11 @@
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { Button, Skeleton } from '@/shared/components';
 import { cn } from '@/shared/lib/utils';
 import { useFeaturedCollections } from '../../hooks/useFeaturedCollections';
 
 export function FeaturedCollections() {
+  const navigate = useNavigate();
   const { collections, isLoading } = useFeaturedCollections();
 
   if (isLoading) {
@@ -62,7 +64,11 @@ export function FeaturedCollections() {
           {/* Products Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
             {collection.items.map((item) => (
-              <div key={item.productId} className="group/card relative aspect-square overflow-hidden bg-muted cursor-pointer transition-all duration-500">
+              <div 
+                key={item.productId} 
+                onClick={() => navigate(`/products/${item.slug}`)}
+                className="group/card relative aspect-square overflow-hidden bg-muted cursor-pointer transition-all duration-500"
+              >
                 <img 
                   src={item.coverUrl} 
                   alt={item.title} 

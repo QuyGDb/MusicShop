@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MusicShop.Infrastructure.Persistence;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MusicShop.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260429120249_RemoveWantlistAndCollection")]
+    partial class RemoveWantlistAndCollection
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -59,7 +62,7 @@ namespace MusicShop.Infrastructure.Migrations
                     b.HasIndex("Slug")
                         .IsUnique();
 
-                    b.ToTable("Artists", (string)null);
+                    b.ToTable("Artists");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.ArtistGenre", b =>
@@ -74,7 +77,7 @@ namespace MusicShop.Infrastructure.Migrations
 
                     b.HasIndex("GenreId");
 
-                    b.ToTable("ArtistGenres", (string)null);
+                    b.ToTable("ArtistGenres");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Genre", b =>
@@ -107,7 +110,7 @@ namespace MusicShop.Infrastructure.Migrations
                     b.HasIndex("Slug")
                         .IsUnique();
 
-                    b.ToTable("Genres", (string)null);
+                    b.ToTable("Genres");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Label", b =>
@@ -146,7 +149,7 @@ namespace MusicShop.Infrastructure.Migrations
                     b.HasIndex("Slug")
                         .IsUnique();
 
-                    b.ToTable("Labels", (string)null);
+                    b.ToTable("Labels");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Release", b =>
@@ -192,7 +195,7 @@ namespace MusicShop.Infrastructure.Migrations
 
                     b.HasIndex("Title");
 
-                    b.ToTable("Releases", (string)null);
+                    b.ToTable("Releases");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.ReleaseGenre", b =>
@@ -207,7 +210,7 @@ namespace MusicShop.Infrastructure.Migrations
 
                     b.HasIndex("GenreId");
 
-                    b.ToTable("ReleaseGenres", (string)null);
+                    b.ToTable("ReleaseGenres");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.ReleaseVersion", b =>
@@ -255,7 +258,7 @@ namespace MusicShop.Infrastructure.Migrations
 
                     b.HasIndex("ReleaseId");
 
-                    b.ToTable("ReleaseVersions", (string)null);
+                    b.ToTable("ReleaseVersions");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.Track", b =>
@@ -292,7 +295,7 @@ namespace MusicShop.Infrastructure.Migrations
 
                     b.HasIndex("ReleaseId");
 
-                    b.ToTable("Tracks", (string)null);
+                    b.ToTable("Tracks");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Orders.Cart", b =>
@@ -315,7 +318,7 @@ namespace MusicShop.Infrastructure.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Carts", (string)null);
+                    b.ToTable("Carts");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Orders.CartItem", b =>
@@ -345,7 +348,7 @@ namespace MusicShop.Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CartItems", (string)null);
+                    b.ToTable("CartItems");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Orders.Order", b =>
@@ -405,7 +408,7 @@ namespace MusicShop.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Orders.OrderItem", b =>
@@ -444,7 +447,7 @@ namespace MusicShop.Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderItems", (string)null);
+                    b.ToTable("OrderItems");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Orders.Payment", b =>
@@ -485,7 +488,7 @@ namespace MusicShop.Infrastructure.Migrations
                     b.HasIndex("OrderId")
                         .IsUnique();
 
-                    b.ToTable("Payments", (string)null);
+                    b.ToTable("Payments");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Orders.ProcessedWebhookEvent", b =>
@@ -518,7 +521,7 @@ namespace MusicShop.Infrastructure.Migrations
                     b.HasIndex("StripeEventId")
                         .IsUnique();
 
-                    b.ToTable("ProcessedWebhookEvents", (string)null);
+                    b.ToTable("ProcessedWebhookEvents");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Shop.CassetteAttributes", b =>
@@ -604,7 +607,7 @@ namespace MusicShop.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CuratedCollections", (string)null);
+                    b.ToTable("CuratedCollections");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Shop.CuratedCollectionItem", b =>
@@ -634,7 +637,7 @@ namespace MusicShop.Infrastructure.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("CuratedCollectionItems", (string)null);
+                    b.ToTable("CuratedCollectionItems");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Shop.Product", b =>
@@ -705,7 +708,7 @@ namespace MusicShop.Infrastructure.Migrations
                     b.HasIndex("Slug")
                         .IsUnique();
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Shop.VinylAttributes", b =>
@@ -780,7 +783,7 @@ namespace MusicShop.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AdminActivityLogs", (string)null);
+                    b.ToTable("AdminActivityLogs");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.System.NotificationLog", b =>
@@ -824,7 +827,7 @@ namespace MusicShop.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NotificationLogs", (string)null);
+                    b.ToTable("NotificationLogs");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.System.RefreshToken", b =>
@@ -857,7 +860,7 @@ namespace MusicShop.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RefreshTokens", (string)null);
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.System.User", b =>
@@ -901,7 +904,7 @@ namespace MusicShop.Infrastructure.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("MusicShop.Domain.Entities.Catalog.ArtistGenre", b =>

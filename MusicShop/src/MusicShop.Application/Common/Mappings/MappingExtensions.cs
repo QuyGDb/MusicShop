@@ -165,6 +165,7 @@ public static class MappingExtensions
             item.Product.ReleaseVersion?.Release.Artist.Name ?? "Unknown Artist",
             item.Product.Price,
             item.Product.ReleaseVersion?.Release.CoverUrl ?? string.Empty,
+            item.Product.Slug,
             item.SortOrder);
     }
 }

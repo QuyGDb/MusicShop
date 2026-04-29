@@ -29,7 +29,7 @@ public class ArtistsController(IMediator mediator) : BaseApiController
         return HandleResult(result);
     }
 
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -40,7 +40,7 @@ public class ArtistsController(IMediator mediator) : BaseApiController
         return HandleCreatedResult(result, nameof(GetArtist), value => new { slug = value });
     }
 
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "Admin")]
     [HttpPut("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)] // Kept because result is updated slug string
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -60,7 +60,7 @@ public class ArtistsController(IMediator mediator) : BaseApiController
         return HandleResult(result);
     }
 
-    [Authorize(Roles = "admin")]
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
