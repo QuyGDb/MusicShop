@@ -3,12 +3,14 @@ import { cartService } from '../services/cartService';
 import { useAuthStore } from '@/store/useAuthStore';
 
 export function useCart() {
+  const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => !!state.accessToken);
+  const isCustomer = isAuthenticated && user?.role?.toLowerCase() !== 'admin';
 
   const { data: cart, isLoading, error } = useQuery({
     queryKey: ['cart'],
     queryFn: () => cartService.getCart(),
-    enabled: isAuthenticated,
+    enabled: isCustomer,
     retry: 1,
   });
 

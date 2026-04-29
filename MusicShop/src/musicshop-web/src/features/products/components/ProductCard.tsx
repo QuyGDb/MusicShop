@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom';
 import { Product, ReleaseFormat } from '../types';
 import { Card, CardContent, CardFooter, Badge, Button } from '@/shared/components';
 import { ShoppingCart, Disc, Music } from 'lucide-react';
+import { useAuthStore } from '@/store/useAuthStore';
 
 interface ProductCardProps {
   product: Product;
 }
 
 export function ProductCard({ product }: ProductCardProps) {
+  const user = useAuthStore((state) => state.user);
   const formatIcon = product.format === ReleaseFormat.Vinyl ? <Disc className="h-4 w-4" /> : <Music className="h-4 w-4" />;
   const formatName = ReleaseFormat[product.format];
 
@@ -32,12 +34,14 @@ export function ProductCard({ product }: ProductCardProps) {
             alt={`${product.artistName} - ${product.name}`}
             className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
-            <Button className="w-full bg-primary hover:bg-primary-dark text-primary-foreground rounded-full translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-              <ShoppingCart className="h-4 w-4 mr-2" />
-              View Details
-            </Button>
-          </div>
+          {user?.role?.toLowerCase() !== 'admin' && (
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+              <Button className="w-full bg-primary hover:bg-primary-dark text-primary-foreground rounded-full translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
+                <ShoppingCart className="h-4 w-4 mr-2" />
+                View Details
+              </Button>
+            </div>
+          )}
         </div>
 
         <CardContent className="p-4 flex-grow">

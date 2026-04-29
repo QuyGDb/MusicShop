@@ -1,5 +1,6 @@
 import React from 'react';
 import { useProductDetail } from '../../hooks/useProductDetail';
+import { useAuthStore } from '@/store/useAuthStore';
 import { ReleaseFormat } from '../../types';
 import { Button, Badge, Card, CardContent } from '@/shared/components';
 import {
@@ -33,6 +34,7 @@ function FormatIcon({ format }: { format: ReleaseFormat }) {
 }
 
 export function ProductDetail({ slug }: ProductDetailProps) {
+  const user = useAuthStore((state) => state.user);
   const { product, isLoading, error, handleBack, handleAddToCart, isAddingToCart } = useProductDetail({ slug });
 
   if (isLoading) {
@@ -140,18 +142,20 @@ export function ProductDetail({ slug }: ProductDetailProps) {
             </div>
 
             {/* Add to Cart */}
-            <Button
-              onClick={handleAddToCart}
-              disabled={!inStock || isAddingToCart}
-              className="w-full sm:w-auto h-14 px-10 text-lg rounded-2xl bg-primary text-primary-foreground hover:bg-primary-dark shadow-xl shadow-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isAddingToCart ? (
-                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-              ) : (
-                <ShoppingCart className="h-5 w-5 mr-2" />
-              )}
-              {inStock ? (isAddingToCart ? 'Adding...' : 'Add to Cart') : 'Sold Out'}
-            </Button>
+            {user?.role?.toLowerCase() !== 'admin' && (
+              <Button
+                onClick={handleAddToCart}
+                disabled={!inStock || isAddingToCart}
+                className="w-full sm:w-auto h-14 px-10 text-lg rounded-2xl bg-primary text-primary-foreground hover:bg-primary-dark shadow-xl shadow-primary/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isAddingToCart ? (
+                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                ) : (
+                  <ShoppingCart className="h-5 w-5 mr-2" />
+                )}
+                {inStock ? (isAddingToCart ? 'Adding...' : 'Add to Cart') : 'Sold Out'}
+              </Button>
+            )}
 
             {/* Description */}
             {product.description && (
