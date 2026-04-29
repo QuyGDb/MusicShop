@@ -43,19 +43,21 @@ public sealed class StripeService(
                 Quantity = item.Quantity,
             }).ToList();
 
+            string finalSuccessUrl = successUrl.Contains('?') 
+                ? $"{successUrl}&order_id={order.Id}" 
+                : $"{successUrl}?order_id={order.Id}";
+
             SessionCreateOptions options = new SessionCreateOptions
             {
                 LineItems = lineItems,
                 Mode = "payment",
-                SuccessUrl = successUrl,
+                SuccessUrl = finalSuccessUrl,
                 CancelUrl = cancelUrl,
                 Metadata = new Dictionary<string, string>
                 {
                     { "OrderId", order.Id.ToString() }
                 },
                 ClientReferenceId = order.Id.ToString(),
-                // Optionally pre-fill customer email if available in order/user context
-                // CustomerEmail = order.User?.Email, 
                 ExpiresAt = DateTime.UtcNow.AddMinutes(30)
             };
 
@@ -63,7 +65,6 @@ public sealed class StripeService(
 
             if (string.IsNullOrEmpty(session.Url))
             {
-                logger.LogError("Stripe session URL is null or empty. SessionId: {SessionId}", session.Id);
                 return Result<StripeCheckoutDto>.Failure(PaymentErrors.CustomStripeError("Stripe failed to generate a checkout URL."));
             }
 
@@ -76,25 +77,25 @@ public sealed class StripeService(
         }
     }
 
-    public Task<WebhookProcessResult> HandleWebhookAsync(
+    public async Task<WebhookProcessResult> HandleWebhookAsync(
         string json,
         string signature,
         CancellationToken cancellationToken = default)
     {
         try
         {
-            Event stripeEvent = EventUtility.ConstructEvent(json, signature, _settings.WebhookSecret);
+            Event stripeEvent = EventUtility.ConstructEvent(json, signature, _settings.WebhookSecret, throwOnApiVersionMismatch: false);
 
-            return Task.FromResult(stripeEvent.Type switch
+            return stripeEvent.Type switch
             {
                 "checkout.session.completed" => HandleCheckoutCompleted(stripeEvent),
                 _ => WebhookProcessResult.Ignored(stripeEvent.Type)
-            });
+            };
         }
         catch (StripeException ex)
         {
             logger.LogError(ex, "Stripe webhook signature verification failed");
-            return Task.FromResult(WebhookProcessResult.Failure(PaymentErrors.CustomStripeError(ex.Message)));
+            return WebhookProcessResult.Failure(PaymentErrors.CustomStripeError(ex.Message));
         }
     }
 
@@ -109,7 +110,7 @@ public sealed class StripeService(
         {
             return WebhookProcessResult.Failure(PaymentErrors.InvalidWebhookEvent);
         }
-        // We use OrderStatus.Confirmed as the "Paid/Processing" status in this system
+        
         UpdateOrderStatusCommand command = new(orderId, OrderStatus.Confirmed, null, session.Id);
         return WebhookProcessResult.ShouldProcess(stripeEvent.Id, stripeEvent.Type, command);
     }

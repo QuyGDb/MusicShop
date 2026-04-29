@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.Extensions.Logging;
 using MusicShop.Application.Common.Interfaces;
 using MusicShop.Domain.Common;
 using MusicShop.Domain.Entities.Orders;
@@ -11,10 +12,12 @@ namespace MusicShop.Application.UseCases.Shop.Orders.Commands.UpdateOrderStatus;
 public sealed class UpdateOrderStatusCommandHandler(
     IOrderRepository orderRepository,
     ICartRepository cartRepository,
-    IUnitOfWork unitOfWork) : IRequestHandler<UpdateOrderStatusCommand, Result>
+    IUnitOfWork unitOfWork,
+    ILogger<UpdateOrderStatusCommandHandler> logger) : IRequestHandler<UpdateOrderStatusCommand, Result>
 {
     public async Task<Result> Handle(UpdateOrderStatusCommand request, CancellationToken cancellationToken)
     {
+        logger.LogInformation("Updating Order {OrderId} status to {Status}", request.OrderId, request.Status);
         Order? order = await orderRepository.GetByIdWithDetailsAsync(request.OrderId, cancellationToken);
 
         if (order == null)

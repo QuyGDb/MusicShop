@@ -46,6 +46,11 @@ axiosInstance.interceptors.request.use(
 );
 
 /**
+ * Singleton promise for handling concurrent refresh token requests.
+ */
+let refreshPromise: Promise<void> | null = null;
+
+/**
  * Refresh Token Logic for axios-auth-refresh
  */
 const refreshAuthLogic = async (failedRequest: { response: AxiosResponse }) => {
@@ -55,28 +60,47 @@ const refreshAuthLogic = async (failedRequest: { response: AxiosResponse }) => {
     return Promise.reject(failedRequest);
   }
 
-  try {
-    const response = await axios.post(
-      `${axiosInstance.defaults.baseURL}/auth/refresh`,
-      {},
-      { withCredentials: true }
-    );
-
-    const { accessToken } = response.data.data;
-    setAccessToken(accessToken);
-
-    // Update the header of the failed request and resume it
-    if (failedRequest.response.config.headers) {
-      failedRequest.response.config.headers['Authorization'] = `Bearer ${accessToken}`;
+  // If a refresh is already in progress, wait for it
+  if (refreshPromise) {
+    await refreshPromise;
+    
+    // Update the failed request header with the new token after the existing refresh is done
+    const token = getAccessToken();
+    if (failedRequest.response.config.headers && token) {
+      failedRequest.response.config.headers['Authorization'] = `Bearer ${token}`;
     }
-
     return Promise.resolve();
-  } catch (refreshError) {
-    // If refresh fails, clear auth state and notify UI
-    setAccessToken(null);
-    axiosInstance.onUnauthorized?.();
-    return Promise.reject(refreshError);
   }
+
+  // Create a new refresh promise
+  refreshPromise = (async () => {
+    try {
+      const response = await axios.post(
+        `${axiosInstance.defaults.baseURL}/auth/refresh`,
+        {},
+        { withCredentials: true }
+      );
+
+      const { accessToken } = response.data.data;
+      setAccessToken(accessToken);
+    } catch (refreshError) {
+      setAccessToken(null);
+      axiosInstance.onUnauthorized?.();
+      throw refreshError;
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  await refreshPromise;
+
+  // Update the header of the initial failed request
+  const token = getAccessToken();
+  if (failedRequest.response.config.headers && token) {
+    failedRequest.response.config.headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  return Promise.resolve();
 };
 
 // Instantiate the interceptor

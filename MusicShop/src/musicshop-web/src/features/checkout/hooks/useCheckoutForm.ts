@@ -27,7 +27,7 @@ export function useCheckoutForm(onSubmit: (data: CreateOrderRequest) => Promise<
     await onSubmit({
       ...values,
       paymentGateway: 'Stripe',
-      successUrl: `${window.location.origin}/checkout/success`,
+      successUrl: `${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancelUrl: `${window.location.origin}/checkout/cancel`,
     });
   });

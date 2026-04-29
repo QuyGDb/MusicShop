@@ -26,20 +26,17 @@ public sealed class ProcessStripeWebhookCommandHandler(
             return Result.Failure(result.Error!);
         }
 
-        // 1. Idempotency Check
         if (await eventRepository.AnyAsync(x => x.StripeEventId == result.StripeEventId, cancellationToken))
         {
             return Result.Success();
         }
 
-        // 2. Mark as processed
         eventRepository.Add(new ProcessedWebhookEvent
         {
             StripeEventId = result.StripeEventId!,
             EventType = result.EventType!
         });
 
-        // 3. Execute business logic
         return await mediator.Send(result.Command!, cancellationToken);
     }
 }

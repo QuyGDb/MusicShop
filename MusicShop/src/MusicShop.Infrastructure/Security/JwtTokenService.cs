@@ -13,6 +13,8 @@ public class JwtTokenService(IOptions<JwtSettings> jwtSettings) : ITokenService
 {
     private readonly JwtSettings _jwtSettings = jwtSettings.Value;
 
+    public int RefreshTokenGracePeriodSeconds => _jwtSettings.RefreshTokenGracePeriodSeconds;
+
     public (string Token, DateTime ExpiresAtUtc) GenerateAccessToken(User user)
     {
         DateTime expiresAtUtc = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes);

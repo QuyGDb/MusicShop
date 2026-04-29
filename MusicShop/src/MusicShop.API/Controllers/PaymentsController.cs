@@ -10,22 +10,29 @@ namespace MusicShop.Api.Controllers;
 public sealed class PaymentsController(IMediator mediator) : ControllerBase
 {
     [HttpPost("webhook")]
+    [Microsoft.AspNetCore.Authorization.AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Webhook()
+    public async Task<IActionResult> Webhook([FromServices] ILogger<PaymentsController> logger)
     {
+        Request.EnableBuffering();
         using StreamReader reader = new StreamReader(Request.Body);
         string json = await reader.ReadToEndAsync();
         string? signature = Request.Headers["Stripe-Signature"];
 
         if (string.IsNullOrWhiteSpace(signature))
         {
-            return BadRequest();
+            return BadRequest("Missing Stripe-Signature header");
         }
 
         ProcessStripeWebhookCommand command = new ProcessStripeWebhookCommand(json, signature);
         Result result = await mediator.Send(command);
 
-        return result.IsSuccess ? Ok() : BadRequest();
+        if (!result.IsSuccess)
+        {
+            return BadRequest(result.Error.Message);
+        }
+
+        return Ok();
     }
 }

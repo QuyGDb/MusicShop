@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MusicShop.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260428105950_AddProcessedWebhookEventTable")]
+    [Migration("20260429041122_AddProcessedWebhookEventTable")]
     partial class AddProcessedWebhookEventTable
     {
         /// <inheritdoc />

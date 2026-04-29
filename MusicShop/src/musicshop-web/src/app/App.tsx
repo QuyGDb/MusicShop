@@ -9,6 +9,8 @@ import TermsPage from '@/pages/shop/TermsPage';
 import ProductDetailPage from '@/pages/shop/ProductDetailPage';
 import OrderHistoryPage from '@/pages/shop/OrderHistoryPage';
 import { CheckoutPage } from '@/pages/shop/CheckoutPage';
+import CheckoutSuccessPage from '@/pages/shop/CheckoutSuccessPage';
+import CheckoutCancelPage from '@/pages/shop/CheckoutCancelPage';
 import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
 import { AdminLayout } from '@/layouts/AdminLayout';
@@ -54,6 +56,8 @@ export default function App() {
           <Route path="/products" element={<ProductListPage />} />
           <Route path="/products/:slug" element={<ProductDetailPage />} />
           <Route path="/checkout" element={accessToken ? <CheckoutPage /> : <Navigate to="/login" />} />
+          <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
+          <Route path="/checkout/cancel" element={<CheckoutCancelPage />} />
           <Route path="/profile" element={accessToken ? <ProfilePage /> : <Navigate to="/login" />} />
           <Route path="/orders" element={accessToken ? <OrderHistoryPage /> : <Navigate to="/login" />} />
           <Route path="/orders/:id" element={accessToken ? <OrderHistoryPage /> : <Navigate to="/login" />} />

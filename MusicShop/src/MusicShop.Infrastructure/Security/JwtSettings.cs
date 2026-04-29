@@ -20,4 +20,7 @@ public sealed class JwtSettings
 
     [Range(1, 90)]
     public int RefreshTokenDays { get; set; }
+
+    [Range(0, 300)]
+    public int RefreshTokenGracePeriodSeconds { get; set; } = 60;
 }
