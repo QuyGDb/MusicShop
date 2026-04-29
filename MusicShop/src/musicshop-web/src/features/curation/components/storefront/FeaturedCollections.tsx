@@ -38,10 +38,6 @@ export function FeaturedCollections() {
           {/* Section Header */}
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
             <div className="space-y-4 max-w-2xl">
-              <div className="flex items-center gap-2 text-primary font-black uppercase tracking-[0.2em] text-xs">
-                <Sparkles className="h-4 w-4" />
-                Curated Collection
-              </div>
               <h2 className="text-4xl md:text-6xl font-black tracking-tighter text-foreground leading-tight">
                 {collection.title}
               </h2>
@@ -52,13 +48,6 @@ export function FeaturedCollections() {
               )}
             </div>
             
-            <Button 
-              variant="outline" 
-              className="group/btn h-14 px-8 rounded-2xl border-2 border-border hover:border-primary transition-all font-bold tracking-tight"
-            >
-              Explore Collection
-              <ArrowRight className="ml-2 h-5 w-5 group-hover/btn:translate-x-1 transition-transform" />
-            </Button>
           </div>
 
           {/* Products Grid */}
