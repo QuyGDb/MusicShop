@@ -128,7 +128,6 @@ Request → Controller → MediatR → Handler → Repository → DB
 |---|---|---|
 | 16 | AI Chat — Claude SSE streaming | Phase 7 |
 | 17 | AI Recommendation (content-based filtering) | Phase 7 |
-| 18 | Wantlist / Collection | Phase 5 |
 | 19 | Sentry error tracking | Phase 1 |
 | 20 | Curated collections | Phase 2 |
 

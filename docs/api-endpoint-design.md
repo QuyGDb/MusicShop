@@ -55,7 +55,6 @@
 | `VALIDATION_ERROR` | 422 | Dữ liệu đầu vào không hợp lệ |
 | `OUT_OF_STOCK` | 409 | Hết hàng |
 | `ORDER_NOT_CANCELLABLE` | 409 | Đơn hàng không thể hủy |
-| `ALREADY_IN_WANTLIST` | 409 | Sản phẩm đã có trong wantlist |
 
 ---
 
@@ -1395,92 +1394,8 @@ Trạng thái thanh toán của đơn hàng.
 
 ---
 
-## Mục 7 — Wantlist & Collection
 
-### `GET /api/v1/wantlist`
-
-Danh sách sản phẩm muốn mua của user.
-
-**Auth:** Customer
-
-**Response `200`:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": "uuid",
-      "addedAt": "2024-01-10T08:00:00Z",
-      "product": {
-        "id": "uuid",
-        "name": "Miles Davis — Kind of Blue",
-        "coverUrl": "https://...",
-        "inStock": false
-      }
-    }
-  ]
-}
-```
-
----
-
-### `POST /api/v1/wantlist`
-
-Thêm sản phẩm vào wantlist. Trả về lỗi `ALREADY_IN_WANTLIST` nếu đã có.
-
-**Auth:** Customer
-
-**Request body:**
-```json
-{
-  "productId": "uuid"
-}
-```
-
----
-
-### `DELETE /api/v1/wantlist/:productId`
-
-Xóa sản phẩm khỏi wantlist.
-
-**Auth:** Customer
-
----
-
-### `GET /api/v1/collection`
-
-Bộ sưu tập cá nhân của user (những đĩa user đang sở hữu).
-
-**Auth:** Customer
-
-**Response `200`:** Cấu trúc tương tự `GET /wantlist`.
-
----
-
-### `POST /api/v1/collection`
-
-Thêm sản phẩm vào collection. User có thể thêm dù không mua tại shop.
-
-**Auth:** Customer
-
-**Request body:**
-```json
-{
-  "productId": "uuid"
-}
-```
-
----
-
-### `DELETE /api/v1/collection/:productId`
-
-Xóa sản phẩm khỏi collection.
-
-**Auth:** Customer
-
----
-
-## Mục 8 — Notifications
+## Mục 7 — Notifications
 
 ### `GET /api/v1/notifications`
 
@@ -1598,14 +1513,8 @@ Admin retry gửi lại email thất bại (`status = failed`).
 | 63 | GET | `/payments/vnpay/callback` | Public |
 | 64 | POST | `/payments/vnpay/ipn` | Public |
 | 65 | GET | `/orders/:id/payment` | Customer |
-| 66 | GET | `/wantlist` | Customer |
-| 67 | POST | `/wantlist` | Customer |
-| 68 | DELETE | `/wantlist/:productId` | Customer |
-| 69 | GET | `/collection` | Customer |
-| 70 | POST | `/collection` | Customer |
-| 71 | DELETE | `/collection/:productId` | Customer |
-| 72 | GET | `/notifications` | Customer |
-| 73 | GET | `/admin/notifications` | Admin |
-| 74 | POST | `/admin/notifications/:id/retry` | Admin |
+| 66 | GET | `/notifications` | Customer |
+| 67 | GET | `/admin/notifications` | Admin |
+| 68 | POST | `/admin/notifications/:id/retry` | Admin |
 
-**Tổng: 74 endpoints**
+**Tổng: 68 endpoints**

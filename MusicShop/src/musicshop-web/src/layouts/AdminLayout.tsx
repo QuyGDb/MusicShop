@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import { Link, useLocation, Outlet } from 'react-router-dom';
-import { LayoutDashboard, Package, Users, ShoppingBag, Settings, ArrowLeft, Music, UserCircle, Hash, Tag, Layers } from 'lucide-react';
+import { Package, Users, ShoppingBag, Settings, ArrowLeft, Music, UserCircle, Hash, Tag, Layers } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { useAuthStore } from '@/store/useAuthStore';
 
@@ -13,12 +13,6 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   const user = useAuthStore((state) => state.user);
 
   const sidebarGroups = [
-    {
-      title: 'Main',
-      links: [
-        { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-      ]
-    },
     {
       title: 'Music Catalog',
       links: [

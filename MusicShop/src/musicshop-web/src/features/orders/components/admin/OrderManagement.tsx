@@ -11,6 +11,8 @@ import { useOrderManagement } from '../../hooks/useOrderManagement';
 export function OrderManagement() {
   const {
     orders,
+    isLoading,
+    error,
     stats,
     statusStyles,
     selectedOrderId,
@@ -23,6 +25,8 @@ export function OrderManagement() {
     <ManagementLayout
       title="Orders & Fulfillment"
       subtitle="Monitor customer purchases and manage the lifecycle of every shipment."
+      isLoading={isLoading}
+      error={error}
       isEmpty={isEmpty}
       emptyState={
         <EmptyState 
@@ -86,15 +90,15 @@ export function OrderManagement() {
                     </td>
                     <td className="p-5">
                       <div className="flex flex-col">
-                        <span className="font-bold text-foreground">{order.customerName}</span>
+                        <span className="font-bold text-foreground">{order.recipientName}</span>
                         <span className="text-xs text-muted-foreground">{order.email}</span>
                       </div>
                     </td>
                     <td className="p-5 text-sm text-muted-foreground">
-                      {order.date}
+                      {new Date(order.createdAt).toLocaleDateString()}
                     </td>
                     <td className="p-5 font-bold text-foreground">
-                      ${order.total.toFixed(2)}
+                      ${order.totalAmount.toFixed(2)}
                     </td>
                     <td className="p-5">
                       <div className={cn(

@@ -76,7 +76,9 @@ export function OrderDetailsModal({ orderId, onClose }: OrderDetailsModalProps) 
                 <CardTitle className="text-xl font-bold text-foreground">Order #{orderId}</CardTitle>
                 <div className="flex items-center gap-2 mt-1">
                    <Calendar className="h-3 w-3 text-subtle" />
-                   <span className="text-xs text-muted-foreground uppercase tracking-widest font-bold">April 18, 2026</span>
+                   <span className="text-xs text-muted-foreground uppercase tracking-widest font-bold">
+                     {new Date(order.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                   </span>
                 </div>
              </div>
           </div>

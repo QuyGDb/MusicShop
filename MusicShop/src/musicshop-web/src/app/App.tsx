@@ -15,7 +15,6 @@ import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { AdminRoute } from '@/features/auth/components/AdminRoute';
-import AdminDashboardPage from '@/pages/admin/AdminDashboardPage';
 import ArtistManagementPage from '@/pages/admin/ArtistManagementPage';
 import LabelManagementPage from '@/pages/admin/LabelManagementPage';
 import GenreManagementPage from '@/pages/admin/GenreManagementPage';
@@ -72,7 +71,7 @@ export default function App() {
 
         {/* Admin Routes */}
         <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
-          <Route index element={<AdminDashboardPage />} />
+          <Route index element={<Navigate to="orders" replace />} />
           <Route path="artists" element={<ArtistManagementPage />} />
           <Route path="labels" element={<LabelManagementPage />} />
           <Route path="genres" element={<GenreManagementPage />} />

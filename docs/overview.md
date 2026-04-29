@@ -62,13 +62,9 @@ The key differentiator is the detailed catalog management and specialized attrib
 * Hủy đơn hàng
 * Xem báo cáo doanh thu
 
-### 0.6 Wantlist & Collection
-* Thêm / xóa sản phẩm khỏi Wantlist
-* Thêm / xóa sản phẩm khỏi Collection
-* Nhận thông báo khi sản phẩm trong Wantlist có hàng trở lại
 
 
-### 0.8 Thông báo
+### 0.6 Thông báo
 * Gửi email xác nhận khi đơn được tạo
 * Gửi email khi đơn được xác nhận
 * Gửi email kèm thông tin vận chuyển khi đơn được ship
@@ -82,7 +78,7 @@ The key differentiator is the detailed catalog management and specialized attrib
 | Vai trò | Mô tả | Quyền hạn |
 |---|---|---|
 | **Guest** | Khách vãng lai, chưa đăng nhập | Xem danh mục, tìm kiếm & lọc sản phẩm |
-| **Customer** | Khách hàng đã đăng ký (Email hoặc Google) | Mua hàng, theo dõi đơn, Wantlist, Collection |
+| **Customer** | Khách hàng đã đăng ký (Email hoặc Google) | Mua hàng, theo dõi đơn |
 | **Admin** | Chủ shop | Quản lý catalog, xác nhận / ship / hủy đơn, xem báo cáo doanh thu, xem log hành động |
 
 ---
@@ -237,10 +233,6 @@ Mỗi lần thanh toán lưu: số tiền, phương thức thanh toán, mã giao
 | Đơn hoàn thành | Gửi email mời khách đánh giá sản phẩm |
 | Đơn bị hủy | Gửi email thông báo hủy đơn |
 
-### 7.2 Thông báo Wantlist
-
-- Khi sản phẩm trong Wantlist có hàng trở lại → thông báo ngay cho khách hàng.
-- Sau khi đã thông báo → không thông báo lại cho cùng sản phẩm đó trong vòng **7 ngày**.
 
 ---
 
