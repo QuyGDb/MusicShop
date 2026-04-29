@@ -4,20 +4,16 @@ import { useProductFilters } from './useProductFilters';
 import { toast } from 'sonner';
 
 export function useProductsList() {
-  const { 
-    selectedFormat, 
-    selectedGenre, 
-    minPrice, 
-    maxPrice, 
-    page, 
-    searchQuery 
+  const {
+    selectedFormat,
+    selectedGenre,
+    page,
+    searchQuery
   } = useProductFilters();
 
   const filters: ProductFilters = {
     format: selectedFormat || undefined,
     genre: selectedGenre || undefined,
-    minPrice: minPrice ? parseFloat(minPrice) : undefined,
-    maxPrice: maxPrice ? parseFloat(maxPrice) : undefined,
     page: page,
     limit: 12,
     searchQuery: searchQuery || undefined,
@@ -64,7 +60,7 @@ export function useAdminProduct(id: string) {
 
 export function useCreateProduct() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (data: any) => productService.createProduct(data),
     onSuccess: () => {
@@ -79,9 +75,9 @@ export function useCreateProduct() {
 
 export function useUpdateProduct() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
-    mutationFn: ({ id, data }: { id: string, data: any }) => 
+    mutationFn: ({ id, data }: { id: string, data: any }) =>
       productService.updateProduct(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products'] });
@@ -95,7 +91,7 @@ export function useUpdateProduct() {
 
 export function useDeleteProduct() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: (id: string) => productService.deleteProduct(id),
     onSuccess: () => {

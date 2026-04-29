@@ -6,8 +6,6 @@ export function useProductFilters() {
   // Current filter values from URL
   const selectedFormat = searchParams.get('format');
   const selectedGenre = searchParams.get('genre');
-  const minPrice = searchParams.get('minPrice') || '0';
-  const maxPrice = searchParams.get('maxPrice') || '500';
   const page = searchParams.get('page') || '1';
   const searchQuery = searchParams.get('q') || '';
 
@@ -36,8 +34,6 @@ export function useProductFilters() {
   return {
     selectedFormat,
     selectedGenre,
-    minPrice,
-    maxPrice,
     page: parseInt(page),
     searchQuery,
     searchParams,

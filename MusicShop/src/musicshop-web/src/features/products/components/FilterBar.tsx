@@ -1,6 +1,6 @@
 import React from 'react';
 import { ReleaseFormat } from '../types';
-import { Label, Checkbox, Slider, Button, Badge, Skeleton } from '@/shared/components';
+import { Label, Checkbox, Button, Badge, Skeleton } from '@/shared/components';
 import { Disc, Music, CassetteTape, Filter, RotateCcw } from 'lucide-react';
 import { useProductFilters } from '../hooks/useProductFilters';
 import { useGenres } from '@/features/catalog/hooks/useGenres';
@@ -9,8 +9,6 @@ export function FilterBar() {
   const {
     selectedFormat,
     selectedGenre,
-    minPrice,
-    maxPrice,
     updateFilters,
     clearFilters
   } = useProductFilters();
@@ -64,23 +62,6 @@ export function FilterBar() {
         </div>
       </div>
 
-      {/* Price Range Filter */}
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <Label className="text-sm font-semibold text-muted-foreground">Price Range</Label>
-          <span className="text-xs font-mono text-primary">${minPrice} - ${maxPrice}</span>
-        </div>
-        <Slider
-          defaultValue={[parseInt(minPrice), parseInt(maxPrice)]}
-          max={500}
-          step={10}
-          onValueCommitted={(values: number[]) => {
-            updateFilters('minPrice', values[0].toString());
-            updateFilters('maxPrice', values[1].toString());
-          }}
-          className="cursor-pointer"
-        />
-      </div>
 
       {/* Dynamic Genres */}
       <div className="space-y-4">
@@ -94,9 +75,9 @@ export function FilterBar() {
             genres.map((genre) => (
               <Badge
                 key={genre.id}
-                variant={selectedGenre === genre.name ? 'default' : 'outline'}
-                className={`cursor-pointer px-3 py-1 transition-all ${selectedGenre === genre.name ? 'bg-primary text-primary-foreground border-primary' : 'border-border text-muted-foreground hover:border-primary hover:text-primary'}`}
-                onClick={() => updateFilters('genre', selectedGenre === genre.name ? null : genre.name)}
+                variant={selectedGenre === genre.slug ? 'default' : 'outline'}
+                className={`cursor-pointer px-3 py-1 transition-all ${selectedGenre === genre.slug ? 'bg-primary text-primary-foreground border-primary' : 'border-border text-muted-foreground hover:border-primary hover:text-primary'}`}
+                onClick={() => updateFilters('genre', selectedGenre === genre.slug ? null : genre.slug)}
               >
                 {genre.name}
               </Badge>
