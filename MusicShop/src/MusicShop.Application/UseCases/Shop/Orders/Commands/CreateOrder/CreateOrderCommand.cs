@@ -7,6 +7,7 @@ namespace MusicShop.Application.UseCases.Shop.Orders.Commands.CreateOrder;
 
 public record CreateOrderCommand(
     string RecipientName,
+    string Email,
     string Phone,
     string ShippingAddress,
     PaymentGateway PaymentGateway,

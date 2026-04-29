@@ -12,6 +12,7 @@ namespace MusicShop.Application.UseCases.Shop.Orders.Commands.UpdateOrderStatus;
 public sealed class UpdateOrderStatusCommandHandler(
     IOrderRepository orderRepository,
     ICartRepository cartRepository,
+    IEmailService emailService,
     IUnitOfWork unitOfWork,
     ILogger<UpdateOrderStatusCommandHandler> logger) : IRequestHandler<UpdateOrderStatusCommand, Result>
 {
@@ -91,6 +92,37 @@ public sealed class UpdateOrderStatusCommandHandler(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
+        // 4. Send Email Notification
+        try 
+        {
+            await SendStatusUpdateEmailAsync(order, cancellationToken);
+        }
+        catch (Exception ex)
+        {
+            // Don't fail the whole request if email fails, but log it
+            logger.LogError(ex, "Failed to send order status update email for Order {OrderId}", order.Id);
+        }
+
         return MusicShop.Domain.Common.Result.Success();
+    }
+
+    private async Task SendStatusUpdateEmailAsync(Order order, CancellationToken cancellationToken)
+    {
+        string subject = $"Order #{order.Id.ToString().ToUpper()[..8]} Status Update";
+        string statusText = order.Status.ToString();
+        string body = $@"
+            <div style='font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;'>
+                <h2 style='color: #333;'>Hello {order.RecipientName},</h2>
+                <p>Your order <strong>#{order.Id}</strong> has been updated to: <span style='color: #4f46e5; font-weight: bold;'>{statusText}</span></p>
+                
+                {(order.Status == OrderStatus.Shipped && !string.IsNullOrEmpty(order.TrackingNumber) 
+                    ? $"<p>Your tracking number is: <strong>{order.TrackingNumber}</strong></p>" 
+                    : "")}
+                
+                <hr style='border: 0; border-top: 1px solid #eee; margin: 20px 0;' />
+                <p style='font-size: 12px; color: #666;'>Thank you for shopping with MusicShop!</p>
+            </div>";
+
+        await emailService.SendEmailAsync(order.Email, subject, body);
     }
 }

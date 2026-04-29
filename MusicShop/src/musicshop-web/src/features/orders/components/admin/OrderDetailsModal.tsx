@@ -9,37 +9,15 @@ import { OrderSummary } from './OrderForm/OrderSummary';
 import { OrderFulfillment } from './OrderForm/OrderFulfillment';
 import { CustomerDetails } from './OrderForm/CustomerDetails';
 
+import { useOrderDetail } from '../../hooks/useOrderDetail';
+
 interface OrderDetailsModalProps {
   orderId: string;
   onClose: () => void;
 }
 
 export function OrderDetailsModal({ orderId, onClose }: OrderDetailsModalProps) {
-  // Mock data for the specific order (Ideally fetched via useOrderQuery)
-  const orderData = {
-    customer: {
-      name: 'John Doe',
-      email: 'john@example.com',
-      phone: '+1 (555) 123-4567',
-      address: '123 Synthwave Blvd, Neon City, CA 90210'
-    },
-    items: [
-      { id: '1', title: 'Endless Summer', format: 'Vinyl (180g Pink)', price: 45.00, quantity: 2, cover: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=200&q=80' },
-      { id: '2', title: 'Dark All Day', format: 'CD (Deluxe Edition)', price: 18.00, quantity: 1, cover: 'https://images.unsplash.com/photo-1514525253361-bee243870eb2?w=200&q=80' }
-    ],
-    summary: {
-      subtotal: 108.00,
-      shipping: 12.50,
-      tax: 5.00,
-      total: 125.50
-    },
-    payment: {
-      method: 'Visa **** 4242',
-      status: 'Paid',
-      transactionId: 'txn_3M9h4L2eZvKYlo2C1abc'
-    },
-    currentStatus: 'Processing' as OrderStatus
-  };
+  const { order, isLoading, error } = useOrderDetail(orderId);
 
   const { 
     register, 
@@ -48,9 +26,43 @@ export function OrderDetailsModal({ orderId, onClose }: OrderDetailsModalProps) 
     control, 
     isSubmitting 
   } = useOrderForm({
-    initialStatus: orderData.currentStatus,
+    orderId,
+    initialStatus: order?.status || OrderStatus.Pending,
     onSuccess: onClose,
   });
+
+  if (isLoading) return null; // Or a loading spinner
+  if (!order) return null;
+
+  // Map backend order to what sub-components expect
+  const mappedData = {
+    customer: {
+      name: order.recipientName,
+      email: order.email, // We will add email to OrderDetail too
+      phone: order.phone,
+      address: order.shippingAddress
+    },
+    items: order.items.map(item => ({
+      id: item.id,
+      title: item.productName,
+      format: '', // Not in DTO
+      price: item.unitPrice,
+      quantity: item.quantity,
+      cover: item.productCoverUrl
+    })),
+    summary: {
+      subtotal: order.totalAmount,
+      shipping: 0,
+      tax: 0,
+      total: order.totalAmount
+    },
+    payment: {
+      method: order.payment?.method || 'N/A',
+      status: order.payment?.status || 'Pending',
+      transactionId: order.payment?.transactionCode || ''
+    },
+    currentStatus: order.status
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
@@ -77,8 +89,8 @@ export function OrderDetailsModal({ orderId, onClose }: OrderDetailsModalProps) 
           <div className="grid grid-cols-1 lg:grid-cols-3">
              {/* Left Column: Line Items & Summary */}
              <div className="lg:col-span-2 p-8 border-r border-border space-y-8">
-                <OrderItemsList items={orderData.items} />
-                <OrderSummary summary={orderData.summary} />
+                <OrderItemsList items={mappedData.items} />
+                <OrderSummary summary={mappedData.summary} />
              </div>
 
              {/* Right Column: Customer & Status */}
@@ -90,8 +102,8 @@ export function OrderDetailsModal({ orderId, onClose }: OrderDetailsModalProps) 
                   isSubmitting={isSubmitting}
                 />
                 <CustomerDetails 
-                  customer={orderData.customer} 
-                  payment={orderData.payment} 
+                  customer={mappedData.customer} 
+                  payment={mappedData.payment} 
                 />
              </div>
           </div>

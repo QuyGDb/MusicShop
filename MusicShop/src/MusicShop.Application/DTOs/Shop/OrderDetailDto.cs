@@ -6,6 +6,7 @@ public sealed record OrderDetailDto(
     Guid Id,
     OrderStatus Status,
     string RecipientName,
+    string Email,
     string Phone,
     string ShippingAddress,
     string? Note,

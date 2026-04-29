@@ -5,6 +5,7 @@ import { CreateOrderRequest } from '../types';
 
 const checkoutSchema = z.object({
   recipientName: z.string().min(1, 'Recipient name is required'),
+  email: z.string().email('Valid email is required'),
   phone: z.string().min(10, 'Valid phone number is required'),
   shippingAddress: z.string().min(5, 'Shipping address is required'),
   note: z.string().optional(),
@@ -17,6 +18,7 @@ export function useCheckoutForm(onSubmit: (data: CreateOrderRequest) => Promise<
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
       recipientName: '',
+      email: '',
       phone: '',
       shippingAddress: '',
       note: '',

@@ -27,7 +27,9 @@ public sealed class GetOrderHistoryQueryHandler(
             order.Status,
             order.TotalAmount,
             order.CreatedAt,
-            order.OrderItems.Count
+            order.OrderItems.Count,
+            order.RecipientName,
+            order.Email
         )).ToList();
 
         return Result<PaginatedResult<OrderListItemDto>>.Success(

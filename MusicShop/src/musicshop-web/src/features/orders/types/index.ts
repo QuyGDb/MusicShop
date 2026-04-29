@@ -35,6 +35,8 @@ export interface OrderListItem {
   totalAmount: number;
   createdAt: string;
   itemCount: number;
+  recipientName: string;
+  email: string;
 }
 
 // Full order detail
@@ -42,6 +44,7 @@ export interface OrderDetail {
   id: string;
   status: OrderStatus;
   recipientName: string;
+  email: string;
   phone: string;
   shippingAddress: string;
   note?: string;

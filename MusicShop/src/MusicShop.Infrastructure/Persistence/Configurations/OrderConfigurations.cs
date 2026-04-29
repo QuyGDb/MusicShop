@@ -17,6 +17,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             .HasPrecision(18, 2);
 
         builder.Property(x => x.RecipientName).IsRequired().HasMaxLength(200);
+        builder.Property(x => x.Email).IsRequired().HasMaxLength(255);
         builder.Property(x => x.Phone).IsRequired().HasMaxLength(20);
         builder.Property(x => x.ShippingAddress).IsRequired().HasMaxLength(500);
 

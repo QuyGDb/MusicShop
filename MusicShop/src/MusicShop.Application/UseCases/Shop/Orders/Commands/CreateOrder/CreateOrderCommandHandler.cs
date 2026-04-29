@@ -43,6 +43,7 @@ public sealed class CreateOrderCommandHandler(
         {
             UserId = userId,
             RecipientName = request.RecipientName,
+            Email = request.Email,
             Phone = request.Phone,
             ShippingAddress = request.ShippingAddress,
             Note = request.Note,

@@ -33,4 +33,26 @@ export const orderService = {
   cancelOrder: async (id: string): Promise<void> => {
     await http.post(`/Orders/${id}/cancel`);
   },
+  
+  getAdminOrders: async (filters: OrderHistoryFilters): Promise<PaginatedResponse<OrderListItem>> => {
+    const response = await http.get<ApiResponse<OrderListItem[]>>('/admin/orders', {
+      params: {
+        Status: filters.status,
+        PageNumber: filters.page,
+        PageSize: filters.limit,
+      },
+    });
+
+    return {
+      items: response.data || [],
+      meta: response.meta,
+    };
+  },
+
+  updateOrderStatus: async (id: string, status: string, trackingNumber?: string): Promise<void> => {
+    await http.patch(`/admin/orders/${id}/status`, {
+      status,
+      trackingNumber,
+    });
+  },
 };

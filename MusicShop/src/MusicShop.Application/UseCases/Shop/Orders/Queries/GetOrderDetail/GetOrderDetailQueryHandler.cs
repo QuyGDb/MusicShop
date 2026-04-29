@@ -32,6 +32,7 @@ public sealed class GetOrderDetailQueryHandler(
             order.Id,
             order.Status,
             order.RecipientName,
+            order.Email,
             order.Phone,
             order.ShippingAddress,
             order.Note,

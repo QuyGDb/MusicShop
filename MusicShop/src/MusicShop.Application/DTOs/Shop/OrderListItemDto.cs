@@ -7,4 +7,6 @@ public sealed record OrderListItemDto(
     OrderStatus Status,
     decimal TotalAmount,
     DateTime CreatedAt,
-    int ItemCount);
+    int ItemCount,
+    string RecipientName,
+    string Email);

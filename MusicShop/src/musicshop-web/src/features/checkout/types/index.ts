@@ -1,5 +1,6 @@
 export interface CreateOrderRequest {
   recipientName: string;
+  email: string;
   phone: string;
   shippingAddress: string;
   paymentGateway: 'Stripe';

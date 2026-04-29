@@ -15,6 +15,7 @@ using Amazon.S3;
 using Amazon.Runtime;
 using Amazon;
 using Amazon.Extensions.NETCore.Setup;
+using MusicShop.Application.Common.Models;
 
 namespace MusicShop.Infrastructure;
 
@@ -92,6 +93,13 @@ public static class DependencyInjection
         services.AddDefaultAWSOptions(awsOptions);
         services.AddAWSService<IAmazonS3>();
         services.AddScoped<IImageService, S3ImageService>();
+        
+        // 7. Email Service
+        services.AddOptions<EmailSettings>()
+            .Bind(configuration.GetSection(EmailSettings.SectionName))
+            .ValidateOnStart();
+
+        services.AddScoped<IEmailService, GmailEmailService>();
 
         return services;
     }
