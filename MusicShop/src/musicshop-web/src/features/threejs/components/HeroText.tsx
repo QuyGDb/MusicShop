@@ -16,11 +16,15 @@ export function HeroText({ fontUrl, text, position = [0, 0, 0], rotation = [0, 0
   useHeroText();
   const materialRef = useRef<THREE.MeshStandardMaterial>(null);
 
-  // Hiệu ứng nhấp nháy (breathing glow) cho chữ
   useFrame((state) => {
     if (materialRef.current) {
-      // Dao động intensity từ 5 đến 15 theo thời gian
-      const intensity = 10 + Math.sin(state.clock.elapsedTime * 2) * 5;
+      const time = state.clock.elapsedTime;
+
+      const hue = (time * 0.1) % 1;
+      materialRef.current.color.setHSL(hue, 0.8, 0.5);
+      materialRef.current.emissive.setHSL(hue, 0.8, 0.5);
+
+      const intensity = 8 + Math.sin(time * 2) * 6;
       materialRef.current.emissiveIntensity = intensity;
     }
   });
