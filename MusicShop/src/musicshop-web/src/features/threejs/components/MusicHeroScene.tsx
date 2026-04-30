@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import * as THREE from 'three';
 import { Canvas } from '@react-three/fiber';
-import { Sky, OrbitControls, Environment, ContactShadows, SpotLight } from '@react-three/drei';
+import { Sky, OrbitControls, Environment, SpotLight, PerspectiveCamera } from '@react-three/drei';
 import { EffectComposer, Bloom } from '@react-three/postprocessing';
-import { useControls } from 'leva';
+import { useControls, button } from 'leva';
 import { useMusicHeroScene } from '../hooks/useMusicHeroScene';
 import { Particles } from './Particles';
 import { HeroText } from './HeroText';
 import { Model } from './Model';
 
-
 export function MusicHeroScene() {
   const { particleCount, fontUrl, heroText, models } = useMusicHeroScene();
+  const cameraRef = useRef<any>(null);
 
   // Leva controls for Black Cat
   const catConfig = useControls('Black Cat', {
@@ -64,7 +65,6 @@ export function MusicHeroScene() {
     mieDirectionalG: { value: 0.7, min: 0, max: 1 }
   });
 
-
   // Leva controls for SpotLight
   const spotConfig = useControls('SpotLight', {
     position: { value: [4.8, 50.8, -9.2], step: 0.1 },
@@ -75,9 +75,34 @@ export function MusicHeroScene() {
     color: '#8a603e'
   });
 
+  // Camera & Controls settings
+  const { cameraPosition, controlsTarget, autoRotate, rotationSpeed } = useControls('Camera', {
+    cameraPosition: { value: [-4.5, 9.6, -63.3], step: 0.1 },
+    controlsTarget: { value: [0, 2, 0], step: 0.1 },
+    autoRotate: false,
+    rotationSpeed: { value: 1.0, min: 0.1, max: 10, step: 0.1 },
+    'Log Camera State': button(() => {
+      if (cameraRef.current) {
+        const pos = cameraRef.current.position;
+        const target = controlsTarget;
+        console.log('--- CAMERA STATE SAVED ---');
+        console.log(`cameraPosition: [${pos.x.toFixed(2)}, ${pos.y.toFixed(2)}, ${pos.z.toFixed(2)}]`);
+        console.log(`controlsTarget: [${target[0]}, ${target[1]}, ${target[2]}]`);
+        console.log('---------------------------');
+        alert('Camera state logged to Console (F12)!');
+      }
+    }),
+  });
+
   return (
-    <div style={{ width: '100%', height: '100%', background: sceneConfig.background }}>
-      <Canvas camera={{ position: [0, 0, 10], fov: 45 }} gl={{ antialias: false, stencil: false, depth: true }}>
+    <div style={{ width: '100%', height: '100vh', background: sceneConfig.background }}>
+      <Canvas shadows dpr={[1, 2]}>
+        <PerspectiveCamera
+          ref={cameraRef}
+          makeDefault
+          position={cameraPosition}
+          fov={45}
+        />
         <Sky
           distance={450000}
           sunPosition={skyConfig.sunPosition}
@@ -102,10 +127,14 @@ export function MusicHeroScene() {
         />
 
         <OrbitControls
+          makeDefault
+          target={new THREE.Vector3(...controlsTarget)}
           enableDamping
           dampingFactor={0.05}
-          minDistance={15}
-          maxDistance={100}
+          minDistance={5}
+          maxDistance={200}
+          autoRotate={autoRotate}
+          autoRotateSpeed={rotationSpeed}
         />
 
         <Particles 
@@ -114,6 +143,7 @@ export function MusicHeroScene() {
           color={particlesConfig.color}
           opacity={particlesConfig.opacity}
         />
+        
         <HeroText
           fontUrl={fontUrl}
           text={heroText}
@@ -122,7 +152,6 @@ export function MusicHeroScene() {
           scale={textConfig.scale}
         />
 
-        {/* White Room Model controlled by Leva */}
         <Model
           url={models.room}
           scale={roomConfig.scale}
@@ -130,7 +159,6 @@ export function MusicHeroScene() {
           position={roomConfig.position}
         />
 
-        {/* Black Cat Model controlled by Leva */}
         <Model
           url={models.blackCat}
           scale={catConfig.scale}
@@ -138,14 +166,12 @@ export function MusicHeroScene() {
           position={catConfig.position}
         />
 
-        {/* Vinyl Player Model controlled by Leva */}
         <Model
           url={models.vinylPlayer}
           scale={vinylConfig.scale}
           rotation={vinylConfig.rotation}
           position={vinylConfig.position}
         />
-
 
         <EffectComposer>
           <Bloom

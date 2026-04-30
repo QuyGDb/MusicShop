@@ -4,7 +4,6 @@ import roomModel from '@/assets/models/empty_white_room_final.glb';
 import vinylPlayerModel from '@/assets/models/stylized_vinyl_player.glb';
 
 export interface UseMusicHeroSceneReturn {
-  particleCount: number;
   fontUrl: string;
   heroText: string;
   models: {
@@ -15,7 +14,6 @@ export interface UseMusicHeroSceneReturn {
 }
 
 export function useMusicHeroScene(): UseMusicHeroSceneReturn {
-  const particleCount = 2000;
   const fontUrl = "https://raw.githubusercontent.com/mrdoob/three.js/master/examples/fonts/helvetiker_bold.typeface.json";
   const heroText = "CAT MUSIC SHOP";
 
@@ -26,7 +24,6 @@ export function useMusicHeroScene(): UseMusicHeroSceneReturn {
   }), []);
 
   return {
-    particleCount,
     fontUrl,
     heroText,
     models
