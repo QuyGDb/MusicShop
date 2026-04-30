@@ -29,7 +29,7 @@ export function Navbar() {
         <div className="flex items-center gap-8">
           <Link to="/" className="flex items-center gap-2">
             <Music className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold tracking-tight text-foreground">MusicShop</span>
+            <span className="text-xl font-black tracking-tighter text-foreground uppercase">CAT MUSIC SHOP</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-6">

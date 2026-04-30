@@ -16,6 +16,7 @@ export function OrderManagement() {
     stats,
     statusStyles,
     selectedOrderId,
+    searchTerm,
     actions
   } = useOrderManagement();
 
@@ -28,6 +29,9 @@ export function OrderManagement() {
       isLoading={isLoading}
       error={error}
       isEmpty={isEmpty}
+      searchPlaceholder="Search by Order ID, name or email..."
+      searchQuery={searchTerm}
+      onSearchChange={actions.setSearchTerm}
       emptyState={
         <EmptyState 
           icon={Calendar} 
@@ -37,11 +41,11 @@ export function OrderManagement() {
       }
       filterContent={
         <>
-          <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2">
+          <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2 text-xs font-black uppercase tracking-widest">
             <Filter className="h-4 w-4" />
             Status
           </Button>
-          <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2">
+          <Button variant="outline" className="h-14 px-5 rounded-2xl bg-surface border-border flex gap-2 text-xs font-black uppercase tracking-widest">
             <Calendar className="h-4 w-4" />
             Date
           </Button>

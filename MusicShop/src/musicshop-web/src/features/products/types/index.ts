@@ -4,6 +4,11 @@ export enum ReleaseFormat {
   Cassette = 'Cassette'
 }
 
+export interface Artist {
+  id: string;
+  name: string;
+}
+
 export interface Product {
   id: string;
   slug: string;
@@ -47,6 +52,7 @@ export interface CassetteAttributes {
 }
 
 export interface ProductDetail extends Product {
+  artist: Artist;
   vinylAttributes?: VinylAttributes;
   cdAttributes?: CdAttributes;
   cassetteAttributes?: CassetteAttributes;

@@ -5,7 +5,6 @@ import { AuthLayout } from '@/layouts/AuthLayout';
 import HomePage from '@/pages/shop/HomePage';
 import ProductListPage from '@/pages/shop/ProductListPage';
 import ProfilePage from '@/pages/shop/ProfilePage';
-import TermsPage from '@/pages/shop/TermsPage';
 import ProductDetailPage from '@/pages/shop/ProductDetailPage';
 import OrderHistoryPage from '@/pages/shop/OrderHistoryPage';
 import { CheckoutPage } from '@/pages/shop/CheckoutPage';
@@ -60,7 +59,6 @@ export default function App() {
           <Route path="/profile" element={accessToken ? <ProfilePage /> : <Navigate to="/login" />} />
           <Route path="/orders" element={accessToken ? <OrderHistoryPage /> : <Navigate to="/login" />} />
           <Route path="/orders/:id" element={accessToken ? <OrderHistoryPage /> : <Navigate to="/login" />} />
-          <Route path="/terms" element={<TermsPage />} />
         </Route>
 
         {/* Auth Routes */}

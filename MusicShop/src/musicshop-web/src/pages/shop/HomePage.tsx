@@ -5,7 +5,7 @@ import { buttonVariants } from '@/shared/components';
 import { ShoppingBag } from 'lucide-react';
 import { cn } from '@/shared/lib/utils';
 import { FeaturedCollections } from '@/features/curation/components/storefront/FeaturedCollections';
-import { MusicHeroScene } from '@/widgets/home/ui/MusicHeroScene';
+import { MusicHeroScene } from '@/features/threejs';
 
 export default function HomePage() {
   const accessToken = useAuthStore((state) => state.accessToken);

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { ShoppingBag, Clock, Truck, AlertCircle, CheckCircle2, X } from 'lucide-react';
 import { OrderListItem, OrderStatus } from '../types';
@@ -15,19 +15,32 @@ const statusStyles: Record<OrderStatus, { color: string, icon: any }> = {
 export function useOrderManagement() {
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const { data, isLoading, error } = useQuery({
     queryKey: ['admin', 'orders', statusFilter],
     queryFn: () => orderService.getAdminOrders({ status: statusFilter, page: 1, limit: 50 }),
   });
 
-  const orders = data?.items ?? [];
+  const allOrders = data?.items ?? [];
+
+  // Client-side search filtering
+  const orders = useMemo(() => {
+    if (!searchTerm) return allOrders;
+    
+    const query = searchTerm.toLowerCase();
+    return allOrders.filter(order => 
+      order.id.toLowerCase().includes(query) ||
+      order.recipientName.toLowerCase().includes(query) ||
+      order.email.toLowerCase().includes(query)
+    );
+  }, [allOrders, searchTerm]);
 
   const stats = [
-    { label: 'Pending Orders', value: orders.filter(o => o.status === OrderStatus.Pending).length.toString(), icon: Clock, color: 'text-amber-500', bg: 'bg-amber-50' },
-    { label: 'To Ship', value: orders.filter(o => o.status === OrderStatus.Confirmed).length.toString(), icon: Truck, color: 'text-purple-500', bg: 'bg-purple-50' },
-    { label: 'Processing', value: orders.filter(o => o.status === OrderStatus.Shipped).length.toString(), icon: AlertCircle, color: 'text-blue-500', bg: 'bg-blue-50' },
-    { label: 'Total Sales', value: `$${orders.reduce((acc, o) => acc + o.totalAmount, 0).toLocaleString()}`, icon: ShoppingBag, color: 'text-primary', bg: 'bg-primary/10' },
+    { label: 'Pending Orders', value: allOrders.filter(o => o.status === OrderStatus.Pending).length.toString(), icon: Clock, color: 'text-amber-500', bg: 'bg-amber-50' },
+    { label: 'To Ship', value: allOrders.filter(o => o.status === OrderStatus.Confirmed).length.toString(), icon: Truck, color: 'text-purple-500', bg: 'bg-purple-50' },
+    { label: 'Processing', value: allOrders.filter(o => o.status === OrderStatus.Shipped).length.toString(), icon: AlertCircle, color: 'text-blue-500', bg: 'bg-blue-50' },
+    { label: 'Total Sales', value: `$${allOrders.reduce((acc, o) => acc + o.totalAmount, 0).toLocaleString()}`, icon: ShoppingBag, color: 'text-primary', bg: 'bg-primary/10' },
   ];
 
   return {
@@ -38,10 +51,12 @@ export function useOrderManagement() {
     statusStyles,
     selectedOrderId,
     statusFilter,
+    searchTerm,
     actions: {
       openDetails: (order: OrderListItem) => setSelectedOrderId(order.id),
       closeDetails: () => setSelectedOrderId(null),
-      setStatusFilter
+      setStatusFilter,
+      setSearchTerm
     }
   };
 }
