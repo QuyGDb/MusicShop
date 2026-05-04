@@ -13,6 +13,7 @@ export default defineConfig({
   assetsInclude: ['**/*.glb', '**/*.gltf'],
   server: {
     port: 3000,
+    host: true,
     headers: {
       'Cross-Origin-Opener-Policy': 'same-origin-allow-popups',
     }

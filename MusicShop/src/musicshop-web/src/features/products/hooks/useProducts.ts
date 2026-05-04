@@ -50,6 +50,14 @@ export function useProduct(slug: string) {
   });
 }
 
+export function useProductId(id: string) {
+  return useQuery({
+    queryKey: ['products', 'id', id],
+    queryFn: () => productService.getProductById(id),
+    enabled: !!id,
+  });
+}
+
 export function useAdminProduct(id: string) {
   return useQuery({
     queryKey: ['products', 'admin', id],

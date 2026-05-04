@@ -40,7 +40,7 @@ export const productService = {
   },
 
   getProductById: async (id: string): Promise<ProductDetail> => {
-    const response = await http.get<ApiResponse<ProductDetail>>(`/Products/admin/${id}`);
+    const response = await http.get<ApiResponse<ProductDetail>>(`/Products/${id}`);
     if (!response.data) throw new Error('Product not found');
     return response.data;
   },

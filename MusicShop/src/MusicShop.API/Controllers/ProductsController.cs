@@ -38,8 +38,7 @@ public sealed class ProductsController(IMediator mediator) : BaseApiController
         return HandleResult(result);
     }
 
-    [Authorize(Roles = "Admin")]
-    [HttpGet("admin/{id:guid}")]
+    [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ApiResponse<ProductDetailDto>>> GetProductById(
         Guid id,

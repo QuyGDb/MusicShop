@@ -36,6 +36,7 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins(
                 "http://localhost:3000",
+                "http://192.168.1.5:3000",
                 "https://catmusicshop.duckdns.org"
             )
               .AllowAnyMethod()

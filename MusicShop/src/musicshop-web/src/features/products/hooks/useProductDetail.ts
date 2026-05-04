@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { useProduct } from './useProducts';
+import { useProduct, useProductId } from './useProducts';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useCartMutations } from '@/features/cart/hooks/useCartMutations';
 import { useCartUIStore } from '@/features/cart/store/useCartUIStore';
@@ -19,7 +19,16 @@ interface UseProductDetailReturn {
 
 export function useProductDetail({ slug }: UseProductDetailProps): UseProductDetailReturn {
   const navigate = useNavigate();
-  const { data: product, isLoading, error } = useProduct(slug);
+  
+  const isGuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(slug);
+  
+  // Call both hooks but only enable the relevant one
+  const slugQuery = useProduct(!isGuid ? slug : '');
+  const idQuery = useProductId(isGuid ? slug : '');
+  
+  const product = isGuid ? idQuery.data : slugQuery.data;
+  const isLoading = isGuid ? idQuery.isLoading : slugQuery.isLoading;
+  const error = isGuid ? idQuery.error : slugQuery.error;
   const isAuthenticated = useAuthStore((state) => !!state.accessToken);
   const { addToCart } = useCartMutations();
   const openCart = useCartUIStore((state) => state.openCart);

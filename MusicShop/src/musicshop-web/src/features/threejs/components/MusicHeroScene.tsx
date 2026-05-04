@@ -14,6 +14,16 @@ export function MusicHeroScene() {
   const cameraRef = useRef<any>(null);
   const controlsRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isMobile, setIsMobile] = React.useState(false);
+
+  React.useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   React.useEffect(() => {
     const handleWheelGlobal = (event: WheelEvent) => {
@@ -47,14 +57,14 @@ export function MusicHeroScene() {
   return (
     <div
       ref={containerRef}
-      style={{ width: '100%', height: '100vh', background: '#09090b' }}
+      className="w-full h-full bg-[#09090b]"
     >
       <Canvas shadows dpr={[1, 2]}>
         <PerspectiveCamera
           ref={cameraRef}
           makeDefault
-          position={[0.08, 8.68, -63.56]}
-          fov={45}
+          position={isMobile ? [0.08, 10.0, -75.0] : [0.08, 8.68, -63.56]}
+          fov={isMobile ? 55 : 45}
         />
 
         <Sky
@@ -97,9 +107,9 @@ export function MusicHeroScene() {
         <HeroText
           fontUrl={fontUrl}
           text={heroText}
-          position={[0.6, 2.1, -15.0]}
+          position={isMobile ? [0.6, 2.5, -15.0] : [0.6, 2.1, -15.0]}
           rotation={[0, -3.2, 0]}
-          scale={1.03}
+          scale={isMobile ? 0.7 : 1.03}
         />
 
         <ArtistFloatingImages />

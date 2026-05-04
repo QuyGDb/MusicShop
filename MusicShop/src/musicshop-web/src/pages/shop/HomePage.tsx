@@ -15,9 +15,9 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Immersive 3D Hero Section */}
-      <div className="flex flex-row w-full h-screen overflow-hidden bg-[#09090b]">
-        {/* Left Column: 3D Scene */}
-        <div className="flex-1 h-full relative">
+      <div className="flex flex-col lg:flex-row w-full h-screen overflow-hidden bg-[#09090b]">
+        {/* Main Column: 3D Scene */}
+        <div className="flex-1 h-[60vh] lg:h-full relative">
           <MusicHeroScene />
         </div>
 
