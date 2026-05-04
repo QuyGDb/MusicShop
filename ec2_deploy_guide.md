@@ -54,7 +54,7 @@ This guide covers **Docker Compose on EC2** — the fastest path given your exis
 
 | Setting | Value |
 |---------|-------|
-| **Name** | `musicshop-prod` |
+| **Name** | `catmusicshop-prod` |
 | **AMI** | Ubuntu Server 24.04 LTS (HVM, SSD) |
 | **Instance type** | `t3.small` (2 vCPU, 2 GB RAM) — minimum for .NET + PG + Node build |
 | **Key pair** | Create new or select existing `.pem` key |
@@ -146,22 +146,22 @@ cd CatMusicShop/MusicShop
 scp -i your-key.pem -r D:\CatMusicShop\MusicShop ubuntu@<ELASTIC-IP>:~/MusicShop
 ```
 
-### 3.2 Create Production `.env`
+### 3.2 Create `.env`
 
 ```bash
 cd ~/CatMusicShop/MusicShop   # or ~/MusicShop depending on method
-nano .env.production
+nano .env
 ```
 
 ```env
 # Database
-POSTGRES_USER=musicshop_user
+POSTGRES_USER=catmusicshop_user
 POSTGRES_PASSWORD=<GENERATE-STRONG-PASSWORD-HERE>
-POSTGRES_DB=MusicShopDb
+POSTGRES_DB=CatMusicShopDb
 
 # API Configuration
 ASPNETCORE_ENVIRONMENT=Production
-DB_CONNECTION_STRING=Host=postgres;Database=MusicShopDb;Username=musicshop_user;Password=<SAME-STRONG-PASSWORD>
+DB_CONNECTION_STRING=Host=postgres;Database=CatMusicShopDb;Username=catmusicshop_user;Password=<SAME-STRONG-PASSWORD>
 
 # JWT Settings (MUST be unique, 64+ chars for production)
 JWT_SECRET=<GENERATE-64-CHAR-RANDOM-STRING>
@@ -190,7 +190,7 @@ EMAIL_FROM=MusicShop
 > [!CAUTION]
 > Generate the JWT secret with: `openssl rand -base64 64`
 > Generate the DB password with: `openssl rand -base64 32`
-> Never commit `.env.production` to Git.
+> Never commit `.env` to Git.
 
 ### 3.3 Update `docker-compose.yml` for Production
 
@@ -204,7 +204,7 @@ nano docker-compose.prod.yml
 services:
   postgres:
     image: ankane/pgvector:latest
-    container_name: musicshop-db
+    container_name: catmusicshop-db
     restart: always
     ports:
       - "127.0.0.1:5432:5432"      # Bind to localhost only
@@ -215,18 +215,18 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - musicshop-network
+      - catmusicshop-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  musicshop-api:
+  catmusicshop-api:
     build:
       context: ./src
       dockerfile: MusicShop.API/Dockerfile
-    container_name: musicshop-api
+    container_name: catmusicshop-api
     restart: always
     ports:
       - "127.0.0.1:5000:8080"      # Bind to localhost only
@@ -252,28 +252,28 @@ services:
       postgres:
         condition: service_healthy
     networks:
-      - musicshop-network
+      - catmusicshop-network
 
-  musicshop-web:
+  catmusicshop-web:
     build:
       context: ./src/musicshop-web
       dockerfile: Dockerfile
       args:
         - VITE_API_URL=https://yourdomain.com/api/v1
-    container_name: musicshop-web
+    container_name: catmusicshop-web
     restart: always
     ports:
       - "127.0.0.1:3000:80"        # Bind to localhost only
     depends_on:
-      - musicshop-api
+      - catmusicshop-api
     networks:
-      - musicshop-network
+      - catmusicshop-network
 
 volumes:
   postgres_data:
 
 networks:
-  musicshop-network:
+  catmusicshop-network:
     driver: bridge
 ```
 
@@ -287,16 +287,16 @@ Key production changes vs your current `docker-compose.yml`:
 ### 3.4 Build & Start
 
 ```bash
-# Use production env file and compose
-docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build
+# Use compose
+docker compose -f docker-compose.prod.yml up -d --build
 
 # Verify all containers are running
 docker compose -f docker-compose.prod.yml ps
 
 # Check logs
-docker logs musicshop-api --tail 50
-docker logs musicshop-db --tail 20
-docker logs musicshop-web --tail 20
+docker logs catmusicshop-api --tail 50
+docker logs catmusicshop-db --tail 20
+docker logs catmusicshop-web --tail 20
 ```
 
 ---
@@ -496,7 +496,7 @@ VITE_API_URL=https://yourdomain.com/api/v1
 ## Phase 6: Production Checklist
 
 ### Security
-- [ ] `.env.production` not committed to Git (add to `.gitignore`)
+- [ ] `.env` not committed to Git (add to `.gitignore`)
 - [ ] Strong JWT secret (64+ chars, generated randomly)
 - [ ] Strong PostgreSQL password
 - [ ] SSH restricted to your IP in Security Group
@@ -512,7 +512,7 @@ VITE_API_URL=https://yourdomain.com/api/v1
 - [ ] Database backups configured (see below)
 
 ### Monitoring
-- [ ] Application logs visible via `docker logs musicshop-api`
+- [ ] Application logs visible via `docker logs catmusicshop-api`
 - [ ] Set up AWS CloudWatch agent (optional)
 - [ ] Set up AWS Budget alarm to avoid surprise charges
 
@@ -529,7 +529,7 @@ cd ~/CatMusicShop/MusicShop
 git pull origin main
 
 # Rebuild and restart
-docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml up -d --build
 
 # Check status
 docker compose -f docker-compose.prod.yml ps
@@ -539,10 +539,10 @@ docker compose -f docker-compose.prod.yml ps
 
 ```bash
 # Manual backup
-docker exec musicshop-db pg_dump -U musicshop_user MusicShopDb > backup_$(date +%Y%m%d_%H%M%S).sql
+docker exec musicshop-db pg_dump -U catmusicshop_user CatMusicShopDb > backup_$(date +%Y%m%d_%H%M%S).sql
 
 # Restore
-cat backup_20260503.sql | docker exec -i musicshop-db psql -U musicshop_user MusicShopDb
+cat backup_20260503.sql | docker exec -i musicshop-db psql -U catmusicshop_user CatMusicShopDb
 ```
 
 ### Automated Daily Backup (cron)
@@ -553,11 +553,11 @@ mkdir -p ~/backups
 cat << 'EOF' > ~/backup-db.sh
 #!/bin/bash
 BACKUP_DIR=~/backups
-FILENAME="musicshopdb_$(date +%Y%m%d_%H%M%S).sql.gz"
-docker exec musicshop-db pg_dump -U musicshop_user MusicShopDb | gzip > "$BACKUP_DIR/$FILENAME"
+FILENAME="CatMusicShopDb_$(date +%Y%m%d_%H%M%S).sql.gz"
+docker exec musicshop-db pg_dump -U catmusicshop_user CatMusicShopDb | gzip > "$BACKUP_DIR/$FILENAME"
 
 # Keep only last 7 days
-find "$BACKUP_DIR" -name "musicshopdb_*.sql.gz" -mtime +7 -delete
+find "$BACKUP_DIR" -name "CatMusicShopDb_*.sql.gz" -mtime +7 -delete
 echo "Backup created: $FILENAME"
 EOF
 
@@ -574,8 +574,8 @@ chmod +x ~/backup-db.sh
 docker compose -f docker-compose.prod.yml logs --tail 100
 
 # Specific service
-docker logs musicshop-api --tail 50 -f     # follow mode
-docker logs musicshop-db --tail 50
+docker logs catmusicshop-api --tail 50 -f     # follow mode
+docker logs catmusicshop-db --tail 50
 
 # Nginx (host)
 sudo tail -f /var/log/nginx/access.log
@@ -589,10 +589,10 @@ sudo tail -f /var/log/nginx/error.log
 docker compose -f docker-compose.prod.yml restart
 
 # Restart single service
-docker compose -f docker-compose.prod.yml restart musicshop-api
+docker compose -f docker-compose.prod.yml restart catmusicshop-api
 
 # Full rebuild (after code changes)
-docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build --force-recreate
+docker compose -f docker-compose.prod.yml up -d --build --force-recreate
 ```
 
 ---
@@ -621,7 +621,7 @@ jobs:
           script: |
             cd ~/CatMusicShop/MusicShop
             git pull origin main
-            docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build
+            docker compose -f docker-compose.prod.yml up -d --build
             docker image prune -f
 ```
 
@@ -646,14 +646,14 @@ ssh -i key.pem ubuntu@<IP>
 git clone https://github.com/<user>/CatMusicShop.git
 cd CatMusicShop/MusicShop
 
-# 4. Create .env.production
+# 4. Create .env
 # (see Phase 3.2)
 
 # 5. Create docker-compose.prod.yml
 # (see Phase 3.3)
 
 # 6. Build & run
-docker compose --env-file .env.production -f docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml up -d --build
 
 # 7. Install Nginx + SSL
 # (see Phase 4)

@@ -1,0 +1,77 @@
+services:
+  postgres:
+    image: ankane/pgvector:latest
+    container_name: catmusicshop-db
+    restart: always
+    ports:
+      - "127.0.0.1:5432:5432" # Bind to localhost only — not publicly accessible
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - catmusicshop-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  catmusicshop-api:
+    build:
+      context: ./src
+      dockerfile: MusicShop.API/Dockerfile
+    container_name: catmusicshop-api
+    restart: always
+    ports:
+      - "127.0.0.1:5000:8080" # Bind to localhost only — Nginx proxies externally
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING}
+      - AWS__BucketName=${AWS__BucketName}
+      - AWS__Region=${AWS__Region}
+      - AWS__CdnBaseUrl=${AWS__CdnBaseUrl}
+      - AWS__AccessKey=${AWS__AccessKey}
+      - AWS__SecretKey=${AWS__SecretKey}
+      - JwtSettings__Secret=${JWT_SECRET}
+      - JwtSettings__Issuer=${JWT_ISSUER}
+      - JwtSettings__Audience=${JWT_AUDIENCE}
+      - GoogleSettings__ClientId=${GOOGLE_CLIENT_ID}
+      - EmailSettings__Email=${EMAIL_USER}
+      - EmailSettings__Password=${EMAIL_PASS}
+      - EmailSettings__Host=${EMAIL_HOST}
+      - EmailSettings__Port=${EMAIL_PORT}
+      - EmailSettings__FromName=${EMAIL_FROM}
+      - Stripe__SecretKey=${STRIPE_SECRET_KEY}
+      - Stripe__PublishableKey=${STRIPE_PUBLISHABLE_KEY}
+      - Stripe__WebhookSecret=${STRIPE_WEBHOOK_SECRET}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - catmusicshop-network
+
+  catmusicshop-web:
+    build:
+      context: ./src/musicshop-web
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=https://yourdomain.com/api/v1 # REPLACE with your actual domain
+    container_name: catmusicshop-web
+    restart: always
+    ports:
+      - "127.0.0.1:3000:80" # Bind to localhost only — Nginx proxies externally
+    depends_on:
+      - catmusicshop-api
+    networks:
+      - catmusicshop-network
+
+volumes:
+  postgres_data:
+
+networks:
+  catmusicshop-network:
+    driver: bridge
