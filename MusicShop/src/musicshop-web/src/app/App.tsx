@@ -14,6 +14,7 @@ import LoginPage from '@/pages/auth/LoginPage';
 import RegisterPage from '@/pages/auth/RegisterPage';
 import { AdminLayout } from '@/layouts/AdminLayout';
 import { AdminRoute } from '@/features/auth/components/AdminRoute';
+import { ProtectedRoute } from '@/features/auth/components/ProtectedRoute';
 import ArtistManagementPage from '@/pages/admin/ArtistManagementPage';
 import LabelManagementPage from '@/pages/admin/LabelManagementPage';
 import GenreManagementPage from '@/pages/admin/GenreManagementPage';
@@ -48,17 +49,21 @@ export default function App() {
     <>
       <Toaster position="top-right" richColors closeButton />
       <Routes>
-        {/* Shop Routes */}
+        {/* Shop Routes — public */}
         <Route element={<ShopLayout />}>
           <Route path="/" element={<HomePage />} />
           <Route path="/products" element={<ProductListPage />} />
           <Route path="/products/:slug" element={<ProductDetailPage />} />
-          <Route path="/checkout" element={accessToken ? <CheckoutPage /> : <Navigate to="/login" />} />
           <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
           <Route path="/checkout/cancel" element={<CheckoutCancelPage />} />
-          <Route path="/profile" element={accessToken ? <ProfilePage /> : <Navigate to="/login" />} />
-          <Route path="/orders" element={accessToken ? <OrderHistoryPage /> : <Navigate to="/login" />} />
-          <Route path="/orders/:id" element={accessToken ? <OrderHistoryPage /> : <Navigate to="/login" />} />
+
+          {/* Shop Routes — authenticated */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/orders" element={<OrderHistoryPage />} />
+            <Route path="/orders/:id" element={<OrderHistoryPage />} />
+          </Route>
         </Route>
 
         {/* Auth Routes */}
@@ -68,18 +73,19 @@ export default function App() {
         </Route>
 
         {/* Admin Routes */}
-        <Route path="/admin" element={<AdminRoute><AdminLayout /></AdminRoute>}>
-          <Route index element={<Navigate to="orders" replace />} />
-          <Route path="artists" element={<ArtistManagementPage />} />
-          <Route path="labels" element={<LabelManagementPage />} />
-          <Route path="genres" element={<GenreManagementPage />} />
-          <Route path="releases" element={<ReleaseManagementPage />} />
-          <Route path="products" element={<ProductManagementPage />} />
-          <Route path="orders" element={<OrderManagementPage />} />
+        <Route element={<AdminRoute />}>
+          <Route path="/admin" element={<AdminLayout />}>
+            <Route index element={<Navigate to="orders" replace />} />
+            <Route path="artists" element={<ArtistManagementPage />} />
+            <Route path="labels" element={<LabelManagementPage />} />
+            <Route path="genres" element={<GenreManagementPage />} />
+            <Route path="releases" element={<ReleaseManagementPage />} />
+            <Route path="products" element={<ProductManagementPage />} />
+            <Route path="orders" element={<OrderManagementPage />} />
 
-          <Route path="collections" element={<CollectionManagementPage />} />
-          <Route path="products/:id" element={<ProductAdminDetailsPage />} />
-          {/* Future admin sub-routes will go here */}
+            <Route path="collections" element={<CollectionManagementPage />} />
+            <Route path="products/:id" element={<ProductAdminDetailsPage />} />
+          </Route>
         </Route>
 
         {/* Fallback */}
