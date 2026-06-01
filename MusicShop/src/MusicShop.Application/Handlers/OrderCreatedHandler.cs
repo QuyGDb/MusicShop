@@ -1,5 +1,4 @@
 using MediatR;
-using Microsoft.Extensions.Logging;
 using MusicShop.Application.Common.Interfaces.Repositories;
 using MusicShop.Application.Common.Interfaces.Services;
 using MusicShop.Application.Events;
@@ -10,20 +9,13 @@ namespace MusicShop.Application.Handlers;
 
 public sealed class OrderCreatedHandler(
     IOrderRepository orderRepository,
-    IEmailService emailService,
-    ILogger<OrderCreatedHandler> logger) : INotificationHandler<OrderCreatedEvent>
+    IEmailService emailService) : INotificationHandler<OrderCreatedEvent>
 {
     public async Task Handle(OrderCreatedEvent notification, CancellationToken ct)
     {
-        logger.LogInformation("Processing OrderCreatedEvent for Order {OrderId}", notification.OrderId);
-
         Order? order = await orderRepository.GetByIdWithDetailsAsync(notification.OrderId, ct);
         
-        if (order == null)
-        {
-            logger.LogWarning("Order {OrderId} not found while processing OrderCreatedEvent.", notification.OrderId);
-            return;
-        }
+        if (order == null)  return;
 
         string subject = $"Order Confirmation - #{order.Id.ToString().ToUpper()[..8]}";
         
@@ -64,7 +56,7 @@ public sealed class OrderCreatedHandler(
                     <p style='margin-bottom: 0; font-size: 14px;'>
                         {order.ShippingAddress}<br/>
                         Phone: {order.Phone}
-                    </p>
+                     </p>
                 </div>
 
                 <hr style='border: 0; border-top: 1px solid #eee; margin: 30px 0;' />
@@ -74,16 +66,7 @@ public sealed class OrderCreatedHandler(
                 </p>
             </div>";
 
-        try
-        {
-            await emailService.SendEmailAsync(order.Email, subject, body);
-            logger.LogInformation("Order confirmation email sent successfully for Order {OrderId}", order.Id);
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to send order confirmation email for Order {OrderId}", order.Id);
-            throw; // Rethrow to trigger Hangfire retry
-        }
+        await emailService.SendEmailAsync(order.Email, subject, body);
     }
 }
 

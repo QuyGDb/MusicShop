@@ -102,7 +102,7 @@ public sealed class CreateOrderCommandHandler(
         OutboxMessage outbox = new()
         {
             Id = Guid.NewGuid(),
-            EventType = MessageTypes.Orders.Created,
+            EventType = EventType.Orders.Created,
             Payload = JsonSerializer.Serialize(new OrderCreatedEvent
             {
                 OrderId = order.Id,

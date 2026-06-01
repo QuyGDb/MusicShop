@@ -33,7 +33,7 @@ public sealed class OutboxProcessor(
 
         object? notification = message.EventType switch
         {
-            MessageTypes.Orders.Created => JsonSerializer.Deserialize<OrderCreatedEvent>(message.Payload),
+            EventType.Orders.Created => JsonSerializer.Deserialize<OrderCreatedEvent>(message.Payload),
             _ => null
         };
 
